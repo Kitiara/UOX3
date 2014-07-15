@@ -33,6 +33,10 @@
 #include "Dictionary.h"
 #include "ObjectFactory.h"
 
+#if ACT_SQL == 1
+#include "SQLManager.h"
+#endif
+
 namespace UOX
 {
 
@@ -578,6 +582,9 @@ void CWorldMain::SaveNewWorld( bool x )
 		Console << "Saving Misc. data... ";
 		ServerData()->save();
 		Console.Log( "Server data save", "server.log" );
+#if ACT_SQL == 1
+		SQLManager::getSingleton().BeginTransaction();
+#endif
 		RegionSave();
 		Console.PrintDone();
 		MapRegion->Save(); 
@@ -585,16 +592,23 @@ void CWorldMain::SaveNewWorld( bool x )
 		JailSys->WriteData();
 		Effects->SaveEffects();
 		ServerData()->SaveTime();
-		SaveStatistics();
-
+#if ACT_SQL == 1
+		SQLManager::getSingleton().FinaliseTransaction(true);
+#else
+		SaveStatistics(); // No need, we have sql functionalities when (ACT_SQL != 1)
+#endif
 		if( ServerData()->ServerAnnounceSavesStatus() )
 			sysBroadcast( "World Save Complete." );
 
 		//	If accounts are to be loaded then they should be loaded
 		//	all the time if using the web interface
 		Accounts->Save();
+#if ACT_SQL == 1
+		Accounts->Load();
+#else
 		// Make sure to import the new accounts so they have access too.
 		Console << "New accounts processed: " << Accounts->ImportAccounts() << myendl;
+#endif
 		SetWorldSaveProgress( SS_JUSTSAVED );
 		Console << "World save complete." << myendl;
 		Console.PrintSectionBegin();
@@ -613,6 +627,7 @@ void CWorldMain::SaveNewWorld( bool x )
 //o--------------------------------------------------------------------------o	
 void CWorldMain::RegionSave( void )
 {
+#if ACT_SQL == 0
 	std::string regionsFile	= cwmWorldState->ServerData()->Directory( CSDDP_SHARED ) + "regions.wsc";
 	std::ofstream regionsDestination( regionsFile.c_str() );
 	if( !regionsDestination ) 
@@ -620,16 +635,35 @@ void CWorldMain::RegionSave( void )
 		Console.Error( "Failed to open %s for writing", regionsFile.c_str() );
 		return;
 	}
-	TOWNMAP_CITERATOR tIter	= cwmWorldState->townRegions.begin();
-	TOWNMAP_CITERATOR tEnd	= cwmWorldState->townRegions.end();
-	while( tIter != tEnd )
-	{
-		CTownRegion *myReg = tIter->second;
-		if( myReg != NULL )
-			myReg->Save( regionsDestination );
-		++tIter;
-	}
+
+	for(TOWNMAP_CITERATOR tIter = cwmWorldState->townRegions.begin(); tIter != cwmWorldState->townRegions.end(); ++tIter)
+		if( tIter->second != NULL )
+			tIter->second->Save( regionsDestination );
+
 	regionsDestination.close();
+#else
+	UString uStr = "DELETE FROM regions";
+	bool Started = false;
+	for (TOWNMAP_CITERATOR tIter = cwmWorldState->townRegions.begin(); tIter != cwmWorldState->townRegions.end(); ++tIter)
+		if (tIter->second != NULL)
+		{
+			if (Started)
+				uStr += ",";
+			else
+			{
+				uStr += "\nINSERT INTO regions VALUES ";
+				Started = true;
+			}
+
+			uStr += tIter->second->Save();
+		}
+
+	std::istringstream iss;
+	iss.str(uStr);
+	uStr.clear();
+	while (std::getline(iss, uStr))
+		SQLManager::getSingleton().ExecuteQuery(uStr);
+#endif
 }
 
 CServerData *CWorldMain::ServerData( void )

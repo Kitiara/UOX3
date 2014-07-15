@@ -511,6 +511,9 @@ bool cMovement::VerifySequence( CChar *c, CSocket *mSock, SI16 sequence )
 {
     if( mSock != NULL )
     {
+		if (sequence == mSock->WalkSequence())
+			++sequence;
+
         if( mSock->WalkSequence() + 1 != sequence && sequence != 256 )
         {
             deny( mSock, c, sequence );  
@@ -554,9 +557,7 @@ bool cMovement::CheckForRunning( CChar *c, UI08 dir )
 				c->SetTimer( tCHAR_TIMEOUT, BuildTimeValue( 2 ) );
 	}
 	else
-	{
 		c->SetRunning( 0 );
-	}
 	return true;
 }
 

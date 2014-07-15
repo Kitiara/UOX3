@@ -12,8 +12,9 @@
 //o--------------------------------------------------------------------------o
 #include "uox3.h"
 #include "cVersionClass.h"
-#if P_ODBC == 1
-#include "ODBCManager.h"
+#if ACT_SQL == 1
+#include "SQLManager.h"
+#include <openssl\sha.h>
 #endif
 
 namespace UOX
@@ -674,11 +675,32 @@ UI16 cAccountClass::AddAccount(std::string sUsername, std::string sPassword, std
 	actbTemp.wFlags		= wAttributes;
 	actbTemp.wTimeBan	= 0;
 	actbTemp.dwLastIP	= 0;
-	for( UI08 ii = 0; ii < CHARACTERCOUNT; ++ii )
+	for(UI08 i = 0; i < CHARACTERCOUNT; ++i)
 	{
-		actbTemp.lpCharacters[ii] = NULL;
-		actbTemp.dwCharacters[ii] = INVALIDSERIAL;
+		actbTemp.lpCharacters[i] = NULL;
+		actbTemp.dwCharacters[i] = INVALIDSERIAL;
 	}
+
+#if ACT_SQL == 1
+    unsigned char digest[SHA_DIGEST_LENGTH];
+    SHA_CTX ctx;
+    SHA1_Init(&ctx);
+    SHA1_Update(&ctx, (sUsername+":"+sPassword).c_str(), strlen((sUsername+":"+sPassword).c_str()));
+    SHA1_Final(digest, &ctx);
+ 
+    char sha1hash[SHA_DIGEST_LENGTH*2+1];
+    for (int i = 0; i < SHA_DIGEST_LENGTH; i++)
+        sprintf(&sha1hash[i*2], "%02x", (unsigned int)digest[i]);
+
+	std::stringstream sql;
+	sql << "INSERT INTO accounts (id, username, sha_pass_hash, email, flags, last_ip) VALUES ('";
+	sql << m_wHighestAccount+1 << sUsername << "', '" << sha1hash << "', '" << sContact << "', '" << actbTemp.wFlags.to_ulong() << "', '";
+	sql << (int)((actbTemp.dwLastIP&0xFF000000)>>24) << "." << (int)((actbTemp.dwLastIP&0x00FF0000)>>16) << ".";
+	sql << (int)((actbTemp.dwLastIP&0x0000FF00)>>8) << "." << (int)((actbTemp.dwLastIP&0x000000FF)%256) << "')";
+
+	SQLManager::getSingleton().ExecuteQuery(sql.str(), NULL, false);
+	SQLManager::getSingleton().QueryRelease(false);
+#else
 	// Ok we have everything except the path to the account dir, so make that now
 	std::string sTempPath( m_sAccountsDirectory );
 	if( sTempPath[sTempPath.length()-1]=='\\'||sTempPath[sTempPath.length()-1]=='/' )
@@ -750,7 +772,7 @@ UI16 cAccountClass::AddAccount(std::string sUsername, std::string sPassword, std
 	fsAccountsUAD << "CONTACT " << actbTemp.sContact << "\n";
 	fsAccountsUAD << "//------------------------------------------------------------------------------\n";
 	// Ok write out the characters and the charcter names if we know them
-	for( UI08 i = 0; i < CHARACTERCOUNT; ++i )
+	for(UI08 i = 0; i < CHARACTERCOUNT; ++i)
 	{
 		fsAccountsUAD << "CHARACTER-" << (i+1) << " 0x" << std::hex << (actbTemp.dwCharacters[i] != INVALIDSERIAL ? actbTemp.dwCharacters[i]:INVALIDSERIAL) << " [" << (char*)(actbTemp.lpCharacters[i] != NULL ? actbTemp.lpCharacters[i]->GetName().c_str() : "INVALID" ) << "]\n"; 
 	}
@@ -771,10 +793,11 @@ UI16 cAccountClass::AddAccount(std::string sUsername, std::string sPassword, std
 	}
 	WriteAccountSection( actbTemp, fsAccountsADM );
 	fsAccountsADM.close();
+	m_wHighestAccount=actbTemp.wAccountIndex;
+#endif
 	// Ok might be a good thing to add this account to the map(s) now.
 	m_mapUsernameIDMap[actbTemp.wAccountIndex]=actbTemp;
 	m_mapUsernameMap[actbTemp.sUsername]=&m_mapUsernameIDMap[actbTemp.wAccountIndex];
-	m_wHighestAccount=actbTemp.wAccountIndex;
 	// Return to the calling function
 	return (UI16)m_mapUsernameIDMap.size();
 }
@@ -839,209 +862,128 @@ size_t cAccountClass::size()
 //o--------------------------------------------------------------------------o
 //| Modifications	-	
 //o--------------------------------------------------------------------------o
-#if P_ODBC == 1
-bool cAccountClass::FinaliseBlock( CAccountBlock& toFinalise )
+#if ACT_SQL == 1
+bool cAccountClass::FinaliseBlock(CAccountBlock& toFinalise)
 {
-	for( int y = 0; y < CHARACTERCOUNT; ++y )
+	for(int i = 0; i < CHARACTERCOUNT; ++i)
 	{
-		if( toFinalise.dwCharacters[y] != INVALIDSERIAL )
+		if(toFinalise.dwCharacters[i] != INVALIDSERIAL)
 		{
-			toFinalise.lpCharacters[y] = calcCharObjFromSer( toFinalise.dwCharacters[y] );
-			if( toFinalise.lpCharacters[y] != NULL )
-				toFinalise.lpCharacters[y]->SetAccount( toFinalise );
+			toFinalise.lpCharacters[i] = calcCharObjFromSer(toFinalise.dwCharacters[i]);
+			if(toFinalise.lpCharacters[i] != NULL)
+				toFinalise.lpCharacters[i]->SetAccount(toFinalise);
 		}
 	}
-	m_mapUsernameIDMap[toFinalise.wAccountIndex]	= toFinalise;
-	m_mapUsernameMap[toFinalise.sUsername]			= &m_mapUsernameIDMap[toFinalise.wAccountIndex];
+	m_mapUsernameIDMap[toFinalise.wAccountIndex] = toFinalise;
+	m_mapUsernameMap[toFinalise.sUsername] = &m_mapUsernameIDMap[toFinalise.wAccountIndex];
 	return true;
 }
-bool cAccountClass::SaveToDB( UI16& numSaved )
-{
-	bool rvalue = true;
-	numSaved	= 0;
 
-	ODBCManager::getSingleton().BeginTransaction();
-	for( MAPUSERNAMEID_CITERATOR i = m_mapUsernameIDMap.begin(); i != m_mapUsernameIDMap.end(); ++i )
-	{
-		const CAccountBlock *curr = &(i->second);
-		if( curr->dbRetrieved )
-		{	// From DB, so UPDATE
-			std::string uSQL = "UPDATE Account SET";
-			uSQL			+= " Password = '" + curr->sPassword + "'";
-			uSQL			+= ", ContactDetails = '" + curr->sContact + "'";
-			uSQL			+= ", IsBanned = ";
-			uSQL			+= (curr->wFlags.test( AB_FLAGS_BANNED )?"1":"0");
-			uSQL			+= ", IsSuspended = ";
-			uSQL			+= (curr->wFlags.test( AB_FLAGS_SUSPENDED )?"1":"0");
-			uSQL			+= ", IsPublic = ";
-			uSQL			+= (curr->wFlags.test( AB_FLAGS_PUBLIC )?"1":"0");
-			uSQL			+= ", IsOnline = ";
-			uSQL			+= (curr->wFlags.test( AB_FLAGS_ONLINE )?"1":"0");
-			uSQL			+= ", IsSeer = ";
-			uSQL			+= (curr->wFlags.test( AB_FLAGS_SEER )?"1":"0");
-			uSQL			+= ", IsCounselor = ";
-			uSQL			+= (curr->wFlags.test( AB_FLAGS_COUNSELOR )?"1":"0");
-			uSQL			+= ", IsGM = ";
-			uSQL			+= (curr->wFlags.test( AB_FLAGS_GM )?"1":"0");
-			uSQL			+= ", LastUpdated = getdate()";
-			uSQL			+= " WHERE AccountID = " + UString::number( curr->wAccountIndex ) + ";";
-			Console.Warning( uSQL.c_str() );
-			ODBCManager::getSingleton().ExecuteQuery( uSQL );
-			uSQL			= "DELETE FROM AccountCharacters WHERE AccountID = " + UString::number( curr->wAccountIndex ) + ";";
-			Console.Warning( uSQL.c_str() );
-			ODBCManager::getSingleton().ExecuteQuery( uSQL );
-		}
-		else
-		{	// Not from DB, so INSERT
-			std::string iSQL = "INSERT INTO Account( AccountID, Username, Password, ContactDetails, IsBanned, IsSuspended, IsPublic, IsOnline, IsSeer, IsCounselor, IsGM, LastUpdated ) VALUES( ";
-			iSQL			+= "  " + UString::number( curr->wAccountIndex );
-			iSQL			+= ", '" + curr->sUsername + "'";
-			iSQL			+= ", '" + curr->sPassword + "'";
-			iSQL			+= ", '" + curr->sContact + "'";
-			iSQL			+= ", ";
-			iSQL			+= (curr->wFlags.test( AB_FLAGS_BANNED )?"1":"0");
-			iSQL			+= ", ";
-			iSQL			+= (curr->wFlags.test( AB_FLAGS_SUSPENDED )?"1":"0");
-			iSQL			+= ", ";
-			iSQL			+= (curr->wFlags.test( AB_FLAGS_PUBLIC )?"1":"0");
-			iSQL			+= ", ";
-			iSQL			+= (curr->wFlags.test( AB_FLAGS_ONLINE )?"1":"0");
-			iSQL			+= ", ";
-			iSQL			+= (curr->wFlags.test( AB_FLAGS_SEER )?"1":"0");
-			iSQL			+= ", ";
-			iSQL			+= (curr->wFlags.test( AB_FLAGS_COUNSELOR )?"1":"0");
-			iSQL			+= ", ";
-			iSQL			+= (curr->wFlags.test( AB_FLAGS_GM )?"1":"0");
-			iSQL			+= ", getdate()";
-			Console.Warning( iSQL.c_str() );
-			ODBCManager::getSingleton().ExecuteQuery( iSQL );
-		}
-		for( int z = 0; z < CHARACTERCOUNT; ++z )
-		{
-			if( curr->lpCharacters[z] != NULL )
-			{
-				std::string cSQL	= "INSERT INTO AccountCharacters( AccountID, Serial ) VALUES( ";
-				cSQL				+= UString::number( curr->wAccountIndex ) + ", " + UString::number( curr->lpCharacters[z]->GetSerial() ) + " );";
-				Console.Warning( cSQL.c_str() );
-				ODBCManager::getSingleton().ExecuteQuery( cSQL );
-			}
-		}
-		++numSaved;
-	}
-	ODBCManager::getSingleton().FinaliseTransaction( true );
-	return rvalue;
-}
-bool cAccountClass::LoadFromDB( UI16& numLoaded )
+bool cAccountClass::LoadFromDB(UI16& numLoaded)
 {
-	bool rvalue = true;
-	UString values[13];
-	bool valueFound[13];
+	int index = 0;
+	bool result = SQLManager::getSingleton().ExecuteQuery("SELECT * FROM accounts", &index, false);
 
-	int index = -1;
-	std::string sql	= "SELECT Account.AccountID, Account.Username, Account.Password, Account.ContactDetails, Account.IsBanned, Account.IsSuspended, Account.IsPublic, Account.IsOnline, Account.IsSeer, Account.IsCounselor, Account.IsGM, Account.LastUpdated, AccountCharacters.Serial FROM         Account LEFT OUTER JOIN AccountCharacters ON Account.AccountID = AccountCharacters.AccountID ORDER BY Account.AccountID, AccountCharacters.Serial";
-	bool execQuery	= ODBCManager::getSingleton().ExecuteQuery( sql, &index );
-	if( execQuery )
+	if (result)
 	{
 		CAccountBlock actB;
-		int prevID		= -1;
-		numLoaded		= 0;
-		bool bRetrieved = false;
-		int charCount	= -1;
-		int iTemp		= 0;
-		while( ODBCManager::getSingleton().FetchRow( index ) )
+		numLoaded = 0;
+		UI08 CharacterLimit = 0;
+		int ColumnCount = mysql_num_fields(SQLManager::getSingleton().GetMYSQLResult());
+		while (SQLManager::getSingleton().FetchRow(&index))
 		{
-			// 0	Account.AccountID
-			// 1	Account.Username
-			// 2	Account.Password
-			// 3	Account.ContactDetails
-			// 4	Account.IsBanned
-			// 5	Account.IsSuspended
-			// 6	Account.IsPublic
-			// 7	Account.IsOnline
-			// 8	Account.IsSeer
-			// 9	Account.IsCounselor
-			// 10	Account.IsGM
-			// 11	Account.LastUpdated
-			// 12	AccountCharacters.Serial
-			for( int x = 0; x < 13; ++x )
+			std::string AccountID = "";
+			for(int i = 0; i < ColumnCount; ++i)
 			{
-				valueFound[x] = ODBCManager::getSingleton().GetColumn( x, values[x], index );
-				if( !valueFound[x] )
-					Console.Warning( "ODBC: Error retrieving column %i on record %i", x, numLoaded );
-			}
-			if( valueFound[0] )
-			{	// we have an ID
-				int realID = values[0].toInt();
-				if( realID != prevID )
-				{	// next account retrieved
-					if( bRetrieved )
-					{	// tidy up previous account
-						FinaliseBlock( actB );
-					}
-					actB.reset();
-					actB.dbRetrieved	= true;
-					actB.wAccountIndex	= realID;
-					bRetrieved			= true;
-					prevID				= realID;
-					charCount			= -1;
-					++numLoaded;
-					if( valueFound[1] )
-						actB.sUsername = values[1].stripWhiteSpace();
-					else
-						Console.Warning( "ODBC: Account with no username! [%i]", actB.wAccountIndex );
-					if( valueFound[2] )
-						actB.sPassword = values[2].stripWhiteSpace();
-					else
-						Console.Warning( "ODBC: Account with no username! [%i]", actB.wAccountIndex );
-					if( valueFound[3] )
-						actB.sContact = values[3];
-					if( valueFound[4] )
-						actB.wFlags.set( AB_FLAGS_BANNED,	( values[4].toInt() != 0 ) );
-					if( valueFound[5] )
-						actB.wFlags.set( AB_FLAGS_SUSPENDED,( values[5].toInt() != 0 ) );
-					if( valueFound[6] )
-						actB.wFlags.set( AB_FLAGS_PUBLIC,	( values[6].toInt() != 0 ) );
-					if( valueFound[8] )
-						actB.wFlags.set( AB_FLAGS_SEER,		( values[8].toInt() != 0 ) );
-					if( valueFound[9] )
-						actB.wFlags.set( AB_FLAGS_COUNSELOR,( values[9].toInt() != 0 ) );
-					if( valueFound[10] )
-						actB.wFlags.set( AB_FLAGS_GM,		( values[10].toInt() != 0 ) );
-				}
-				++charCount;
-				if( charCount < CHARACTERCOUNT )
+				UString value;
+				if(!SQLManager::getSingleton().GetColumn(i, value, &index))
 				{
-					if( valueFound[12] && values[12] != "NULL" )
-						actB.dwCharacters[charCount] = values[12].toInt();
-					else
-						actB.dwCharacters[charCount] = INVALIDSERIAL;
+					Console.Warning("SQLManager: Error retrieving column %i on record %i.", i, index);
+					if (i == 1 || i == 2)
+					{
+						Console.Warning("SQLManager: Account with no %s! [%i], skipping...", i == 1 ? "username" : "sha_pass_hash", index);
+						break;
+					}
 				}
 				else
 				{
-					Console.Warning( "ODBC: Too many characters on account" );
+					switch(i)
+					{
+					case 0:
+						actB.reset();
+						actB.dbRetrieved = true;
+						CharacterLimit = -1;
+						AccountID = value;
+						actB.wAccountIndex = value.toUShort();
+						break;
+					case 1:
+						actB.sUsername = value.stripWhiteSpace();
+						break;
+					case 2:
+						actB.sPassword = value.stripWhiteSpace();
+						break;
+					case 3:
+						actB.sContact = value.stripWhiteSpace();
+						break;
+					case 4:
+						{
+							int currflags = value.toUInt();
+							for (int flags = AB_FLAGS_ALL; flags > -1; --flags)
+								if (currflags >= pow(2.0, flags))
+								{
+									actB.wFlags.set(flags, true);
+									currflags -= pow(2.0, flags);
+								}
+
+								int index2 = 0;							
+								if (SQLManager::getSingleton().ExecuteQuery("SELECT serial FROM characters WHERE account = "+AccountID, &index2, false))
+								{
+									while(SQLManager::getSingleton().FetchRow(&index2))
+									{
+										++CharacterLimit;
+										if (CharacterLimit == CHARACTERCOUNT)
+										{
+											Console.Warning("SQLManager: Too many characters on account.");
+											break;
+										}
+
+										UString value2;
+										if(!SQLManager::getSingleton().GetColumn(0, value2, &index2))
+										{
+											Console.Warning("SQLManager: Error retrieving column 0 on record %i.", index2);
+											actB.dwCharacters[CharacterLimit] = INVALIDSERIAL;
+										}
+										else
+											actB.dwCharacters[CharacterLimit] = value2.toULong();
+									}
+									SQLManager::getSingleton().QueryRelease(false);
+								}
+						}
+						break;
+					case 5:
+						actB.dwLastIP = calcserial(value.section(".", 0, 0).toByte(), value.section(".", 1, 1).toByte(), value.section(".", 2, 2).toByte(), value.section(".", 3, 3).toByte());
+						++numLoaded;
+						FinaliseBlock(actB);
+						break;
+					}
 				}
 			}
 		}
-		if( bRetrieved )
-		{	// tidy up previous account
-			FinaliseBlock( actB );
-		}
-		ODBCManager::getSingleton().QueryRelease();
+		SQLManager::getSingleton().QueryRelease(false);
 	}
-	else
-		rvalue = false;
-	return rvalue;
+
+	return result;
 }
 #endif
 
 UI16 cAccountClass::Load(void)
 {
-#if P_ODBC == 1
+#if ACT_SQL == 1
+	// önceki kaydettiklerini sildiðniden emin ol
 	UI16 retVal = 0;
-	if( LoadFromDB( retVal ) )
+	if (LoadFromDB(retVal))
 		return retVal;
-#endif
-
+#else
 	// Now we can load the accounts file in and re fill the map.
 	std::string sAccountsADM( m_sAccountsDirectory );
 	sAccountsADM += (m_sAccountsDirectory[m_sAccountsDirectory.length()-1]=='\\'||m_sAccountsDirectory[m_sAccountsDirectory.length()-1]=='/')?"accounts.adm":"/accounts.adm";
@@ -1329,6 +1271,8 @@ UI16 cAccountClass::Load(void)
 	wImportCount = ImportAccounts();
 	// Return the number of accounts loaded
 	return m_mapUsernameMap.size();
+#endif
+	return 0;
 }
 
 //o--------------------------------------------------------------------------o
@@ -1386,14 +1330,7 @@ bool cAccountClass::TransCharacter(UI16 wSAccountID,UI16 wSSlot,UI16 wDAccountID
 	// Get the account block for this username.
 
 	// ok at this point I/II = SourceID, and DestID and J/JJ SourceName/DestName
-	if( AddCharacter( wDAccountID, actbID.dwCharacters[wSSlot], actbID.lpCharacters[wSSlot] ) )
-	{
-		// OK the character was added, need to remove it from the source.
-		DelCharacter( wSAccountID, (int)wSSlot );
-		Save( false );
-		return true;
-	}
-	return false;
+	return AddCharacter(wDAccountID, wSAccountID, wSSlot, actbID, true);
 }
 
 //o--------------------------------------------------------------------------o
@@ -1410,99 +1347,74 @@ bool cAccountClass::TransCharacter(UI16 wSAccountID,UI16 wSSlot,UI16 wDAccountID
 //o--------------------------------------------------------------------------o
 bool cAccountClass::AddCharacter(UI16 wAccountID, CChar *lpObject)
 {
-	// Make sure that the lpObject pointer is valid
-	if( lpObject==NULL )
-		return false;
-	// Ok we need to do is get see if this account id exists
-	MAPUSERNAMEID_ITERATOR I = m_mapUsernameIDMap.find( wAccountID );
-	if( I == m_mapUsernameIDMap.end() )
-	{
-		// This ID was not found.
-		return false;
-	}
-	// Get the account block for this ID
-	CAccountBlock& actbID	= I->second;
-	// Ok now we need to get the matching username map 
-	MAPUSERNAME_ITERATOR J	= m_mapUsernameMap.find(actbID.sUsername);
-	if( J==m_mapUsernameMap.end() )
-	{
-		// This ID was not found.
-		return false;
-	}
-	// Get the account block for this username.
-	CAccountBlock& actbName = (*J->second);
-	// ok now that we have both of our account blocks we can update them. We will use teh first empty slot for this character
-	bool bExit = false;
-	for( UI08 i = 0; i < CHARACTERCOUNT; ++i )
-	{
-		if( actbID.dwCharacters[i]!=lpObject->GetSerial()&&actbName.dwCharacters[i]!=lpObject->GetSerial()&&actbID.dwCharacters[i]==INVALIDSERIAL&&actbName.dwCharacters[i]==INVALIDSERIAL )
-		{
-			// ok this slot is empty, we will stach this character in this slot
-			actbID.lpCharacters[i]=lpObject;
-			actbID.dwCharacters[i]=lpObject->GetSerial();
-			actbName.lpCharacters[i]=lpObject;
-			actbName.dwCharacters[i]=lpObject->GetSerial();
-			// we do not need to continue throught this loop anymore.
-			bExit=true;
-			break; 
-		}
-	}
-	// If we were successfull then we return true
-	if( bExit )
-	{
-		// make sure to put the values back into the maps corrected.
-		m_mapUsernameIDMap[actbID.wAccountIndex] = actbID;
-		return true;
-	}
-	return false;
+	return AddCharacter(wAccountID, NULL, NULL, lpObject->GetSerial(), lpObject);
 }
-//
-bool cAccountClass::AddCharacter(UI16 wAccountID,UI32 dwCharacterID, CChar *lpObject)
+
+bool cAccountClass::AddCharacter(UI16 wDAccountID, UI16 wSAccountID, UI16 wSSlot, CAccountBlock& actbTemp, bool transaction)
 {
-	// Make sure that the lpObject pointer is valid
-	if( lpObject==NULL )
+#if ACT_SQL == 1
+	if (transaction)
+		SQLManager::getSingleton().BeginTransaction();
+#endif
+	bool res = AddCharacter(wDAccountID, wSAccountID, wSSlot, actbTemp.dwCharacters[wSSlot], actbTemp.lpCharacters[wSSlot], transaction);
+#if ACT_SQL == 1
+	if (transaction)
+		SQLManager::getSingleton().FinaliseTransaction(transaction);
+#endif
+	return res;
+}
+
+bool cAccountClass::AddCharacter(UI16 wAccountID, UI16 wSAccountID, UI16 wSSlot, UI32 dwCharacterID, CChar *lpObject, bool transaction)
+{
+	if (lpObject == NULL) // Make sure that the lpObject pointer is valid
 		return false;
+
 	// Ok we need to do is get see if this account id exists
-	MAPUSERNAMEID_ITERATOR I;
-	I = m_mapUsernameIDMap.find(wAccountID);
-	if( I==m_mapUsernameIDMap.end() )
-	{
-		// This ID was not found.
-		return false;
-	}
-	// Get the account block for this ID
-	CAccountBlock& actbID = I->second;
+	MAPUSERNAMEID_ITERATOR IdItr = m_mapUsernameIDMap.find(wAccountID);
+	if (IdItr == m_mapUsernameIDMap.end())
+		return false; // This ID was not found.
+
+	CAccountBlock& actbID = IdItr->second; // Get the account block for this ID
 	// Ok now we need to get the matching username map 
-	MAPUSERNAME_ITERATOR J = m_mapUsernameMap.find(actbID.sUsername);
-	if( J==m_mapUsernameMap.end() )
-	{
-		// This ID was not found.
-		return false;
-	}
-	// Get the account block for this username.
-	CAccountBlock& actbName = (*J->second);
-	// ok now that we have both of our account blocks we can update them. We will use teh first empty slot for this character
-	bool bExit=false;
-	for( UI08 i = 0; i < CHARACTERCOUNT; ++i )
-	{
-		if( actbID.dwCharacters[i]!=lpObject->GetSerial()&&actbName.dwCharacters[i]!=lpObject->GetSerial()&&actbID.dwCharacters[i]==INVALIDSERIAL&&actbName.dwCharacters[i]==INVALIDSERIAL )
+	MAPUSERNAME_ITERATOR NameItr = m_mapUsernameMap.find(actbID.sUsername);
+	if (NameItr == m_mapUsernameMap.end())
+		return false; // This ID was not found.
+	
+	CAccountBlock& actbName = (*NameItr->second); // Get the account block for this username.
+	// Ok now that we have both of our account blocks we can update them. We will use the first empty slot for this character
+	bool bExit = false;
+	for (UI08 i = 0; i < CHARACTERCOUNT; ++i)
+		if (actbID.dwCharacters[i] != lpObject->GetSerial() && actbName.dwCharacters[i] != lpObject->GetSerial() &&
+			actbID.dwCharacters[i] == INVALIDSERIAL && actbName.dwCharacters[i] == INVALIDSERIAL)
 		{
-			// ok this slot is empty, we will stach this character in this slot
-			actbID.lpCharacters[i]		= lpObject;
-			actbID.dwCharacters[i]		= dwCharacterID;
-			actbName.lpCharacters[i]	= lpObject;
-			actbName.dwCharacters[i]	= dwCharacterID;
-			// we do not need to continue throught this loop anymore.
-			bExit=true;
+			// Ok this slot is empty, we will stach this character in this slot
+			actbID.lpCharacters[i] = lpObject;
+			actbID.dwCharacters[i] = dwCharacterID;
+			actbName.lpCharacters[i] = lpObject;
+			actbName.dwCharacters[i] = dwCharacterID;
+			bExit = true; // we do not need to continue throught this loop anymore.
 			break; 
 		}
-	}
+
 	// If we were successfull then we return true
-	if( bExit )
+	if (bExit)
 	{
-		// make sure to put the values back into the maps corrected.
-		m_mapUsernameIDMap[actbID.wAccountIndex]=actbID;
-		Save(false);
+		m_mapUsernameIDMap[actbID.wAccountIndex] = actbID; // Make sure to put the values back into the maps corrected.
+#if ACT_SQL == 1
+		if (wSAccountID != NULL && wSSlot != NULL)
+		{
+			transaction = true;
+			DelCharacter(wSAccountID, wSSlot, true, transaction);
+
+			std::stringstream sql;
+			sql << "UPDATE characters SET account = '" << wAccountID << "' WHERE account ='" << wAccountID << "' and serial = '" << lpObject->GetSerial() << "'";
+			SQLManager::getSingleton().ExecuteQuery(sql.str(), NULL, transaction);
+		}
+		
+		lpObject->SetAccountNum(wAccountID);
+#else
+		Save();
+#endif
 		return true;
 	}
 	return false;
@@ -1578,6 +1490,21 @@ bool cAccountClass::DelAccount(UI16 wAccountID)
 	if( J==m_mapUsernameMap.end() )
 		return false;
 
+#if ACT_SQL == 1
+	std::stringstream sql;
+	sql << "DELETE FROM accounts WHERE id = '" << wAccountID << "'\n";
+	sql << "DELETE FROM attributes WHERE serial IN (SELECT serial FROM characters WHERE account = '" << wAccountID << "')\n";
+	sql << "DELETE FROM baseobjects WHERE type = '1' and serial IN (SELECT serial FROM characters WHERE account = '" << wAccountID << "')\n";
+	sql << "DELETE FROM characters WHERE account = '" << wAccountID << "')";
+
+	std::istringstream iss;
+	iss.str(sql.str());
+	std::string line;
+	while (std::getline(iss, line))
+		SQLManager::getSingleton().ExecuteQuery(line);
+
+	SQLManager::getSingleton().FinaliseTransaction(true);
+#else
 	// Before we delete this account we need to spin the characters, and list them in the orphan.adm file
 	std::string sTempPath(m_sAccountsDirectory);
 	if( sTempPath[sTempPath.length()-1]=='\\'||sTempPath[sTempPath.length()-1]=='/' )
@@ -1607,6 +1534,7 @@ bool cAccountClass::DelAccount(UI16 wAccountID)
 			fsOrphansADM << "," << actbID.lpCharacters[jj]->GetName() << "," << actbID.lpCharacters[jj]->GetX() << "," << actbID.lpCharacters[jj]->GetY() << "," << (int)actbID.lpCharacters[jj]->GetZ() << std::endl;
 	}
 	fsOrphansADM.close();
+#endif
 	// Ok we have both the map iterators pointing to the right place. Erase these entries
 	m_mapUsernameIDMap.erase(I);
 	m_mapUsernameMap.erase(J);
@@ -1622,8 +1550,10 @@ bool cAccountClass::DelAccount(UI16 wAccountID)
 	sNewDir += "_";
 	sNewDir += szDirName;
 	rename(actbID.sPath.c_str(),sNewDir.c_str());
+#if ACT_SQL == 0
 	// We have to run a save to make sure that the accoung it removed.
-	Save( false );
+	Save();
+#endif
 	return true;
 }
 
@@ -1691,93 +1621,111 @@ std::string cAccountClass::GetPath(void)
 //o--------------------------------------------------------------------------o
 //| Modifications	-	
 //o--------------------------------------------------------------------------o
-bool cAccountClass::DelCharacter(UI16 wAccountID, UI08 nSlot)
+bool cAccountClass::DelCharacter(UI16 wAccountID, UI08 nSlot, bool switching, bool transaction)
 {
 	// Do the simple here, save us some work
-	if( nSlot > CHARACTERCOUNT )
+	if (nSlot > CHARACTERCOUNT)
 		return false;
 	// ok were going to need to get the respective blocked from the maps
-	MAPUSERNAMEID_ITERATOR I=m_mapUsernameIDMap.find(wAccountID);
-	if( I==m_mapUsernameIDMap.end() )
+	MAPUSERNAMEID_ITERATOR IdItr = m_mapUsernameIDMap.find(wAccountID);
+	if (IdItr == m_mapUsernameIDMap.end())
 		return false;
-	CAccountBlock& actbID = I->second;
+
+	CAccountBlock& actbID = IdItr->second;
 	// Ok now that we have the ID Map block we can get the Username Block
-	MAPUSERNAME_ITERATOR J=m_mapUsernameMap.find(actbID.sUsername);
-	if( J==m_mapUsernameMap.end() )
+	MAPUSERNAME_ITERATOR NameItr = m_mapUsernameMap.find(actbID.sUsername);
+	if (NameItr == m_mapUsernameMap.end())
 		return false;
-	CAccountBlock& actbName=(*J->second);
+
+	CAccountBlock& actbName = (*NameItr->second);
 	// Check to see if this record has been flagged changed
-	if( actbID.bChanged )
+	if (actbID.bChanged)
 	{
-		I->second.bChanged = false;
+		IdItr->second.bChanged = false;
 		return false;
 	}
 	// We have both blocks now. We should validate the slot, and make the changes
-	if( actbID.dwCharacters[nSlot]==INVALIDSERIAL||actbName.dwCharacters[nSlot]==INVALIDSERIAL )
+	if (actbID.dwCharacters[nSlot] == INVALIDSERIAL || actbName.dwCharacters[nSlot] == INVALIDSERIAL)
 		return false;
+#if ACT_SQL == 0
 	// We need to make a entry in the orphan.adm file for this block before we change it
 	std::string sTempPath(m_sAccountsDirectory);
-	if( sTempPath[sTempPath.length()-1]=='\\'||sTempPath[sTempPath.length()-1]=='/' )
+	if (sTempPath[sTempPath.length()-1]=='\\' || sTempPath[sTempPath.length()-1] == '/')
 		sTempPath += "orphans.adm";
 	else
 		sTempPath += "/orphans.adm";
 	// First lets see if the file exists.
 	bool bOrphanHeader=false;
-	std::fstream fsOrphansADMTest(sTempPath.c_str(),std::ios::in);
-	if( !fsOrphansADMTest.is_open() )
+	std::fstream fsOrphansADMTest (sTempPath.c_str(),std::ios::in);
+	if (!fsOrphansADMTest.is_open())
 		bOrphanHeader=true;
 	fsOrphansADMTest.close();
 	// ok open the stream for append and add this record to the end of the file
-	std::fstream fsOrphansADM(sTempPath.c_str(),std::ios::out|std::ios::app);
-	if( !fsOrphansADM.is_open() )
+	std::fstream fsOrphansADM(sTempPath.c_str(), std::ios::out|std::ios::app);
+	if (!fsOrphansADM.is_open())
 		return false;
 	// If this is a new file then we need to write the header first
-	if( bOrphanHeader )
-	{
+	if (bOrphanHeader)
 		WriteOrphanHeader(fsOrphansADM);
-	}
 	// Ok build then write what we need to the file
-	fsOrphansADM << actbID.sUsername << "=0x" << std::hex << actbID.dwCharacters[nSlot] << "," << (actbID.lpCharacters[nSlot]!=NULL?actbID.lpCharacters[nSlot]->GetName():"UNKNOWN") << ",0x" << (actbID.lpCharacters[nSlot]!=NULL?actbID.lpCharacters[nSlot]->GetX():0) << ",0x" << (actbID.lpCharacters[nSlot]!=NULL?actbID.lpCharacters[nSlot]->GetY():0) << "," << std::dec << (actbID.lpCharacters[nSlot]!=NULL?(int)actbID.lpCharacters[nSlot]->GetZ():(int)0) << std::endl;
+	fsOrphansADM << actbID.sUsername << "=0x" << std::hex << actbID.dwCharacters[nSlot] << "," << (actbID.lpCharacters[nSlot]!=NULL?actbID.lpCharacters[nSlot]->GetName():"UNKNOWN") << ",0x" << (actbID.lpCharacters[nSlot]!=NULL?actbID.lpCharacters[nSlot]->GetX():0) << ",0x" << (actbID.lpCharacters[nSlot]!=NULL?actbID.lpCharacters[nSlot]->GetY():0) << "," << std::dec << (actbID.lpCharacters[nSlot] != NULL ? (int)actbID.lpCharacters[nSlot]->GetZ() : (int)0 ) << std::endl;
 	fsOrphansADM.close();
+#endif
+	UI32 serial = actbID.dwCharacters[nSlot];
 	// Ok there is something in this slot so we should remove it.
-	actbID.dwCharacters[nSlot]=actbName.dwCharacters[nSlot]=INVALIDSERIAL;
-	actbID.lpCharacters[nSlot]=actbName.lpCharacters[nSlot]=NULL;
+	actbID.dwCharacters[nSlot] = actbName.dwCharacters[nSlot] = INVALIDSERIAL;
+	actbID.lpCharacters[nSlot] = actbName.lpCharacters[nSlot] = NULL;
 	// need to reorder the accounts or have to change the addchar code to ignore invalid serials(earier here)
 	CAccountBlock actbScratch;
 	actbScratch.reset();
 	actbScratch = actbID;
-	int kk=0;
+	int j=0;
 	// Dont mind this loop, becuase we needed a copy of the data too we need to invalidate actbScracthes pointers, and indexs
-	for( UI08 ll = 0; ll < CHARACTERCOUNT; ++ll )
-	{
-		if( actbID.dwCharacters[ll]!=INVALIDSERIAL && actbID.lpCharacters[ll]!=NULL )
+	for (UI08 i = 0; i < CHARACTERCOUNT; ++i)
+		if (actbID.dwCharacters[i] != INVALIDSERIAL && actbID.lpCharacters[i] != NULL)
 		{
 			// OK we keep this entry 
-			actbScratch.dwCharacters[kk]=actbID.dwCharacters[ll];
-			actbScratch.lpCharacters[kk]=actbID.lpCharacters[ll];
-			kk+=1;
+			actbScratch.dwCharacters[j]=actbID.dwCharacters[j];
+			actbScratch.lpCharacters[j]=actbID.lpCharacters[j];
+			j += 1;
 		}
-	}
-	UI08 jj = 0;
+
 	// Fill the rest with standard empty values.
-	for( jj = kk; jj < CHARACTERCOUNT; ++jj )
+	for (UI08 i = j; i < CHARACTERCOUNT; ++i)
 	{
-		actbScratch.dwCharacters[jj]=INVALIDSERIAL;
-		actbScratch.lpCharacters[jj]=NULL;
+		actbScratch.dwCharacters[i]=INVALIDSERIAL;
+		actbScratch.lpCharacters[i]=NULL;
 	}
 	// Now copy back out the info to the structures
-	for( jj = 0; jj < CHARACTERCOUNT; ++jj )
+	for (UI08 i = 0; i < CHARACTERCOUNT; ++i)
 	{
-		actbID.dwCharacters[jj] = actbName.dwCharacters[jj] = actbScratch.dwCharacters[jj];
-		actbID.lpCharacters[jj] = actbName.lpCharacters[jj] = actbScratch.lpCharacters[jj];
+		actbID.dwCharacters[i] = actbName.dwCharacters[i] = actbScratch.dwCharacters[i];
+		actbID.lpCharacters[i] = actbName.lpCharacters[i] = actbScratch.lpCharacters[i];
 	}
 	actbID.bChanged = actbName.bChanged = true;
 	// Now we have to put the values back into the maps
 	try
 	{
-		I->second = actbID;
-		MAPUSERNAMEID_ITERATOR Q = m_mapUsernameIDMap.find(actbID.wAccountIndex);
-		Save(false);
+#if ACT_SQL == 1
+		if (!switching)
+		{
+			std::stringstream sql;
+			sql << "DELETE FROM characters WHERE account ='" << wAccountID << "' and serial = '" << serial << "'\n";
+			sql << "DELETE FROM baseobjects WHERE type ='1' and serial = '" << serial << "'\n";
+			sql << "DELETE FROM attributes WHERE serial = '" << serial << "'";
+			printf("%s\n", sql.str().c_str());
+			std::istringstream iss;
+			iss.str(sql.str());
+			std::string line;
+			while (std::getline(iss, line))
+				SQLManager::getSingleton().ExecuteQuery(line, NULL, transaction);
+
+			if (transaction == false)
+				SQLManager::getSingleton().QueryRelease(transaction);
+		}
+#else
+		Save();
+#endif
 	}
 	catch( ... )
 	{
@@ -1866,13 +1814,51 @@ CAccountBlock& cAccountClass::GetAccountByID( UI16 wAccountID )
 //o--------------------------------------------------------------------------o
 //| Modifications	-	
 //o--------------------------------------------------------------------------o
-UI16 cAccountClass::Save(bool bForceLoad)
+UI16 cAccountClass::Save()
 {
-#if P_ODBC == 1
-	UI16 numSaved = 0;
-	if( SaveToDB( numSaved ) )
-		return numSaved;
-#endif
+#if ACT_SQL == 1
+	for (MAPUSERNAMEID_ITERATOR itr = m_mapUsernameIDMap.begin(); itr != m_mapUsernameIDMap.end(); ++itr)
+	{
+		CAccountBlock& actbID = itr->second; // Get a usable structure for this iterator
+		// Ok we are going to load up each username block from that map too for checking
+		MAPUSERNAME_ITERATOR NameItr = m_mapUsernameMap.find(actbID.sUsername);
+		CAccountBlock& actbName = (*NameItr->second);
+		// Check to make sure at least that the username and passwords match
+		if (actbID.sUsername != actbName.sUsername || actbID.sPassword != actbName.sPassword )
+		{
+			// there was an error between blocks
+			Console.Error("Save(): Mismatch %s - %s", actbID.sUsername.c_str(), actbName.sUsername.c_str());
+			continue;
+		}
+		std::stringstream sql;
+		sql << "UPDATE accounts SET username = '" << actbID.sUsername;
+		sql << "', sha_pass_hash = '" << actbID.sPassword;
+		sql << "', email = " << (actbID.sContact.length() ? ("'"+actbID.sContact+"'") : "NULL");
+		sql << ", flags = '" << actbID.wFlags.to_ulong();
+		sql << "', last_ip = '" << (int)((actbID.dwLastIP&0xFF000000)>>24) << "." << (int)((actbID.dwLastIP&0x00FF0000)>>16) 
+			<< "." << (int)((actbID.dwLastIP&0x0000FF00)>>8) << "." << (int)((actbID.dwLastIP&0x000000FF)%256) << "' ";
+		sql << "WHERE id = '" << actbID.wAccountIndex << "'\n";
+		for (int i = 0; i < CHARACTERCOUNT; ++i)
+		{
+			SERIAL charSer = INVALIDSERIAL;
+			std::string charName = "UNKNOWN";
+			if (actbID.lpCharacters[i] != NULL)
+			{
+				charSer = actbID.dwCharacters[i];
+				charName = actbID.lpCharacters[i]->GetName();
+			}
+
+			if (charSer != INVALIDSERIAL)
+				sql << "UPDATE characters SET name = '" << charName << "' WHERE serial = '" << charSer << "'\n";
+		}
+
+		std::istringstream iss;
+		iss.str(sql.str());
+		std::string line;
+		while (std::getline(iss, line))
+			SQLManager::getSingleton().ExecuteQuery(line, NULL, false);
+	}
+#else
 	// Ok were not going to mess around. so we open truncate the file and write
 	std::string sTemp(m_sAccountsDirectory);
 	if( sTemp[sTemp.length()-1]=='\\'||sTemp[sTemp.length()-1]=='/' )
@@ -1984,6 +1970,7 @@ UI16 cAccountClass::Save(bool bForceLoad)
 	}
 	// Ok were done looping so we can close the file and return the count of accounts
 	fsAccountsADM.close();
+#endif
 	return m_mapUsernameIDMap.size();
 }
 

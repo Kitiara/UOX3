@@ -110,8 +110,13 @@ public:
 
 	void		SetGuildFaction( GuildType newFaction );
 	void		SetGuildRelation( GUILDID otherGuild, GUILDRELATION toSet );
-	void		Save( std::ofstream &toSave, GUILDID gNum );
+#if ACT_SQL == 1
+	UString Save(void);
+	void		Load(std::vector<UString> dataList);
+#else
+	void		Save( std::ofstream &toSave );
 	void		Load( ScriptSection *toRead );
+#endif
 
 	GUILDREL *	GuildRelationList( void );	// NOTE: This is aimed ONLY at menu stuff
 
@@ -127,7 +132,7 @@ public:
 	bool		IsMember( CChar &toCheck ) const;
 };
 
-typedef std::map< GUILDID, CGuild * > GUILDLIST;
+typedef std::vector<CGuild *> GUILDLIST;
 class CGuildCollection
 {
 private:
@@ -135,7 +140,6 @@ private:
 
 	void			ToggleAbbreviation( CSocket *s );
 	void			Erase( GUILDID toErase );
-	GUILDID			MaximumGuild( void );
 public:
 	void			Resign( CSocket *s );
 					CGuildCollection();

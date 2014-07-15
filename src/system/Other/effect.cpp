@@ -12,6 +12,9 @@
 #include "combat.h"
 #include "CJSMapping.h"
 
+#if ACT_SQL == 1
+#include "SQLManager.h"
+#endif
 namespace UOX
 {
 
@@ -950,12 +953,14 @@ void cEffects::tempeffect( CChar *source, CItem *dest, UI08 num, UI16 more1, UI1
 //o--------------------------------------------------------------------------
 void cEffects::SaveEffects( void )
 {
-	std::ofstream writeDestination, effectDestination; //writeDestination seems to be unused
-	const char blockDiscriminator[] = "\n\n---EFFECT---\n\n";
-	int s_t							= getclock();
+	int StartTime = getclock();
 
 	Console << "Saving Effects...   ";
 	Console.TurnYellow();
+
+#if ACT_SQL == 0
+	std::ofstream writeDestination, effectDestination; //writeDestination seems to be unused
+	const char blockDiscriminator[] = "\n\n---EFFECT---\n\n";
 
 	std::string filename = cwmWorldState->ServerData()->Directory( CSDDP_SHARED ) + "effects.wsc";
 	effectDestination.open( filename.c_str() );
@@ -977,10 +982,33 @@ void cEffects::SaveEffects( void )
 	cwmWorldState->tempEffects.Pop();
 
 	Console << "\b\b\b\b";
-	Console.PrintDone();
+#else
+	std::string str = "DELETE FROM effects";
+	bool Started = false;
+	cwmWorldState->tempEffects.Push();
+	for (CTEffect *currEffect = cwmWorldState->tempEffects.First(); !cwmWorldState->tempEffects.Finished(); currEffect = cwmWorldState->tempEffects.Next())
+		if (currEffect != NULL)
+		{
+			if (Started)
+				str += ",";
+			else
+			{
+				str += "\nINSERT INTO effects VALUES ";
+				Started = true;
+			}
 
-	int e_t = getclock();
-	Console.Print( "Effects saved in %.02fsec\n", ((float)(e_t-s_t))/1000.0f );
+			str += currEffect->Save();
+		}
+	cwmWorldState->tempEffects.Pop();
+
+	std::istringstream iss;
+	iss.str(str);
+	str.clear();
+	while (std::getline(iss, str))
+		SQLManager::getSingleton().ExecuteQuery(str);
+#endif
+	Console.PrintDone();
+	Console.Print("Effects saved in %.02fsec\n", ((float)(getclock()-StartTime))/1000.0f);
 }
 
 //o--------------------------------------------------------------------------
@@ -994,6 +1022,7 @@ void cEffects::SaveEffects( void )
 void ReadWorldTagData( std::ifstream &inStream, UString &tag, UString &data );
 void cEffects::LoadEffects( void )
 {
+#if ACT_SQL == 0
 	std::ifstream input;
 	std::string filename = cwmWorldState->ServerData()->Directory( CSDDP_SHARED ) + "effects.wsc";
 
@@ -1097,6 +1126,68 @@ void cEffects::LoadEffects( void )
 		}
 		input.close();
 	}
+#else
+	int index;
+	if (SQLManager::getSingleton().ExecuteQuery("SELECT * FROM effects", &index, false))
+	{
+		int ColumnCount = mysql_num_fields(SQLManager::getSingleton().GetMYSQLResult());
+		while (SQLManager::getSingleton().FetchRow(&index))
+		{
+			CTEffect *toLoad = new CTEffect;
+			for(int i = 0; i < ColumnCount; ++i)
+			{
+				UString value;
+				SQLManager::getSingleton().GetColumn(i, value, &index);
+				switch(i)
+				{
+				case 0: // effects.source
+					toLoad->Source(value.toULong());
+					break;
+				case 1: // effects.dest
+					toLoad->Destination(value.toULong());
+					break;
+				case 2: // effects.objptr
+					{
+						SERIAL objSer = value.empty() ? INVALIDSERIAL : value.toULong();
+						if(objSer != INVALIDSERIAL)
+						{
+							if(objSer < BASEITEMSERIAL)
+								toLoad->ObjPtr(calcCharObjFromSer(objSer));
+							else
+								toLoad->ObjPtr(calcItemObjFromSer(objSer));
+						}
+						else
+							toLoad->ObjPtr(NULL);
+					}
+					break;
+				case 3: // effects.expire
+					toLoad->ExpireTime(static_cast<UI32>(value.toULong() + cwmWorldState->GetUICurrentTime()));
+					break;
+				case 4: // effects.number
+					toLoad->Number(value.toUByte());
+					break;
+				case 5: // effects.more1
+					toLoad->More1(value.toUShort());
+					break;
+				case 6: // effects.more2
+					toLoad->More2(value.toUShort());
+					break;
+				case 7: // effects.more3
+					toLoad->More3(value.toUShort());
+					break;
+				case 8: // effects.dispel
+					toLoad->Dispellable(value.toUByte() == 1 ? true : false);
+					break;
+				case 9: // effects.assocscript
+					toLoad->AssocScript(value.empty() ? 65535 : value.toUShort());
+					break;
+				}
+			}
+			cwmWorldState->tempEffects.Add(toLoad);
+		}
+		SQLManager::getSingleton().QueryRelease(false);
+	}
+#endif
 }
 
 //o-----------------------------------------------------------------------o
@@ -1106,6 +1197,7 @@ void cEffects::LoadEffects( void )
 //o-----------------------------------------------------------------------o
 //|	Returns			-	true/false indicating the success of the write operation
 //o-----------------------------------------------------------------------o
+#if ACT_SQL == 0
 bool CTEffect::Save( std::ofstream &effectDestination ) const
 {
 	CBaseObject *getPtr = NULL;
@@ -1136,5 +1228,33 @@ bool CTEffect::Save( std::ofstream &effectDestination ) const
 	effectDestination << '\n' << "o---o" << '\n' << '\n';
 	return true;
 }
+#else
+UString CTEffect::Save(void) const
+{
+	std::stringstream Str;
+	CBaseObject *getPtr = NULL;
+	Str << "('" << Source() << "', ";
+	Str << "'" << Destination() << "', ";
+
+	if (!ValidateObject(getPtr))
+		Str << "NULL, ";
+	else
+		Str << "'" << getPtr->GetSerial() << "', ";
+
+	Str << "'" << (ExpireTime() - cwmWorldState->GetUICurrentTime()) << "', ";
+	Str << "'" << int((UI08)static_cast<UI16>(Number())) << "', ";
+	Str << "'" << More1() << "', ";
+	Str << "'" << More2() << "', ";
+	Str << "'" << More3() << "', ";
+	Str << "'" << Dispellable() << "', ";
+
+	if (AssocScript() == 65535)
+		Str << "NULL";
+	else
+		Str << "'" << AssocScript() << "'";
+	Str << ")";
+	return Str.str();
+}
+#endif
 
 }

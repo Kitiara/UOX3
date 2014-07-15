@@ -46,6 +46,7 @@ const SI16 UpperY = static_cast<SI16>(4096 / MapRowSize);
 								};
 
 		void					SaveToDisk( std::ofstream& writeDestination, std::ofstream &houseDestination );
+		void					SaveToDB();
 	};
 
 	class CMapWorld

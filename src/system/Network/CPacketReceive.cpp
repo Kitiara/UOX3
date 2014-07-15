@@ -16,9 +16,11 @@
 #include "PartySystem.h"
 #include "cGuild.h"
 
-#if P_ODBC == 1
-#include "ODBCManager.h"
+#if ACT_SQL == 1
+#include "SQLManager.h"
 #endif
+#include <openssl\sha.h>
+
 namespace UOX
 {
 
@@ -178,11 +180,24 @@ bool CPIFirstLogin::Handle( void )
 				tSock->SetAccount( (*actbTemp) );
 		}
 	}
+
+	char sha1hash[SHA_DIGEST_LENGTH*2+1];
+#if ACT_SQL == 1
+    unsigned char digest[SHA_DIGEST_LENGTH];
+    SHA_CTX ctx;
+    SHA1_Init(&ctx);
+    SHA1_Update(&ctx, (username+":"+pass1).c_str(), strlen((username+":"+pass1).c_str()));
+    SHA1_Final(digest, &ctx);
+ 
+    for (int i = 0; i < SHA_DIGEST_LENGTH; i++)
+        sprintf(&sha1hash[i*2], "%02x", (unsigned int)digest[i]);
+#endif
+
 	if( tSock->AcctNo() != AB_INVALID_ID )
 	{
 		if( actbTemp->wFlags.test( AB_FLAGS_BANNED ) )
 			t = LDR_ACCOUNTDISABLED;
-		else if( actbTemp->sPassword != pass1 )
+		else if( actbTemp->sPassword != (ACT_SQL == 1 ? sha1hash : pass1))
 			t = LDR_BADPASSWORD;
 		else
 		{
@@ -246,19 +261,7 @@ bool CPIFirstLogin::Handle( void )
 		t = LDR_UNKNOWNUSER;
 	if( t == LDR_NODENY && actbTemp->wFlags.test( AB_FLAGS_ONLINE ) )
 		t = LDR_ACCOUNTINUSE;
-#if P_ODBC == 1
-	std::string iSQL	= "INSERT INTO AccountLoginHistory( Username, Password, IPAddress4, WhenAttempted, AttemptStatus ) VALUES( '";
-	iSQL				+=  username + "', '";
-	char ipAddy[16];
-	sprintf( ipAddy, "%i.%i.%i.%i", tSock->ClientIP4(), tSock->ClientIP3(), tSock->ClientIP2(), tSock->ClientIP1() );
-	iSQL				+=  pass1 + "', '";
-	iSQL				+=  ipAddy;
-	iSQL				+=  "', ";
-	iSQL				+=  "getdate(), ";
-	iSQL				+=  UString::number( t ) + " );";
-	ODBCManager::getSingleton().ExecuteQuery( iSQL );
-	ODBCManager::getSingleton().QueryRelease();
-#endif
+
 	if( t != LDR_NODENY )
 	{
 		CPLoginDeny pckDeny( t );
@@ -486,28 +489,28 @@ bool CPISecondLogin::Handle( void )
 	pass0 = Pass();
 	pSplit( pass0, pass1, pass2 );
 
+	char sha1hash[SHA_DIGEST_LENGTH*2+1];
+#if ACT_SQL == 1
+    unsigned char digest[SHA_DIGEST_LENGTH];
+    SHA_CTX ctx;
+    SHA1_Init(&ctx);
+    SHA1_Update(&ctx, (Name()+":"+pass1).c_str(), strlen((Name()+":"+pass1).c_str()));
+    SHA1_Final(digest, &ctx);
+ 
+    for (int i = 0; i < SHA_DIGEST_LENGTH; i++)
+        sprintf(&sha1hash[i*2], "%02x", (unsigned int)digest[i]);
+#endif
+
 	if( tSock->AcctNo() != AB_INVALID_ID )
 	{
 		if( actbTemp.wFlags.test( AB_FLAGS_BANNED ) )
 			t = LDR_ACCOUNTDISABLED;
-		else if( pass1 != actbTemp.sPassword )
+		else if( (ACT_SQL == 1 ? sha1hash : pass1) != actbTemp.sPassword )
 			t = LDR_BADPASSWORD;
 	}
 	else
 		t = LDR_UNKNOWNUSER;
-#if P_ODBC == 1
-	std::string iSQL	= "INSERT INTO AccountLoginHistory( Username, Password, IPAddress4, WhenAttempted, AttemptStatus ) VALUES( '";
-	iSQL				+=  Name() + "', '";
-	char ipAddy[16];
-	sprintf( ipAddy, "%i.%i.%i.%i", tSock->ClientIP4(), tSock->ClientIP3(), tSock->ClientIP2(), tSock->ClientIP1() );
-	iSQL				+=  pass1 + "', '";
-	iSQL				+=  ipAddy;
-	iSQL				+=  "', ";
-	iSQL				+=  "getdate(), ";
-	iSQL				+=  UString::number( t ) + " );";
-	ODBCManager::getSingleton().ExecuteQuery( iSQL );
-	ODBCManager::getSingleton().QueryRelease();
-#endif
+
 	if( t != LDR_NODENY )
 	{
 		tSock->AcctNo( AB_INVALID_ID );

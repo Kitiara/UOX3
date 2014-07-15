@@ -419,12 +419,12 @@ enum CPartyProperties
 	CPARTYP_COUNT
 };
 
-#if P_ODBC == 1
+#if ACT_SQL == 1
 
-enum CODBCProperties
+enum CSQLMProperties
 {
-	CODBCP_LASTSUCCEEDED = 0,
-	CODBCP_COUNT
+	CSQLMP_LASTSUCCEEDED = 0,
+	CSQLMP_COUNT
 };
 
 #endif

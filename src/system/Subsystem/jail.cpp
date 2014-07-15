@@ -3,6 +3,9 @@
 #include "cServerDefinitions.h"
 #include "ssection.h"
 #include "scriptc.h"
+#if ACT_SQL == 1
+#include "SQLManager.h"
+#endif
 
 namespace UOX
 {
@@ -114,6 +117,7 @@ void JailCell::PeriodicCheck( void )
 	}
 }
 
+#if ACT_SQL == 0
 void JailCell::WriteData( std::ofstream &outStream, size_t cellNumber )
 {
 	std::vector< JailOccupant * >::const_iterator jIter;
@@ -134,6 +138,37 @@ void JailCell::WriteData( std::ofstream &outStream, size_t cellNumber )
 		}
 	}
 }
+#else
+UString JailCell::WriteData(size_t cellNumber)
+{
+	std::stringstream Str;
+	bool Started = false;
+	for (std::vector<JailOccupant *>::const_iterator itr = playersInJail.begin(); itr != playersInJail.end(); ++itr)
+		if (*itr != NULL)
+		{
+			if (Started)
+				Str << ",";
+			else
+			{
+				Str << "\nINSERT INTO jail VALUES ";
+				Started = true;
+			}
+
+			Str << "('" << (*itr)->pSerial << "', ";
+			Str << "'" << int((UI08)cellNumber) << "', ";
+			Str << "'" << (*itr)->x << "', ";
+			Str << "'" << (*itr)->y << "', ";
+			Str << "'" << int((SI08)(SI16)(*itr)->z) << "', ";
+			Str << "'" << int((SI08)((*itr)->world == NULL ? 0 : (UI08)(*itr)->world)) << "', ";
+
+			if ((*itr)->releaseTime == 0)
+				Str << "'0000-00-00 00:00:00')";
+			else
+				Str << "FROM_UNIXTIME(" << (*itr)->releaseTime << ")";
+		}
+	return Str.str();
+}
+#endif
 
 JailSystem::JailSystem()
 {
@@ -184,6 +219,7 @@ void JailSystem::ReadSetup( void )
 }
 void JailSystem::ReadData( void )
 {
+#if ACT_SQL == 0
 	if( jails.empty() )
 		return;
 	std::string temp	= cwmWorldState->ServerData()->Directory( CSDDP_SHARED ) + "jails.wsc";
@@ -242,9 +278,63 @@ void JailSystem::ReadData( void )
 		}
 		delete jailData;
 	}
+#else
+	int index;
+	if (SQLManager::getSingleton().ExecuteQuery("SELECT serial, cell, oldx, oldy, oldz, world, UNIX_TIMESTAMP(`release`) FROM jail", &index, false))
+	{
+		int ColumnCount = mysql_num_fields(SQLManager::getSingleton().GetMYSQLResult());
+		while (SQLManager::getSingleton().FetchRow(&index))
+		{
+			JailOccupant toPush;
+			UI08 cellNumber = 0;
+			bool EmptyColumn = false;
+			for(int i = 0; i < ColumnCount; ++i)
+			{
+				UString value;
+				EmptyColumn = SQLManager::getSingleton().GetColumn(i, value, &index) == false ? true : false;
+				if (EmptyColumn && (i == 0 || i == 1))
+					break;
+				else
+				{
+					switch(i)
+					{
+					case 0: // jail.serial
+						toPush.pSerial = value.toULong();
+						break;
+					case 1: // jail.cell
+						cellNumber = value.toUByte();
+						break;
+					case 2: // jail.oldx
+						toPush.x = value.toShort();
+						break;
+					case 3: // jail.oldy
+						toPush.y = value.toShort();
+						break;
+					case 4: // jail.oldz
+						toPush.z = value.toByte();
+						break;
+					case 5: // jail.world
+						toPush.world = value.toByte();
+						break;
+					case 6: // jail.release
+						toPush.releaseTime = value.toLong();
+						break;
+					}
+				}
+			}
+			if (!EmptyColumn)
+				if (cellNumber < jails.size())
+					jails[cellNumber].AddOccupant( &toPush );
+				else
+					jails[RandomNum(static_cast< size_t >(0), jails.size() - 1)].AddOccupant(&toPush);
+		}
+		SQLManager::getSingleton().QueryRelease(false);
+	}
+#endif
 }
 void JailSystem::WriteData( void )
 {
+#if ACT_SQL == 0
 	std::string jailsFile = cwmWorldState->ServerData()->Directory( CSDDP_SHARED ) + "jails.wsc";
 	std::ofstream jailsDestination( jailsFile.c_str() );
 	if( !jailsDestination )
@@ -252,11 +342,22 @@ void JailSystem::WriteData( void )
 		Console.Error( "Failed to open %s for writing", jailsFile.c_str() );
 		return;
 	}
+
 	for( size_t jCtr = 0; jCtr < jails.size(); ++jCtr )
-	{
 		jails[jCtr].WriteData( jailsDestination, jCtr );
-	}
+
 	jailsDestination.close();
+#else
+	UString uStr = "DELETE FROM jail";
+	for (size_t jCtr = 0; jCtr < jails.size(); ++jCtr)
+		uStr += jails[jCtr].WriteData(jCtr);
+
+	std::istringstream iss;
+	iss.str(uStr);
+	uStr.clear();
+	while (std::getline(iss, uStr))
+		SQLManager::getSingleton().ExecuteQuery(uStr);
+#endif
 }
 void JailSystem::PeriodicCheck( void )
 {

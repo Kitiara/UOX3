@@ -45,7 +45,11 @@ public:
 	void	ObjPtr( CBaseObject *value )	{	objptr = value;			}
 	void	AssocScript( UI16 value )		{	assocScript = value;	}
 
+#if ACT_SQL == 0
 	bool	Save( std::ofstream &effectDestination ) const; // saves the current effect
+#else
+	UString Save(void) const;
+#endif
 };
 
 }

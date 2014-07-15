@@ -8,8 +8,8 @@
 	#include <direct.h>
 #endif
 
-#if P_ODBC == 1
-	#include "ODBCManager.h"
+#if ACT_SQL == 1
+	#include "SQLManager.h"
 #endif
 
 namespace UOX
@@ -92,7 +92,7 @@ const std::string UOX3INI_LOOKUP("|SERVERNAME|SERVERNAME|CONSOLELOG|CRASHPROTECT
 	"UOGENABLED|NETRCVTIMEOUT|NETSNDTIMEOUT|NETRETRYCOUNT|CLIENTFEATURES|OVERLOADPACKETS|NPCMOVEMENTSPEED|PETHUNGEROFFLINE|PETOFFLINETIMEOUT|PETOFFLINECHECKTIMER|ARCHERRANGE|ADVANCEDPATHFINDING|SERVERFEATURES|LOOTINGISCRIME|"
 	"NPCRUNNINGSPEED|NPCFLEEINGSPEED|BASICTOOLTIPSONLY|GLOBALITEMDECAY|SCRIPTITEMSDECAYABLE|BASEITEMSDECAYABLE|ITEMDECAYINHOUSES|COMBATEXPLODEDELAY|PAPERDOLLGUILDBUTTON|ATTACKSPEEDFROMSTAMINA|DISPLAYDAMAGENUMBERS|"
 	"CLIENTSUPPORT4000|CLIENTSUPPORT5000|CLIENTSUPPORT6000|CLIENTSUPPORT6050|CLIENTSUPPORT7000|CLIENTSUPPORT7090|CLIENTSUPPORT70160|EXTENDEDSTARTINGSTATS|EXTENDEDSTARTINGSKILLS|CLIENTSUPPORT70240|"
-	"ODBCDSN|ODBCUSER|ODBCPASS|"
+	"MySQLDB|MySQLUSER|MySQLPASS|"
 );
 
 void CServerData::ResetDefaults( void )
@@ -175,9 +175,11 @@ void CServerData::ResetDefaults( void )
 	CombatNPCDamageRate( 2 );
 	RankSystemStatus( true );
 
-	char curWorkingDir[1024];
-	GetCurrentDirectory( 1024, curWorkingDir );
-	UString wDir( curWorkingDir );
+	char curWorkingDir[MAX_PATH];
+	GetModuleFileName(NULL, curWorkingDir, MAX_PATH);
+	std::string::size_type pos = std::string(curWorkingDir).find_last_of("\\");
+	UString wDir( std::string(curWorkingDir).substr(0, pos) );
+
 	wDir = wDir.fixDirectory();
 	UString tDir;
 	Directory( CSDDP_ROOT, wDir );
@@ -476,7 +478,7 @@ void CServerData::ServerSavesTimer( UI32 timer )
 {
 	serversavestimer = timer;
 	if( timer < 180 )						// 3 minutes is the lowest value you can set saves for
-		serversavestimer = 300;	// 10 minutes default
+		serversavestimer = 300;	// 5 minutes default
 }
 
 UI32 CServerData::ServerSavesTimerStatus( void ) const
@@ -576,67 +578,72 @@ std::string CServerData::Directory( CSDDirectoryPaths dp )
 
 void CServerData::Directory( CSDDirectoryPaths dp, std::string value )
 {
-	if( dp != CSDDP_COUNT )
+	if (dp == CSDDP_COUNT)
+		return;
+	
+	if (ACT_SQL == 1 && (dp == CSDDP_ACCESS || dp == CSDDP_ACCOUNTS || dp == CSDDP_SHARED  || dp == CSDDP_BOOKS))
+		return;
+
+	std::string verboseDirectory;
+	switch( dp )
 	{
-		std::string verboseDirectory;
-		switch( dp )
-		{
-			case CSDDP_ROOT:			verboseDirectory = "Root directory";			break;
-			case CSDDP_DATA:			verboseDirectory = "Data directory";			break;
-			case CSDDP_DEFS:			verboseDirectory = "DFNs directory";			break;
-			case CSDDP_ACCESS:			verboseDirectory = "Access directory";			break;
-			case CSDDP_ACCOUNTS:		verboseDirectory = "Accounts directory";		break;
-			case CSDDP_SCRIPTS:			verboseDirectory = "Scripts directory";			break;
-			case CSDDP_BACKUP:			verboseDirectory = "Backup directory";			break;
-			case CSDDP_MSGBOARD:		verboseDirectory = "Messageboard directory";	break;
-			case CSDDP_SHARED:			verboseDirectory = "Shared directory";			break;
-			case CSDDP_HTML:			verboseDirectory = "HTML directory";			break;
-			case CSDDP_LOGS:			verboseDirectory = "Logs directory";			break;
-			case CSDDP_DICTIONARIES:	verboseDirectory = "Dictionary directory";		break;
-			case CSDDP_BOOKS:			verboseDirectory = "Books directory";			break;
-			case CSDDP_COUNT:
-			default:					verboseDirectory = "Unknown directory";			break;
-		};
-		// First, let's normalize the path name and fix common errors
-		UString sText( value );
-		// remove all trailing and leading spaces...
-		sText = sText.stripWhiteSpace();
-		if( sText.empty() )
-		{
-			Console.Error( " %s directory is blank, set in uox.ini", verboseDirectory.c_str() );
-			Shutdown( FATAL_UOX3_DIR_NOT_FOUND );
-			return;
-		}
+		case CSDDP_ROOT:			verboseDirectory = "Root directory";			break;
+		case CSDDP_DATA:			verboseDirectory = "Data directory";			break;
+		case CSDDP_DEFS:			verboseDirectory = "DFNs directory";			break;
+		case CSDDP_ACCESS:			verboseDirectory = "Access directory";			break;
+		case CSDDP_ACCOUNTS:		verboseDirectory = "Accounts directory";		break;
+		case CSDDP_SCRIPTS:			verboseDirectory = "Scripts directory";			break;
+		case CSDDP_BACKUP:			verboseDirectory = "Backup directory";			break;
+		case CSDDP_MSGBOARD:		verboseDirectory = "Messageboard directory";	break;
+		case CSDDP_SHARED:			verboseDirectory = "Shared directory";			break;
+		case CSDDP_HTML:			verboseDirectory = "HTML directory";			break;
+		case CSDDP_LOGS:			verboseDirectory = "Logs directory";			break;
+		case CSDDP_DICTIONARIES:	verboseDirectory = "Dictionary directory";		break;
+		case CSDDP_BOOKS:			verboseDirectory = "Books directory";			break;
+		case CSDDP_COUNT:
+		default:					verboseDirectory = "Unknown directory";			break;
+	};
+	// First, let's normalize the path name and fix common errors
+	UString sText( value );
+	// remove all trailing and leading spaces...
+	sText = sText.stripWhiteSpace();
+	if( sText.empty() )
+	{
+		Console.Error( " %s directory is blank, set in uox.ini", verboseDirectory.c_str() );
+		Shutdown( FATAL_UOX3_DIR_NOT_FOUND );
+		return;
+	}
 
-		// Make sure we're terminated with a directory separator
-		// Just incase it's not set in the .ini
-		// and convert the windows backward slashes to forward slashes
+	// Make sure we're terminated with a directory separator
+	// Just incase it's not set in the .ini
+	// and convert the windows backward slashes to forward slashes
 
-		sText = sText.fixDirectory();
+	sText = sText.fixDirectory();
 
-		bool error = false;
-		if( !resettingDefaults )
-		{
-			char curWorkingDir[1024];
-			GetCurrentDirectory( 1024, curWorkingDir );
-			int iResult = _chdir( sText.c_str() );
-			if( iResult != 0 )
-				error = true;
-			else
-				_chdir( curWorkingDir );	// move back to where we were
-		}
+	bool error = false;
+	if( !resettingDefaults )
+	{
+		char curWorkingDir[MAX_PATH];
+		GetModuleFileName(NULL, curWorkingDir, MAX_PATH);
+		std::string::size_type pos = std::string(curWorkingDir).find_last_of("\\");
 
-		if( error )
-		{
-				Console.Error( "%s %s does not exist", verboseDirectory.c_str(), sText.c_str() );
-				Shutdown( FATAL_UOX3_DIR_NOT_FOUND );
-		}
+		int iResult = _chdir( sText.c_str() );
+		if( iResult != 0 )
+			error = true;
 		else
-		{
-			// There was a check to see if text was empty, to set to "./".  However, if text was blank, we bailed out in the
-			// beginning of the routine
-			serverDirectories[dp] = value;
-		}
+			_chdir( std::string(curWorkingDir).substr(0, pos).c_str() );	// move back to where we were
+	}
+
+	if( error )
+	{
+			Console.Error( "%s %s does not exist", verboseDirectory.c_str(), sText.c_str() );
+			Shutdown( FATAL_UOX3_DIR_NOT_FOUND );
+	}
+	else
+	{
+		// There was a check to see if text was empty, to set to "./".  However, if text was blank, we bailed out in the
+		// beginning of the routine
+		serverDirectories[dp] = value;
 	}
 }
 
@@ -1614,7 +1621,13 @@ UI32 CServerData::GetClientFeatures( void ) const
 
 void CServerData::SetClientFeatures( UI32 nVal )
 {
-	clientFeatures = nVal;
+	char strnVal[256];
+	_snprintf(strnVal, sizeof(strnVal), "%d", nVal);
+	std::stringstream strValue;
+	strValue << strnVal;
+	int intValue;
+	strValue >> intValue;
+	clientFeatures = std::bitset<CF_BIT_COUNT>(intValue);
 }
 
 
@@ -1635,7 +1648,13 @@ size_t CServerData::GetServerFeatures( void ) const
 
 void CServerData::SetServerFeatures( size_t nVal )
 {
-	serverFeatures = nVal;
+	char strnVal[256];
+	_snprintf(strnVal, sizeof(strnVal), "%d", nVal);
+	std::stringstream strValue;
+	strValue << strnVal;
+	int intValue;
+	strValue >> intValue;
+	serverFeatures = std::bitset<SF_BIT_COUNT>(intValue);
 }
 
 //o--------------------------------------------------------------------------o
@@ -1933,8 +1952,8 @@ bool CServerData::save( std::string filename )
 		ofsOutput << "GUARDSPAID=" << TownGuardPayment() << '\n';
 		ofsOutput << "}" << '\n';
 		
-#if P_ODBC == 1
-		ODBCManager::getSingleton().SaveSettings( ofsOutput );
+#if ACT_SQL == 1
+		SQLManager::getSingleton().SaveSettings( ofsOutput );
 #endif
 		
 		ofsOutput.close();
@@ -2068,17 +2087,22 @@ bool CServerData::ParseINI( const std::string& filename )
 			{
 				if( sect == NULL )
 					continue;
-				UString tag, data;
-				for( tag = sect->First(); !sect->AtEnd(); tag = sect->Next() )
+				for(UString tag = sect->First(); !sect->AtEnd(); tag = sect->Next() )
 				{
-					data = sect->GrabData().simplifyWhiteSpace();
+					UString data = sect->GrabData().simplifyWhiteSpace();
 					if( !HandleLine( tag, data ) )
-					{
 						Console.Warning( "Unhandled tag '%s'", tag.c_str() );
-					}
 				}
+
 			}
+			#if ACT_SQL == 1
+				Console << "Connecting to database ... ";
+				if (!SQLManager::getSingleton().Connect())
+					Console.PrintFailed();
+			#endif
+
 			Console.PrintDone();
+
 			rvalue = true;
 		}
 		else
@@ -2487,6 +2511,9 @@ bool CServerData::HandleLine( const UString& tag, const UString& value )
 			toAdd.setIP( inet_ntoa(*pinaddr) );
 			toAdd.setPort( sport.toUShort() );
 			serverList.push_back( toAdd );
+			#if ACT_SQL == 1
+				SQLManager::getSingleton().SetAddress( toAdd.getIP() );
+			#endif
 		}
 		else
 		{
@@ -2640,15 +2667,15 @@ bool CServerData::HandleLine( const UString& tag, const UString& value )
 		ClientSupport70240( value.toUShort() == 1 );
 		break;
 
-#if P_ODBC == 1
-	case 0x098d:	 // ODBCDSN[0168]
-		ODBCManager::getSingleton(0168.SetDatabase( value );
+#if ACT_SQL == 1
+	case 0x098d:	 // MySQLDB[0168]
+		SQLManager::getSingleton().SetDatabase( value );
 		break;
-	case 0x0995:	 // ODBCUSER[0169]
-		ODBCManager::getSingleton().SetUsername( value );
+	case 0x0995:	 // MySQLUSER[0169]
+		SQLManager::getSingleton().SetUsername( value );
 		break;
-	case 0x099e:	 // ODBCPASS[0170]
-		ODBCManager::getSingleton().SetPassword( value );
+	case 0x099f:	 // MySQLPASS[0170]
+		SQLManager::getSingleton().SetPassword( value );
 		break;
 #endif
 	default:
@@ -2804,6 +2831,7 @@ void CServerData::ServerSecondsPerUOMinute( UI16 newVal )
 //o--------------------------------------------------------------------------o	
 void CServerData::SaveTime( void )
 {
+#if ACT_SQL == 0
 	std::string		timeFile = cwmWorldState->ServerData()->Directory( CSDDP_SHARED ) + "time.wsc";
 	std::ofstream	timeDestination( timeFile.c_str() );
 	if( !timeDestination ) 
@@ -2822,11 +2850,23 @@ void CServerData::SaveTime( void )
 	timeDestination << "}" << '\n' << '\n';
 
 	timeDestination.close();
+#else
+	std::stringstream Str;
+	Str << "REPLACE INTO time (currentlight,day,hour,minute,ampm,moon) VALUES ('";
+	Str << int((UI08)static_cast<UI16>(WorldLightCurrentLevel())) << "', ";
+	Str << "'" << ServerTimeDay() << "', ";
+	Str << "'" << static_cast<UI16>(ServerTimeHours()) << "', ";
+	Str << "'" << static_cast<UI16>(ServerTimeMinutes()) << "', ";
+	Str << "'" << (ServerTimeAMPM() ? 1 : 0) << "', ";
+	Str << "'" << ServerMoon(0) << "," << ServerMoon(1) << "')";
+	SQLManager::getSingleton().ExecuteQuery(Str.str());
+#endif
 }
 
 void ReadWorldTagData( std::ifstream &inStream, UString &tag, UString &data );
 void CServerData::LoadTime( void )
 {
+#if ACT_SQL == 0
 	std::ifstream input;
 	std::string filename = cwmWorldState->ServerData()->Directory( CSDDP_SHARED ) + "time.wsc";
 
@@ -2850,8 +2890,49 @@ void CServerData::LoadTime( void )
 		}
 		input.close();
 	}
+#else
+	int index;
+	if (SQLManager::getSingleton().ExecuteQuery("SELECT currentlight,day,hour,minute,ampm,moon FROM time", &index, false))
+	{
+		int ColumnCount = mysql_num_fields(SQLManager::getSingleton().GetMYSQLResult());
+		while (SQLManager::getSingleton().FetchRow(&index))
+		{
+			for(int i = 0; i < ColumnCount; ++i)
+			{
+				UString value;
+				if(SQLManager::getSingleton().GetColumn(i, value, &index))
+				{
+					switch(i)
+					{
+					case 0: // time.currentlight
+						WorldLightCurrentLevel(value.toUByte());
+						break;
+					case 1: // time.day
+						ServerTimeDay(value.toShort());
+						break;
+					case 2: // time.hour
+						ServerTimeHours(value.toUShort());
+						break;
+					case 3: // time.minute
+						ServerTimeMinutes(value.toUShort());
+						break;
+					case 4: // time.ampm
+						ServerTimeAMPM(value.toUByte() == 1);
+						break;
+					case 5: // time.moon
+						if (!value.empty())
+							for (int i = 0; i < value.sectionCount(",")+1; ++i)
+								ServerMoon(i, value.section(",", i, i).stripWhiteSpace().toUShort());
+						break;
+					}
+				}
+			}
+		}
+		SQLManager::getSingleton().QueryRelease(false);
+	}
+#endif
 }
-
+#if ACT_SQL == 1
 void CServerData::LoadTimeTags( std::ifstream &input )
 {
 	UString UTag, tag, data;
@@ -2883,7 +2964,7 @@ void CServerData::LoadTimeTags( std::ifstream &input )
 	}
 	tag = "";
 }
-
+#endif
 SI16 CServerData::ServerTimeDay( void ) const
 {
 	return days;

@@ -1601,7 +1601,13 @@ void CTile::Read( UOXFile *toRead )
 //	BYTE[20]	Name
 	UI32 flagsRead;
 	toRead->getULong( &flagsRead );
-	flags = flagsRead;
+	char strflagsRead[256];
+	_snprintf(strflagsRead, sizeof(strflagsRead), "%d", flagsRead);
+	std::stringstream strValue;
+	strValue << flagsRead;
+	int intValue;
+	strValue >> intValue;
+	flags = std::bitset<TF_COUNT>(intValue);
 	toRead->getUChar( &weight );
 	toRead->getChar(  &layer );
 	toRead->getUShort( &unknown1 );
@@ -1634,7 +1640,13 @@ void CTileHS::Read( UOXFile *toRead )
 //	BYTE[20]	Name
 	UI32 flagsRead;
 	toRead->getULong( &flagsRead );
-	flags = flagsRead;
+	char strflagsRead[256];
+	_snprintf(strflagsRead, sizeof(strflagsRead), "%d", flagsRead);
+	std::stringstream strValue;
+	strValue << flagsRead;
+	int intValue;
+	strValue >> intValue;
+	flags = std::bitset<TF_COUNT>(intValue);
 	toRead->getULong( &unknown0 );
 	toRead->getUChar( &weight );
 	toRead->getChar(  &layer );
@@ -1657,7 +1669,13 @@ void CLand::Read( UOXFile *toRead )
 {
 	UI32 flagsRead;
 	toRead->getULong( &flagsRead );
-	flags = flagsRead;
+	char strflagsRead[256];
+	_snprintf(strflagsRead, sizeof(strflagsRead), "%d", flagsRead);
+	std::stringstream strValue;
+	strValue << flagsRead;
+	int intValue;
+	strValue >> intValue;
+	flags = std::bitset<TF_COUNT>(intValue);
 	toRead->getUShort( &textureID );
 	toRead->getChar( name, 20 );
 }
@@ -1669,7 +1687,13 @@ void CLandHS::Read( UOXFile *toRead )
 {
 	UI32 flagsRead;
 	toRead->getULong( &flagsRead );
-	flags = flagsRead;
+	char strflagsRead[256];
+	_snprintf(strflagsRead, sizeof(strflagsRead), "%d", flagsRead);
+	std::stringstream strValue;
+	strValue << flagsRead;
+	int intValue;
+	strValue >> intValue;
+	flags = std::bitset<TF_COUNT>(intValue);
 	toRead->getULong( &unknown1 );
 	toRead->getUShort( &textureID );
 	toRead->getChar( name, 20 );

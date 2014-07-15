@@ -186,14 +186,15 @@ public:
 	bool					DelAccount( UI16 wAccountID );
 	bool					SetPath( std::string sPath );
 	std::string				GetPath( void );
-	UI16					Save( bool bForceLoad = false );
+	UI16					Save();
 	UI16					Load( void );
 	size_t					size( void );
 	bool					clear( void );
 	bool					isUser( std::string sUsername );
 	bool					AddCharacter( UI16 wAccountID, CChar *lpObject );
-	bool					AddCharacter( UI16 wAccountID, UI32 dwCharacterID, CChar *lpObject );
-	bool					DelCharacter( UI16 wAccountID, UI08 nSlot );
+	bool					AddCharacter( UI16 wDAccountID, UI16 wSAccountID, UI16 wSSlot, CAccountBlock& actbTemp, bool transaction = false );
+	bool					AddCharacter( UI16 wAccountID, UI16 delAccountID, UI16 delSlot, UI32 dwCharacterID, CChar *lpObject, bool transaction = false );
+	bool					DelCharacter( UI16 wAccountID, UI08 nSlot, bool switching = false, bool transaction = false );
 	bool					TransCharacter( UI16 wSAccountID, UI16 wSSlot, UI16 wDAccountID );
 	CAccountBlock&			GetAccountByName( std::string sUsername );
 	CAccountBlock&			GetAccountByID( UI16 wAccountID );
@@ -217,9 +218,8 @@ private:
 	std::string		m_sAccountsDirectory;
 
 #if UOX_PLATFORM == WIN32
-	bool					LoadFromDB( UI16& numLoaded );
-	bool					SaveToDB( UI16& numSaved );
-	bool					FinaliseBlock( CAccountBlock& toFinalise );
+	bool LoadFromDB( UI16& numLoaded );
+	bool FinaliseBlock( CAccountBlock& toFinalise );
 #endif
 };
 

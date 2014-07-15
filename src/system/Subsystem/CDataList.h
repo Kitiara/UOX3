@@ -47,13 +47,10 @@ namespace UOX
 
 		DATALIST_ITERATOR FindEntry( T toFind )
 		{
-			DATALIST_ITERATOR fIter = objData.end();
-			for( fIter = objData.begin(); fIter != objData.end(); ++fIter )
-			{
-				if( (*fIter) == toFind )
-					break;
-			}
-			return fIter;
+			auto search = std::find(objData.begin(), objData.end(), toFind);
+			if (search != objData.end())
+				return search;
+			return objData.end();
 		}
 
 		bool Begin( void )

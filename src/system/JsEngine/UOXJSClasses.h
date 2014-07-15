@@ -392,16 +392,16 @@ static JSExtendedClass UOXParty_class =
 	JSCLASS_NO_RESERVED_MEMBERS
 }; 
 
-#if P_ODBC == 1
+#if ACT_SQL == 1
 
-static JSClass UOXODBC_class =
+static JSClass UOXSQLM_class =
 {
-	"UOXODBC",
+	"UOXSQLM",
 	JSCLASS_HAS_PRIVATE,
 	JS_PropertyStub,
 	JS_PropertyStub,
-	CODBCProps_getProperty,
-	CODBCProps_setProperty,
+	CSQLMProps_getProperty,
+	CSQLMProps_setProperty,
 	JS_EnumerateStub,
 	JS_ResolveStub,
 	JS_ConvertStub,

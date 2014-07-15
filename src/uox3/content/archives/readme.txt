@@ -1,1 +1,1 @@
-This is where backups of the shared directory are stored
+This is where backups are stored

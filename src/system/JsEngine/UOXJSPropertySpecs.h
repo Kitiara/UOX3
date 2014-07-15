@@ -497,11 +497,11 @@ static JSPropertySpec CPartyProperties[] =
 	{	NULL,			(SI08)NULL,				(UI08)0				}
 };
 
-#if P_ODBC == 1
+#if ACT_SQL == 1
 
-static JSPropertySpec CODBCProperties[] =
+static JSPropertySpec CSQLMProperties[] =
 {
-	{ "lastOK",			CODBCP_LASTSUCCEEDED,	JSPROP_ENUMPERMRO	},
+	{ "lastOK",			CSQLMP_LASTSUCCEEDED,	JSPROP_ENUMPERMRO	},
 	{	NULL,			(SI08)NULL,				(UI08)0				}
 };
 

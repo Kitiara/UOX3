@@ -40,8 +40,8 @@
 
 #include "PartySystem.h"
 
-#if P_ODBC == 1
-#include "ODBCManager.h"
+#if ACT_SQL == 1
+#include "SQLManager.h"
 #endif
 
 namespace UOX
@@ -1971,29 +1971,29 @@ namespace UOX
 		return JS_TRUE;
 	}
 
-#if P_ODBC == 1
+#if ACT_SQL == 1
 
-	JSBool CODBCProps_setProperty( JSContext *cx, JSObject *obj, jsval id, jsval *vp )
+	JSBool CSQLMProps_setProperty( JSContext *cx, JSObject *obj, jsval id, jsval *vp )
 	{
 		if( JSVAL_IS_INT( id ) ) 
 		{
 			switch( JSVAL_TO_INT( id ) )
 			{
-			case CODBCP_LASTSUCCEEDED:		break;
+			case CSQLMP_LASTSUCCEEDED:		break;
 			default:						break;
 			}
 		}
 		return JS_TRUE;
 	}
 
-	JSBool CODBCProps_getProperty( JSContext *cx, JSObject *obj, jsval id, jsval *vp )
+	JSBool CSQLMProps_getProperty( JSContext *cx, JSObject *obj, jsval id, jsval *vp )
 	{
 		if( JSVAL_IS_INT( id ) ) 
 		{
 			int realID = JSVAL_TO_INT( id );
 			switch( realID )
 			{
-			case CODBCP_LASTSUCCEEDED:	*vp = BOOLEAN_TO_JSVAL( ODBCManager::getSingleton().LastSucceeded() );	break;
+			case CSQLMP_LASTSUCCEEDED:	*vp = BOOLEAN_TO_JSVAL( SQLManager::getSingleton().LastSucceeded() );	break;
 			default:					Console.Warning( "No such property exists" );							break;
 			}
 		}

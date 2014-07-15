@@ -41,10 +41,16 @@ public:
 	void				LockDownItem( CItem *toLock );
 	void				RemoveLockDown( CItem *toRemove );
 
+#if ACT_SQL == 1
+	virtual UString		Save(void);
+	virtual std::stringstream		DumpBody() const;
+	virtual void		HandleLine(std::vector<UString> dataList);
+#else
 	virtual bool		Save( std::ofstream &outStream );
 	virtual bool		DumpHeader( std::ofstream &outStream ) const;
 	virtual bool		DumpBody( std::ofstream &outStream ) const;
 	virtual bool		HandleLine( UString &UTag, UString &data );
+#endif
 
 	virtual void		SetOwner( CChar *newOwner );
 
@@ -70,10 +76,15 @@ protected:
 	TIMERVAL			nextMoveTime;
 
 private:
+#if ACT_SQL == 1
+	virtual std::stringstream		DumpBody() const;
+	virtual void		HandleLine(std::vector<UString> dataList);
+#else
 	virtual bool		DumpHeader( std::ofstream &outStream ) const;
 	virtual bool		DumpBody( std::ofstream &outStream ) const;
 
 	virtual bool		HandleLine( UString &UTag, UString &data );
+#endif
 
 public:
 						CBoatObj();

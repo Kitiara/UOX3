@@ -671,7 +671,9 @@ public:
 
 	void			SaveTime( void );
 	void			LoadTime( void );
+#if ACT_SQL == 1
 	void			LoadTimeTags( std::ifstream &input );
+#endif
 
 	// These functions return TRUE if it's a new day
 	bool			incSecond( void );

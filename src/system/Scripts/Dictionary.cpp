@@ -35,18 +35,13 @@ CDictionary::~CDictionary()
 
 CDictionary::CDictionary( const std::string& filepath, const std::string& language )
 {
-	CDictionary();	//	Call default constructor for this Class
-#pragma note( "Is the above line valid? You supposedly cannot call constructors from constructors in c++..." )
+	*this = CDictionary();	//	Call default constructor for this Class
 
-	if( language.empty() )
-		Language = "ZRO";
-	else
+	if (!language.empty())
 		Language = language;
 
 	//	Load the path
-	if( filepath.empty() )
-		PathToDictionary = "dictionary.ZRO";
-	else
+	if (!filepath.empty())
 		PathToDictionary = filepath;
 }
 

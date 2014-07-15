@@ -6,6 +6,10 @@
 	#include <direct.h>
 #endif
 
+#if ACT_SQL == 1
+#include "SQLManager.h"
+#endif
+
 namespace UOX
 {
 
@@ -86,8 +90,12 @@ void fileArchive( void )
 
 	std::string backupRoot	= cwmWorldState->ServerData()->Directory( CSDDP_BACKUP );
 	backupRoot				+= timebuffer;
+#if ACT_SQL == 0
 	int makeResult = _mkdir( backupRoot.c_str(), 0777 );
-	if( makeResult == 0 )
+
+	if( makeResult != 0 )
+		Console << "Cannot create backup directory, please check available disk space" << myendl;
+	else
 	{
 		Console << "NOTICE: Accounts not backed up. Archiving will change. Sorry for the trouble." << myendl;
 
@@ -116,10 +124,129 @@ void fileArchive( void )
 		backupFile( "guilds.wsc", backupRoot );
 		backupFile( "regions.wsc", backupRoot );
 	}
-	else
+#else
 	{
-		Console << "Cannot create backup directory, please check available disk space" << myendl;
+		std::stringstream BackupQuery;
+		std::string db = SQLManager::getSingleton().GetDatabase();
+		int index[2];
+		if (SQLManager::getSingleton().ExecuteQuery("SHOW TABLES", &index[0], false))
+		{
+			int tables = mysql_num_fields(SQLManager::getSingleton().GetMYSQLResult());
+			while (SQLManager::getSingleton().FetchRow(&index[0])) // First, get all table names of the db
+			{
+				UString value[2];
+				if (SQLManager::getSingleton().GetColumn(0, value[0], &index[0]))
+				{
+					if (SQLManager::getSingleton().ExecuteQuery("SHOW CREATE TABLE "+db+"."+value[0], &index[1], false))
+					{
+						if (SQLManager::getSingleton().GetColumn(1, value[1], &index[1])) // Second, show how to create the table
+							BackupQuery << value[1] << ";\n";
+						SQLManager::getSingleton().QueryRelease(false);
+					}
+					
+					std::istringstream iss;
+					iss.str(value[1]);
+					value[1].clear();
+
+					if (SQLManager::getSingleton().ExecuteQuery("SELECT COUNT(*) FROM "+value[0], &index[1], false))
+					{
+						SQLManager::getSingleton().GetColumn(0, value[1], &index[1]); // Third, check if the table contains data
+						SQLManager::getSingleton().QueryRelease(false);
+					}
+					if (value[1].compare("0") != 0) // It contains data
+					{
+						value[1].clear();
+
+						std::stringstream first;
+						first << "INSERT INTO `" << value[0] << "` (";
+						int columnnames = 0;
+						if (SQLManager::getSingleton().ExecuteQuery("SELECT `COLUMN_NAME` FROM information_schema.COLUMNS WHERE `TABLE_SCHEMA`=\""+db+"\" and `TABLE_NAME`=\""+value[0]+"\"", &index[1], false))
+						{
+							while (SQLManager::getSingleton().FetchRow(&index[1]))
+							{
+								if (columnnames != 0)
+									first << ", ";
+								if (SQLManager::getSingleton().GetColumn(0, value[1], &index[1])) // Fourth, get all column names of the table
+									first << "`" << value[1] << "`";
+								
+								++columnnames;
+								value[1].clear();
+							}
+
+							SQLManager::getSingleton().QueryRelease(false);
+						}
+
+						std::vector<bool> nullable;
+
+						std::string line;
+						while (std::getline(iss, line))
+						{
+							if (line.find(",") != std::string::npos)
+								if (line.find("NOT NULL") != std::string::npos)
+									nullable.push_back(false);
+								else
+									nullable.push_back(true);
+						}
+
+						first << ") VALUES ";
+
+						int MaxQuerySize = 300; // will affect size of the backup
+						int CurrQuerySize = MaxQuerySize;
+						if (SQLManager::getSingleton().ExecuteQuery("SELECT * FROM "+value[0], &index[1], false))
+						{
+							bool started = false;
+							int columns = mysql_num_fields(SQLManager::getSingleton().GetMYSQLResult());
+							BackupQuery << first.str();
+							while (SQLManager::getSingleton().FetchRow(&index[1])) // Fifth, get all datas
+							{
+								if (CurrQuerySize == 0)
+								{
+									BackupQuery << ");\n" << first.str();
+									started = false;
+									CurrQuerySize = MaxQuerySize;
+								}
+								if (started)
+									BackupQuery << "),";
+
+								BackupQuery << "(";
+								for (int j = 0; j < columns; ++j)
+								{
+									started = true;
+									SQLManager::getSingleton().GetColumn(j, value[1], &index[1]);
+									if (value[1].empty())
+										BackupQuery << (nullable[j] ? "NULL" : "\"\"");
+									else
+									{
+										std::string search[2] = {"'", "\\"};
+										for (int k = 0; k < 2; ++k)
+											if (value[1].find(search[k]) != std::string::npos)
+												value[1].replace(value[1].find(search[k]), search[k].length(), search[k]+search[k]);
+
+										BackupQuery << "'" << value[1] << "'";
+									}
+									value[1].clear();
+
+									if (j != columns-1)
+										BackupQuery << ",";
+								}
+								--CurrQuerySize;
+							}
+							BackupQuery << ");\n";
+
+							SQLManager::getSingleton().QueryRelease(false);
+						}
+					}
+				}
+			}
+			SQLManager::getSingleton().QueryRelease(false);
+		}
+		
+		std::ofstream sqlfile (backupRoot+db+".sql");
+		sqlfile << BackupQuery.str();
+		sqlfile.close();
 	}
+
+#endif
 	Console << "Finished backup" << myendl;
 }
 

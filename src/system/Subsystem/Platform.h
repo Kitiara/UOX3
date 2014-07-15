@@ -107,8 +107,7 @@ suit our own purposes
 #	if UOX_COMPILER == COMPILER_MSVC && UOX_COMP_VER >= 1400	// VS 2005 Defines for Security and Debugging 
 #		define _CRT_SECURE_NO_DEPRECATE						// Disable "depreciated function" warning
 #		define _CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES 1	// Automatically convert normal (sprintf) functions to secure (sprintf_s) functions
-#		define _HAS_ITERATOR_DEBUGGING 0					// Iterator debugging should only be enabled in debug, and WILL cause crashes if iterators are handled improperly.
-#		define _SECURE_SCL 0
+#		define _ITERATOR_DEBUG_LEVEL 0						// Iterator debugging should only be enabled in debug, and WILL cause crashes if iterators are handled improperly.
 #	endif
 
 	#define XP_WIN			// JS API Requires we define OS we compile with

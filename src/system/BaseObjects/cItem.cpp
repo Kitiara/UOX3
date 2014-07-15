@@ -883,6 +883,7 @@ void CItem::LockDown( void )
 	movable = 3;
 }
 
+#if ACT_SQL == 0
 bool CItem::Save( std::ofstream &outStream )
 {
 	if( isFree() )
@@ -902,6 +903,25 @@ bool CItem::Save( std::ofstream &outStream )
 	}
 	return true;
 }
+#else
+UString CItem::Save(void)
+{
+	UString uStr;
+	if(!isFree())
+	{
+		MapData_st& mMap = Map->GetMapData(worldNumber);
+		if(GetCont() != NULL || (GetX() > 0 && GetX() < mMap.xBlock && GetY() < mMap.yBlock))
+		{
+			uStr += DumpBody().str();
+
+			for (CItem *toSave = Contains.First(); !Contains.Finished(); toSave = Contains.Next())
+				if (ValidateObject(toSave) && toSave->ShouldSave())
+					uStr += toSave->Save();
+		}
+	}
+	return uStr;
+}
+#endif
 
 void CItem::RemoveSelfFromOwner( void )
 {
@@ -1049,7 +1069,7 @@ void CItem::SetWeatherDamage( WeatherType effectNum, bool value )
 {
 	weatherBools.set( effectNum, value );
 }
-
+#if ACT_SQL == 0
 bool CItem::DumpHeader( std::ofstream &outStream ) const
 {
 	outStream << "[ITEM]" << '\n';
@@ -1102,7 +1122,79 @@ bool CItem::DumpBody( std::ofstream &outStream ) const
 	outStream << "EntryMadeFrom=" << EntryMadeFrom() << '\n';
 	return true;
 }
+#else
+std::stringstream CItem::DumpBody() const
+{
+	std::stringstream Str = CBaseObject::DumpBody();
+	Str << "INSERT INTO items VALUES (";
+	Str << "'" << serial << "', ";
 
+	Str << "'" << int((SI08)(SI16)GetGridLocation()) << "', ";
+	Str << "'" << int((UI08)(SI16)GetLayer()) << "', ";
+	if (GetContSerial() == NULL)
+		Str << "NULL, ";
+	else
+		Str << "'" << GetContSerial() << "', ";
+
+	Str << "'" << GetTempVar(CITV_MORE) << "', ";
+	Str << "'" << GetCreator() << "', ";
+	Str << "'" << GetTempVar(CITV_MOREX) << "," << GetTempVar(CITV_MOREY) << "," << GetTempVar(CITV_MOREZ) << "', ";
+	Str << "'" << GetGlow() << "', ";
+	Str << "'" << GetGlowColour() << "', ";
+	Str << "'" << GetAmmoID() << "," << GetAmmoHue() << "', ";
+	Str << "'" << GetAmmoFX() << "," << GetAmmoFXHue() << "," << GetAmmoFXRender() << "', ";
+	Str << "'" << GetSpell(0) << "," << GetSpell(1) << "," << GetSpell(2) << "', ";
+
+	if (std::string("#").compare(GetName2()) == 0 || std::string("").compare(GetName2()) == 0)
+		Str << "NULL, ";
+	else
+	{
+		std::string Name2 = GetName2();
+		std::string search = "\"";
+		if (Name2.find(search) != std::string::npos)
+			Name2.replace(Name2.find(search), search.length(), "\\\"");
+
+		Str << "'" << name2 << "', ";
+	}
+	
+	if (GetDesc().empty())
+		Str << "NULL, ";
+	else
+	{
+		std::string Desc = GetDesc();
+		std::string search = "\"";
+		if (Desc.find(search) != std::string::npos)
+			Desc.replace(Desc.find(search), search.length(), "\\\"");
+
+		Str << "'" << Desc << "', ";
+	}
+
+	Str << "'" << int((UI08) static_cast<SI16>(GetType())) << "', ";
+	Str << "'" << int((SI08)(SI16)GetOffSpell()) << "', ";
+	Str << "'" << GetAmount() << "', ";
+	Str << "'" << GetWeightMax() << "', ";
+	Str << "'" << GetBaseWeight() << "', ";
+	Str << "'" << GetMaxHP() << "', ";
+	Str << "'" << int((UI08)(SI16)GetSpeed()) << "', ";
+	Str << "'" << int((SI08)(SI16)GetMovable()) << "', ";
+	Str << "'" << int((UI08)(SI16)GetPriv()) << "', ";
+	Str << "'" << GetBuyValue() << "," << GetSellValue() << "', ";
+	Str << "'" << GetRestock() << "', ";
+	Str << "'" << int((UI08)(SI16)GetArmourClass()) << "', ";
+	Str << "'" << int((SI08)(SI16)GetRank()) << "', ";
+	Str << "'" << int((SI08)(SI16)GetMadeWith()) << "', ";
+	Str << "'" << int((UI08)(SI16)(bools.to_ulong())) << "', ";
+	Str << "'" << GetGood() << "', ";
+	Str << "'" << int((UI08)(SI16)GetGlowEffect()) << "', ";
+	Str << "'" << (SI16)(GetWeatherDamage(LIGHT) ? 1 : 0) << "," << (SI16)(GetWeatherDamage(HEAT) ? 1 : 0) << ","
+               << (SI16)(GetWeatherDamage(RAIN) ? 1 : 0) << "," << (SI16)(GetWeatherDamage(COLD) ? 1 : 0) << ","
+			   << (SI16)(GetWeatherDamage(SNOW) ? 1 : 0) << "," << (SI16)(GetWeatherDamage(LIGHTNING) ? 1 : 0) <<"', ";
+	Str << "'" << EntryMadeFrom() << "')\n";
+	return Str;
+}
+#endif
+
+#if ACT_SQL == 0
 bool CItem::HandleLine( UString &UTag, UString &data )
 {
 	bool rvalue = CBaseObject::HandleLine( UTag, data );
@@ -1131,7 +1223,7 @@ bool CItem::HandleLine( UString &UTag, UString &data )
 					{
 						SetAmmoFX( data.section( ",", 0, 0 ).stripWhiteSpace().toUShort() );
 						SetAmmoFXHue( data.section( ",", 1, 1 ).stripWhiteSpace().toUShort() );
-						SetAmmoFXRender( data.section( ",", 1, 1 ).stripWhiteSpace().toUShort() );
+						SetAmmoFXRender( data.section( ",", 2, 2 ).stripWhiteSpace().toUShort() );
 					}
 					else
 					{
@@ -1420,7 +1512,212 @@ bool CItem::HandleLine( UString &UTag, UString &data )
 	}
 	return rvalue;
 }
+#else
+void CItem::HandleLine(std::vector<UString> dataList)
+{
+	CBaseObject::HandleLine(dataList);
+	for (std::vector<UString>::iterator itr = dataList.begin(); itr != dataList.end(); ++itr)
+	{
+		switch (itr-dataList.begin())
+		{
+		case 28: // items.gridloc
+			SetGridLocation(itr->toByte());
+			break;
+		case 29: // items.layer
+			layer = static_cast<ItemLayers>(itr->toUByte());
+			break;
+		case 30: // items.cont
+			contObj = itr->empty() ? NULL : (CBaseObject *)itr->toULong();
+			break;
+		case 31: // items.more
+			SetTempVar(CITV_MORE, itr->toULong());
+			break;
+		case 32: // items.creator
+			SetCreator(itr->empty() ? DEFITEM_CREATOR : itr->toULong());
+			break;
+		case 33: // items.morexyz
+			{
+				UI32 newvalue[3] = {0, 0, 0};
+				if (!itr->empty())
+					for (int i = 0; i < itr->sectionCount(",")+1; ++i)
+					{
+						UString uStr = itr->section(",", i, i).stripWhiteSpace();
+						if (!uStr.empty())
+							newvalue[i] = uStr.toULong();
+					}
 
+				SetTempVar(CITV_MOREX, newvalue[0]);
+				SetTempVar(CITV_MOREY, newvalue[1]);
+				SetTempVar(CITV_MOREZ, newvalue[2]);
+			}
+			break;
+		case 34: // items.glow
+			SetGlow(itr->empty() ? DEFITEM_GLOW : itr->toULong());
+			break;
+		case 35: // items.glowbc
+			SetGlowColour(itr->empty() ? DEFITEM_GLOWCOLOUR : itr->toUShort());
+			break;
+		case 36: // items.ammo
+			{
+				UI16 ammoid = 0;
+				UI16 ammohue = 0;
+
+				if(!itr->empty())
+					if (itr->sectionCount(",") == 0)
+						ammoid = itr->toUShort();
+					else
+					{
+						ammoid = itr->section(",", 0, 0).stripWhiteSpace().empty() ? 0 : itr->section(",", 0, 0).stripWhiteSpace().toUShort();
+						ammohue = itr->section(",", 1, 1).stripWhiteSpace().empty() ? 0 : itr->section(",", 1, 1).stripWhiteSpace().toUShort();
+					}
+
+				SetAmmoID(ammoid);
+				SetAmmoHue(ammohue);
+			}
+			break;
+		case 37: // items.ammofx
+			{
+				UI16 ammofx[3] = {0, 0, 0};
+
+				if(!itr->empty())
+				{
+					int count = itr->sectionCount(",");
+					if (count == 0)
+						ammofx[0] = itr->toUShort();
+					else
+					{
+						for (int i = 0; i < count+1; ++i)
+						{
+							UString uStr = itr->section(",", i, i).stripWhiteSpace();
+							if (!uStr.empty())
+								ammofx[i] = uStr.toUShort();
+						}
+					}
+				}
+
+				SetAmmoFX(ammofx[0]);
+				SetAmmoFXHue(ammofx[1]);
+				SetAmmoFXRender(ammofx[2]);
+			}
+			break;
+		case 38: // items.spells
+			{
+				UI32 newvalue[3] = {0, 0, 0};
+
+				if(!itr->empty())
+					for (int i = 0; i < itr->sectionCount(",")+1; ++i)
+					{
+						UString uStr = itr->section(",", i, i).stripWhiteSpace();
+						if (!uStr.empty())
+							newvalue[i] = uStr.toULong();
+					}
+
+				for (int i = 0; i < 3; ++i)
+					SetSpell(i, newvalue[i]);
+			}
+			break;
+		case 39: // items.name2
+			SetName2(itr->empty() ? "#" : itr->c_str());
+			break;
+		case 40: // items.desc
+			SetDesc(itr->empty() ? "" : itr->c_str());
+			break;
+		case 41: // items.type
+			SetType(static_cast<ItemTypes>(itr->toUByte()));
+			break;
+		case 42: // items.offspell
+			SetOffSpell(itr->toByte());
+			break;
+		case 43: // items.amount
+			amount = itr->toUShort();
+			break;
+		case 44: // items.weightmax
+			SetWeightMax(itr->toLong());
+			break;
+		case 45: // items.baseweight
+			SetBaseWeight(itr->toULong());
+			break;
+		case 46: // items.maxhp
+			SetMaxHP(itr->toUShort());
+			break;
+		case 47: // items.speed
+			SetSpeed(itr->toUByte());
+			break;
+		case 48: // items.moveable
+			SetMovable(itr->toByte());
+			break;
+		case 49: // items.priv
+			SetPriv(itr->toUByte());
+			break;
+		case 50: // items.value
+			{
+				UI32 buyvalue = 0;
+				UI32 sellvalue = 0;
+
+				if(!itr->empty())
+					if (itr->sectionCount(",") == 0)
+					{
+						buyvalue = itr->toULong();
+						sellvalue = itr->toULong()/2;
+					}
+					else
+					{
+						buyvalue = itr->section(",", 0, 0).stripWhiteSpace().empty() ? 0 : itr->section(",", 0, 0).stripWhiteSpace().toULong();
+						sellvalue = itr->section(",", 1, 1).stripWhiteSpace().empty() ? 0 : itr->section(",", 1, 1).stripWhiteSpace().toULong();
+					}
+
+				SetAmmoID(buyvalue);
+				SetAmmoHue(sellvalue);
+			}
+			break;
+		case 51: // items.restock
+			SetRestock(itr->toUShort());
+			break;
+		case 52: // items.ac
+			SetArmourClass(itr->toUByte());
+			break;
+		case 53: // items.rank
+			SetRank(itr->toByte());
+			break;
+		case 54: // items.sk_made
+			SetMadeWith(itr->toByte());
+			break;
+		case 55: // items.bools
+			bools = itr->toUByte();
+			break;
+		case 56: // items.good
+			SetGood(itr->toShort());
+			break;
+		case 57: // items.glowtype
+			SetGlowEffect(itr->toUByte());
+			break;
+		case 58: // items.racedamage
+			{
+				bool newvalue[6] = {false, false, false, false, false, false};
+
+				if(!itr->empty())
+					for (int i = 0; i < itr->sectionCount(",")+1; ++i)
+					{
+						UString uStr = itr->section(",", i, i).stripWhiteSpace();
+						if (!uStr.empty())
+							newvalue[i] = (uStr.toUByte() == 1);
+					}
+
+				SetWeatherDamage(LIGHT, newvalue[0]);
+				SetWeatherDamage(RAIN, newvalue[1]);
+				SetWeatherDamage(HEAT, newvalue[2]);
+				SetWeatherDamage(COLD, newvalue[3]);
+				SetWeatherDamage(SNOW, newvalue[4]);
+				SetWeatherDamage(LIGHTNING, newvalue[5]);
+			}
+			break;
+		case 59: // items.entrymadefrom
+			EntryMadeFrom(itr->toUShort());
+			break;
+		}
+	}
+}
+#endif
 //o--------------------------------------------------------------------------
 //|	Function		-	bool LoadRemnants( UI32 arrayOffset )
 //|	Date			-	21st January, 2002
@@ -2148,7 +2445,7 @@ void CSpawnItem::IsSectionAList( bool newVal )
 {
 	isSectionAList = newVal;
 }
-
+#if ACT_SQL == 0
 //o---------------------------------------------------------------------------o
 //|   Function    -  bool DumpHeader( std::ofstream &outStream )
 //|   Date        -  6/29/2004
@@ -2177,7 +2474,22 @@ bool CSpawnItem::DumpBody( std::ofstream &outStream ) const
 	outStream << "IsSectionAList=" << (UI16)(IsSectionAList()?1:0) << '\n';
 	return true;
 }
+#else
+std::stringstream CSpawnItem::DumpBody() const
+{
+	std::stringstream Str = CItem::DumpBody();
+	Str << "INSERT INTO spawn_items VALUES (";
+	Str << "'" << serial << "', ";
+	Str << "'" << (UI16)GetInterval(0) << "," << (UI16)GetInterval(1) << "', ";
 
+	if (GetSpawnSection().empty())
+		Str << "NULL, ";
+	else
+		Str << "'" << GetSpawnSection().c_str() << "', ";
+	Str << "'" << (UI16)(IsSectionAList() ? 1 : 0) << "')\n";
+	return Str;
+}
+#endif
 //o---------------------------------------------------------------------------o
 //|   Function    -  bool HandleLine( UString &UTag, UString &data )
 //|   Date        -  6/29/2004
@@ -2185,6 +2497,7 @@ bool CSpawnItem::DumpBody( std::ofstream &outStream ) const
 //o---------------------------------------------------------------------------o
 //|   Purpose     -  Reads data from Worldfile into the class
 //o---------------------------------------------------------------------------o
+#if ACT_SQL == 0
 bool CSpawnItem::HandleLine( UString &UTag, UString &data )
 {
 	bool rvalue = CItem::HandleLine( UTag, data );
@@ -2216,6 +2529,39 @@ bool CSpawnItem::HandleLine( UString &UTag, UString &data )
 	}
 	return rvalue;
 }
+#else
+void CSpawnItem::HandleLine(std::vector<UString> dataList)
+{
+	CItem::HandleLine(dataList);
+	for (std::vector<UString>::iterator itr = dataList.begin(); itr != dataList.end(); ++itr)
+	{
+		switch (itr-dataList.begin())
+		{
+		case 60: // spawn_items.interval
+			{
+				UI08 newvalue[2] = {0, 0};
+				if (!itr->empty())
+					for (int i = 0; i < itr->sectionCount(",")+1; ++i)
+					{
+						UString uStr = itr->section(",", i, i).stripWhiteSpace();
+						if (!uStr.empty())
+							newvalue[i] = uStr.toUByte();
+					}
+
+				for (int i = 0; i < 2; ++i)
+					SetInterval(UI08(i), newvalue[i]);
+				break;
+			}
+		case 61: // spawn_items.spawnsection
+			SetSpawnSection(itr->empty() ? "" : itr->c_str());
+			break;
+		case 62: // spawn_items.issectionalist
+			IsSectionAList(itr->toUByte() == 1);
+			break;
+		}
+	}
+}
+#endif
 
 //o---------------------------------------------------------------------------o
 //|   Function    -  DoRespawn()

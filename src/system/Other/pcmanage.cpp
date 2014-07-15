@@ -12,8 +12,12 @@
 #include "townregion.h"
 #include "Dictionary.h"
 #include "cEffects.h"
-
 #include "ObjectFactory.h"
+
+#if ACT_SQL == 1
+#include "SQLManager.h"
+#include "regions.h"
+#endif
 
 namespace UOX
 {
@@ -696,14 +700,8 @@ bool CPICreateCharacter::Handle( void )
 			mChar->SetName( charName );
 			Accounts->AddCharacter( tSock->AcctNo(), mChar );
 			CAccountBlock &actbRec	= tSock->GetAccount();
-			if( actbRec.dwInGame != INVALIDSERIAL )
-				actbRec.dwInGame = mChar->GetSerial();
 
-			if( actbRec.dwInGame == INVALIDSERIAL || actbRec.dwInGame == mChar->GetSerial() )
-			{
-				actbRec.dwInGame = mChar->GetSerial();
-				mChar->SetAccount( actbRec );
-			}
+			actbRec.dwInGame = mChar->GetSerial();
 
 			SetNewCharGender( mChar );
 
@@ -745,6 +743,12 @@ bool CPICreateCharacter::Handle( void )
 				}
 			}
 			startChar( tSock, true );
+
+			SQLManager::getSingleton().BeginTransaction();
+			auto eachTable = SQLManager::getSingleton().Simplify(mChar->Save());
+			for (auto itr = eachTable.begin(); itr != eachTable.end(); ++itr)
+				SQLManager::getSingleton().ExecuteQuery(*itr);
+			SQLManager::getSingleton().FinaliseTransaction(true);
 		}
 	}
 	return true;

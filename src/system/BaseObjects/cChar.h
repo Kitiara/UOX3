@@ -56,7 +56,11 @@ private:
 	struct NPCValues_st
 	{
 							NPCValues_st();
-		void				DumpBody( std::ofstream& outStream );
+#if ACT_SQL == 1
+		void				DumpBody(std::stringstream &Str, UOX::SERIAL Serial);
+#else
+		void				DumpBody(std::ofstream& outStream);
+#endif
 
 		SI16				aiType;
 		CBaseObject *		petGuarding;
@@ -108,7 +112,11 @@ private:
 	struct PlayerValues_st
 	{
 					PlayerValues_st();
-		void		DumpBody( std::ofstream& outStream );
+#if ACT_SQL == 0
+		void		DumpBody(std::ofstream& outStream);
+#else
+		void		DumpBody(std::stringstream &Str, UOX::SERIAL Serial, std::string Name);
+#endif
 
 		CSocket *	socket;
 
@@ -229,9 +237,15 @@ protected:
 	DAMAGETRACK		damageDealt;
 	DAMAGETRACK		damageHealed;
 
+#if ACT_SQL == 1
+	virtual std::stringstream DumpBody() const;
+	virtual void	HandleLine(std::vector<UString> dataList);
+#else
 	virtual bool	DumpHeader( std::ofstream &outStream ) const;
 	virtual bool	DumpBody( std::ofstream &outStream ) const;
 	virtual bool	HandleLine( UString &UTag, UString &data );
+#endif
+	
 	virtual bool	LoadRemnants( void );
 
 	void		CopyData( CChar *target );
@@ -483,7 +497,12 @@ public:
 
 	void			BreakConcentration( CSocket *sock = NULL );
 
+#if ACT_SQL == 0
 	virtual bool	Save( std::ofstream &outStream );
+#else
+	virtual UString	Save(void);
+#endif
+
 	virtual void	PostLoadProcessing( void );
 
 	SI16			ActualStrength( void ) const;

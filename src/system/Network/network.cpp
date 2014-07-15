@@ -24,6 +24,10 @@
 #undef DBGFILE
 #define DBGFILE "Network.cpp"
 
+#if ACT_SQL == 1
+#include "SQLManager.h"
+#endif
+
 namespace UOX
 {
 
@@ -52,25 +56,12 @@ void cNetworkStuff::ClearBuffers( void ) // Sends ALL buffered data
 void cNetworkStuff::setLastOn( CSocket *s )
 {
 	assert( s != NULL );
-	
+
 	time_t ltime;
 	time( &ltime );
-	char *t = ctime( &ltime );
-	// just to be paranoid and avoid crashing
-	if( NULL == t )
-		t = "";
-	else
-	{
-		// some ctime()s like to stick \r\n on the end, we don't want that
-		size_t mLen = strlen( t );
-		for( size_t end = mLen - 1; end >= 0 && isspace( t[end] ) && end < mLen; --end )
-			t[end] = '\0';
-	}
+
 	if( s->CurrcharObj() != NULL )
-	{
-		s->CurrcharObj()->SetLastOn( t );
 		s->CurrcharObj()->SetLastOnSecs( ltime );
-	}
 }
 
 void cNetworkStuff::Disconnect( UOXSOCKET s ) // Force disconnection of player //Instalog
@@ -1160,6 +1151,8 @@ CSocket *cNetworkStuff::LastSocket( void )
 void cNetworkStuff::LoadFirewallEntries( void )
 {
 	UString token;
+	SI16 p[4];
+#if ACT_SQL == 0
 	std::string fileToUse;
 	if( !FileExists( "banlist.ini" ) )
 	{
@@ -1173,20 +1166,15 @@ void cNetworkStuff::LoadFirewallEntries( void )
 		Script *firewallData = new Script( fileToUse, NUM_DEFS, false );
 		if( firewallData != NULL )
 		{
-			SI16 p[4];
 			ScriptSection *firewallSect = NULL;
 			UString tag, data;
 			for( firewallSect = firewallData->FirstEntry(); firewallSect != NULL; firewallSect = firewallData->NextEntry() )
-			{
 				if( firewallSect != NULL )
-				{
 					for( tag = firewallSect->First(); !firewallSect->AtEnd(); tag = firewallSect->Next() )
-					{
 						if( tag.upper() == "IP" )
 						{
 							data = firewallSect->GrabData();
 							if( !data.empty() )
-							{
 								if( data.sectionCount( "." ) == 3 )	// Wellformed IP address
 								{
 									for( UI08 i = 0; i < 4; ++i )
@@ -1201,14 +1189,40 @@ void cNetworkStuff::LoadFirewallEntries( void )
 								}
 								else if( data != "\n" && data != "\r" )
 									Console.Error( "Malformed IP address in banlist.ini (line: %s)", data.c_str() );
-							}
 						}
-					}
-				}
-			}
 		}
 		delete firewallData;
 	}
+#else
+	int index;
+	if (SQLManager::getSingleton().ExecuteQuery("SELECT ip FROM ip_banned", &index, false))
+	{
+		int ColumnCount = mysql_num_fields(SQLManager::getSingleton().GetMYSQLResult());
+		while (SQLManager::getSingleton().FetchRow(&index))
+		{
+			UString value;
+			if (SQLManager::getSingleton().GetColumn(0, value, &index))
+				if (!value.empty())
+				{
+					if (value.sectionCount(".") == 3)	// Wellformed IP address
+					{
+						for (UI08 i = 0; i < 4; ++i)
+						{
+							token = value.section(".", i, i);
+							if (token == "*")
+								p[i] = -1;
+							else
+								p[i] = token.toShort();
+						}
+						slEntries.push_back(FirewallEntry(p[0], p[1], p[2], p[3]));
+					}
+					else
+						Console.Error("Malformed IP address in ip_banned (ip: %s)", value.c_str());
+				}
+		}
+		SQLManager::getSingleton().QueryRelease(false);
+	}
+#endif
 }
 
 void cNetworkStuff::RegisterPacket( UI08 packet, UI08 subCmd, UI16 scriptID )

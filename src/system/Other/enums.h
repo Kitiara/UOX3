@@ -280,7 +280,8 @@ enum ErrorCodes
 	FATAL_UOX3_MULTI_INDEX_NOT_FOUND,
 
 	FATAL_UOX3_DIR_NOT_FOUND = 400,
-	FATAL_UOX3_BAD_DEF_DICT
+	FATAL_UOX3_BAD_DEF_DICT,
+	FATAL_UOX3_MYSQL_CONNECTION_FAIL,
 };
 
 // List of skill numbers (For later implementation)

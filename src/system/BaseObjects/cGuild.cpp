@@ -12,6 +12,10 @@
 	#include <cstdarg>
 #endif
 
+#if ACT_SQL == 1
+#include "SQLManager.h"
+#endif
+
 namespace UOX
 {
 
@@ -634,9 +638,10 @@ GUILDREL *CGuild::GuildRelationList( void )	// NOTE: This is aimed ONLY at menu 
 	return &relationList;
 }
 
-void CGuild::Save( std::ofstream &toSave, GUILDID gNum )
+#if ACT_SQL == 0
+void CGuild::Save( std::ofstream &toSave)
 {
-	toSave << "[GUILD " << gNum << ']' << '\n' << "{" << '\n';
+	toSave << "[GUILD]" << '\n' << "{" << '\n';
 	toSave << "NAME=" << name << '\n';
 	toSave << "ABBREVIATION=" << abbreviation << '\n';
 	toSave << "TYPE=" << GTypeNames[gType] << '\n';
@@ -644,27 +649,116 @@ void CGuild::Save( std::ofstream &toSave, GUILDID gNum )
 	toSave << "WEBPAGE=" << webpage << '\n';
 	toSave << "STONE=" << stone << '\n';
 	toSave << "MASTER=" << master << '\n';
-	SERLIST_ITERATOR counter;
-	counter = recruits.begin();
-	while( counter != recruits.end() )
-	{
+
+	for (UOX::SERLIST_ITERATOR counter = recruits.begin(); counter != recruits.end(); ++counter)
 		toSave << "RECRUIT=" << (*counter) << '\n';
-		++counter;
-	}
-	counter = members.begin();
-	while( counter != members.end() )
-	{
+
+	for (UOX::SERLIST_ITERATOR counter = members.begin(); counter != members.end(); ++counter)
 		toSave << "MEMBER=" << (*counter) << '\n';
-		++counter;
-	}
-	GUILDREL::const_iterator relly = relationList.begin();
-	while( relly != relationList.end() )
-	{
+
+	for (GUILDREL::const_iterator relly = relationList.begin(); relly != relationList.end(); ++relly)
 		toSave << GRelationNames[relly->second] << " " << relly->first <<'\n';
-		++relly;
-	}
+	
 	toSave << "}" << '\n' << '\n';
 }
+#else
+UString CGuild::Save(void)
+{
+	std::stringstream Str;
+	Str << "('" << stone << "', ";
+
+	if (name.empty())
+		Str << "NULL, ";
+	else
+		Str << "\"" << name << "\", ";
+
+	if (abbreviation == "")
+		Str << "NULL, ";
+	else
+		Str << "\"" << abbreviation << "\", ";
+	Str << "'" << GTypeNames[gType] << "', ";
+
+	if (charter == "")
+		Str << "NULL, ";
+	else
+	{
+		std::string _charter = charter;
+		std::string search = "\"";
+		if (_charter.find(search) != std::string::npos)
+			_charter.replace(_charter.find(search), search.length(), "\\\"");
+
+		Str << "\"" << _charter << "\", ";
+	}
+
+	if (webpage == "")
+		Str << "NULL, ";
+	else
+	{
+		std::string _webpage = webpage;
+		std::string search = "\"";
+		if (_webpage.find(search) != std::string::npos)
+			_webpage.replace(_webpage.find(search), search.length(), "\\\"");
+
+		Str << "\"" << _webpage << "\", ";
+	}
+
+	if (master == INVALIDSERIAL)
+		Str << "NULL, ";
+	else
+		Str << "'" << master << "', ";
+	
+	if (recruits.empty())
+		Str << "NULL, ";
+	else
+	{
+		Str << "'";
+		for (UOX::SERLIST_ITERATOR counter = recruits.begin(); counter != recruits.end(); ++counter)
+			Str << (*counter);
+		Str << "', ";
+	}
+
+	if (members.empty())
+		Str << "NULL, ";
+	else
+	{
+		Str << "'";
+		for (UOX::SERLIST_ITERATOR counter = members.begin(); counter != members.end(); ++counter)
+			Str << (*counter);
+		Str << "', ";
+	}
+
+	if (relationList.empty())
+		Str << "NULL, NULL, NULL, NULL";
+	else
+	{
+		int count;
+		for (int i = 0; i < GR_COUNT-1; ++i)
+		{
+			count = 0;
+			Str << "'";
+			for (GUILDREL::const_iterator relly = relationList.begin(); relly != relationList.end(); ++relly)
+			{
+				++count;
+				if (i == relly->second)
+				{
+					Str << relly->first;
+					if (count != relationList.size())
+						Str << ",";
+				}
+			}
+			if (i != GR_COUNT-2)
+				Str << "', ";
+			else
+				Str << "'";
+		}
+	}
+	Str << ")";
+
+	return Str.str();
+}
+#endif
+
+#if ACT_SQL == 0
 void CGuild::Load( ScriptSection *toRead )
 {
 	UString tag;
@@ -735,6 +829,73 @@ void CGuild::Load( ScriptSection *toRead )
 		}
 	}
 }
+#else
+void CGuild::Load(std::vector<UString> dataList)
+{
+	for (std::vector<UString>::iterator itr = dataList.begin(); itr != dataList.end(); ++itr)
+	{
+		switch (itr-dataList.begin())
+		{
+		case 0: // guilds.stone
+			Stone(itr->toULong());
+			break;
+		case 1: // guilds.name
+			Name(itr->empty() ? "" : itr->c_str());
+			break;
+		case 2: // guilds.abbreviation
+			Abbreviation(itr->empty() ? "" : itr->c_str());
+			break;
+		case 3: // guilds.type
+			for(GuildType gt = GT_STANDARD; gt < GT_COUNT; gt = (GuildType)(gt + (GuildType)1))
+				if(itr->c_str() == GTypeNames[gt].c_str())
+				{
+					Type(gt);
+					break;
+				}
+			break;
+		case 4: // guilds.charter
+			Charter(itr->empty() ? "" : itr->c_str());
+			break;
+		case 5: // guilds.webpage
+			Webpage(itr->empty() ? "" : itr->c_str());
+			break;
+		case 6: // guilds.master
+			Master(itr->empty() ? INVALIDSERIAL : itr->toULong());
+			break;
+		case 7: // guilds.recruit
+			if (!itr->empty())
+				for (int i = 0; i < itr->sectionCount(",")+1; ++i)
+				{
+					UString uStr = itr->section(",", i, i);
+					if (!uStr.empty())
+						NewRecruit(uStr.toULong());
+				}
+			break;
+		case 8: // guilds.member
+			if (!itr->empty())
+				for (int i = 0; i < itr->sectionCount(",")+1; ++i)
+				{
+					UString uStr = itr->section(",", i, i);
+					if (!uStr.empty())
+						NewMember(uStr.toULong());
+				}
+			break;
+		case 9: // guilds.neutral (GR_NEUTRAL)
+		case 10: // guilds.war (GR_WAR)
+		case 11: // guilds.ally (GR_ALLY)
+		case 12: // guilds.unknown (GR_UNKNOWN)
+			if (!itr->empty())
+				for (int i = 0; i < itr->sectionCount(",")+1; ++i)
+				{
+					UString uStr = itr->section(",", i, i);
+					if (!uStr.empty())
+						SetGuildRelation(uStr.toShort(), GUILDRELATION(itr-dataList.begin()-9));
+				}
+			break;
+		}
+	}
+}
+#endif
 
 size_t CGuild::NumMembers( void ) const
 {
@@ -830,40 +991,26 @@ const std::string CGuild::TypeName( void )
 	return GTypeNames[Type()];
 }
 
-CGuildCollection::CGuildCollection()
-{
-}
+CGuildCollection::CGuildCollection() {}
+
 size_t CGuildCollection::NumGuilds( void ) const
 {
 	return gList.size();
 }
 
-GUILDID CGuildCollection::MaximumGuild( void )
-{
-	GUILDID maxVal = -1;
-	GUILDLIST::const_iterator pFind = gList.begin();
-	while( pFind != gList.end() )
-	{
-		if( pFind->first > maxVal )
-			maxVal = pFind->first;
-		++pFind;
-	}
-	return static_cast<GUILDID>(maxVal + 1);
-}
 GUILDID CGuildCollection::NewGuild( void )
 {
-	CGuild *toAdd = new CGuild();
-	GUILDID gAdd = MaximumGuild();
-	gList[gAdd] = toAdd;
-	return gAdd;
+	gList.push_back(new CGuild());
+	return gList.size()-1;
 }
+
 CGuild *CGuildCollection::Guild( GUILDID num ) const
 {
-	GUILDLIST::const_iterator pFind = gList.find( num );
-	if( pFind == gList.end() )
+	if(num > signed(gList.size()-1) || gList[num] == NULL)	// doesn't exist
 		return NULL;
-	return pFind->second;
+	return gList[num];
 }
+
 CGuild *CGuildCollection::operator[]( GUILDID num )
 {
 	return Guild( num );
@@ -871,36 +1018,77 @@ CGuild *CGuildCollection::operator[]( GUILDID num )
 void CGuildCollection::Save( void )
 {
 	Console << "Saving guild data.... ";
+#if ACT_SQL == 0
 	std::string filename = cwmWorldState->ServerData()->Directory( CSDDP_SHARED ) + "guilds.wsc";
 	std::ofstream toSave( filename.c_str() );
-	GUILDLIST::const_iterator pMove = gList.begin();
-	while( pMove != gList.end() )
+	
+	for (GUILDLIST::const_iterator pMove = gList.begin(); pMove != gList.end(); ++pMove)
+		(*pMove)->Save( toSave );
+#else
+	UString uStr = "DELETE FROM guilds";
+	bool Started = false;
+	for (std::vector<CGuild*>::iterator pMove = gList.begin(); pMove != gList.end(); ++pMove)
 	{
-		(pMove->second)->Save( toSave, pMove->first );
-		++pMove;
+		if (Started)
+			uStr += ",";
+		else
+		{
+			uStr += "\nINSERT INTO guilds VALUES ";
+			Started = false;
+		}
+		uStr += (*pMove)->Save();
 	}
-	Console.PrintDone();
 
+	std::istringstream iss;
+	iss.str(uStr);
+	uStr.clear();
+	while (std::getline(iss, uStr))
+		SQLManager::getSingleton().ExecuteQuery(uStr);
+#endif
+	Console.PrintDone();
 }
 void CGuildCollection::Load( void )
 {
+#if ACT_SQL == 0
 	std::string filename	= cwmWorldState->ServerData()->Directory( CSDDP_SHARED ) + "guilds.wsc";
 	if( FileExists( filename ) )
 	{
 		Script newScript( filename, NUM_DEFS, false );
-		ScriptSection *testSect	= NULL;
 		GUILDID guildNum		= 0;
-		for( testSect = newScript.FirstEntry(); testSect != NULL; testSect = newScript.NextEntry() )
+		for( ScriptSection *testSect = newScript.FirstEntry(); testSect != NULL; testSect = newScript.NextEntry() )
 		{
-			UString text	= newScript.EntryName();
-			text = text.substr( 6 );
-			guildNum		= text.toShort();
-			if( gList[guildNum] != NULL )
-				delete gList[guildNum];
-			gList[guildNum] = new CGuild();
-			gList[guildNum]->Load( testSect );
+			CGuild* Guild = new CGuild();
+			gList.push_back(Guild);
+			Guild->Load( testSect );
 		}
 	}
+#else
+	int index;
+	if (SQLManager::getSingleton().ExecuteQuery("SELECT * FROM guilds", &index, false))
+	{
+		int ColumnCount = mysql_num_fields(SQLManager::getSingleton().GetMYSQLResult());
+		while (SQLManager::getSingleton().FetchRow(&index))
+		{
+			std::vector<UString> dataList;
+			for(int i = 0; i < ColumnCount; ++i)
+			{
+				UString value;
+				bool EmptyColumn = SQLManager::getSingleton().GetColumn(i, value, &index) == false ? true : false;
+				if (EmptyColumn && i == 0)
+					break;
+				dataList.push_back(EmptyColumn == true ? "" : value);
+			}
+
+			if (!dataList.empty())
+			{
+				CGuild* Guild = new CGuild();
+				gList.push_back(Guild);
+				Guild->Load(dataList);
+			}
+		}
+	}
+	SQLManager::getSingleton().QueryRelease(false);
+#endif
 }
 
 GUILDRELATION CGuildCollection::Compare( GUILDID srcGuild, GUILDID trgGuild ) const
@@ -1529,49 +1717,39 @@ void CGuildCollection::Resign( CSocket *s )
 			if( ValidateObject( gStone ) )
 				gStone->Delete();
 		}
-		Erase( guildnumber );
+		Erase(guildnumber);
 		s->sysmessage( 172 );
 	}
 }
 
 void CGuildCollection::Erase( GUILDID toErase )
 {
-	GUILDLIST::iterator pFind = gList.find( toErase );
-	if( pFind == gList.end() )	// doesn't exist
+	if(toErase > signed(gList.size()-1) || gList[toErase] == NULL)	// doesn't exist
 		return;
-	CGuild *gErase = pFind->second;
-	if( gErase == NULL )
+
+	for( size_t iCounter = 0; iCounter < gList[toErase]->NumMembers(); ++iCounter )
 	{
-		gList.erase( pFind );
-		return;
-	}
-	for( size_t iCounter = 0; iCounter < gErase->NumMembers(); ++iCounter )
-	{
-		SERIAL iMember	= gErase->MemberNumber( iCounter );
+		SERIAL iMember	= gList[toErase]->MemberNumber( iCounter );
 		CChar *member	= calcCharObjFromSer( iMember );
 		if( ValidateObject( member ) )
 			member->SetGuildNumber( -1 );
 	}
-	for( size_t iC = 0; iC < gErase->NumRecruits(); ++iC )
+	for( size_t iC = 0; iC < gList[toErase]->NumRecruits(); ++iC )
 	{
-		SERIAL iRecruit	= gErase->RecruitNumber( iC );
+		SERIAL iRecruit	= gList[toErase]->RecruitNumber( iC );
 		CChar *recruit	= calcCharObjFromSer( iRecruit );
 		if( ValidateObject( recruit ) )
 			recruit->SetGuildNumber( -1 );
 	}
-	delete pFind->second;
-	gList.erase( pFind );
+	delete gList[toErase];
+	gList[toErase] = NULL; // we want to keep the guildnumbers in order
 }
 
 CGuildCollection::~CGuildCollection()
 {
-	GUILDLIST::const_iterator i = gList.begin();
-	while( i != gList.end() )
-	{
-		if( i->second != NULL )
-			delete i->second;
-		++i;
-	}
+	for (GUILDLIST::const_iterator itr = gList.begin(); itr != gList.end(); ++itr)
+		if(*itr != NULL )
+			delete *itr;
 
 	gList.clear();
 }

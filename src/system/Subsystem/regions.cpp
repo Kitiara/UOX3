@@ -1,8 +1,10 @@
 #include "uox3.h"
 #include "classes.h"
 #include "regions.h"
-
 #include "ObjectFactory.h"
+#if ACT_SQL == 1
+#include "SQLManager.h"
+#endif
 
 namespace UOX
 {
@@ -26,6 +28,59 @@ int FileSize( std::string filename )
 	return retVal;
 }
 
+#if ACT_SQL == 1
+void LoadChar(std::vector<UString> dataList)
+{
+	CChar *x = static_cast<CChar *>(ObjectFactory::getSingleton().CreateBlankObject(OT_CHAR));
+	if (x == NULL) 
+		return;
+	if (!x->Load(dataList))
+	{
+		x->Cleanup();
+		ObjectFactory::getSingleton().DestroyObject(x);
+	}
+}
+void LoadItem(std::vector<UString> dataList)
+{
+	CItem *x = static_cast<CItem *>(ObjectFactory::getSingleton().CreateBlankObject(OT_ITEM));
+	if (x == NULL) 
+		return;
+	if (!x->Load(dataList))
+	{
+		x->Cleanup();
+		ObjectFactory::getSingleton().DestroyObject(x);
+	}
+}
+void LoadMulti(std::vector<UString> dataList)
+{
+	CMultiObj *ourHouse = static_cast<CMultiObj *>(ObjectFactory::getSingleton().CreateBlankObject(OT_MULTI));
+	if (!ourHouse->Load(dataList))	// if no load, DELETE
+	{
+		ourHouse->Cleanup();
+		ObjectFactory::getSingleton().DestroyObject( ourHouse );
+	}
+}
+
+void LoadBoat(std::vector<UString> dataList)
+{
+	CBoatObj *ourBoat = static_cast<CBoatObj *>(ObjectFactory::getSingleton().CreateBlankObject(OT_BOAT));
+	if (!ourBoat->Load(dataList)) // if no load, DELETE
+	{
+		ourBoat->Cleanup();
+		ObjectFactory::getSingleton().DestroyObject(ourBoat);
+	}
+}
+
+void LoadSpawnItem(std::vector<UString> dataList)
+{
+	CSpawnItem *ourSpawner = static_cast<CSpawnItem *>(ObjectFactory::getSingleton().CreateBlankObject(OT_SPAWNER));
+	if (!ourSpawner->Load(dataList)) // if no load, DELETE
+	{
+		ourSpawner->Cleanup();
+		ObjectFactory::getSingleton().DestroyObject(ourSpawner);
+	}
+}
+#else
 void LoadChar( std::ifstream& readDestination )
 {
 	CChar *x = static_cast< CChar * >(ObjectFactory::getSingleton().CreateBlankObject( OT_CHAR ));
@@ -77,6 +132,7 @@ void LoadSpawnItem( std::ifstream& readDestination )
 		ObjectFactory::getSingleton().DestroyObject( ourSpawner );
 	}
 }
+#endif
 
 //o--------------------------------------------------------------------------o
 //|	Function		-	void SaveToDisk( std::ofstream& writeDestination, std::ofstream &houseDestination )
@@ -88,50 +144,117 @@ void LoadSpawnItem( std::ifstream& readDestination )
 //|								reworked SaveChar from WorldMain to deal with pointer based stuff in region rather than index based stuff in array
 //|								Also saves out all data regardless (in preparation for a simple binary save)
 //o--------------------------------------------------------------------------o
-void CMapRegion::SaveToDisk( std::ofstream& writeDestination, std::ofstream &houseDestination )
+#if ACT_SQL == 0
+void CMapRegion::SaveToDisk(std::ofstream& writeDestination, std::ofstream &houseDestination)
 {
 	charData.Push();
-	for( CChar* charToWrite = charData.First(); !charData.Finished(); charToWrite = charData.Next() )
+	for (CChar* charToWrite = charData.First(); !charData.Finished(); charToWrite = charData.Next())
 	{
-		if( !ValidateObject( charToWrite ) )
+		if (!ValidateObject(charToWrite))
 		{
-			charData.Remove( charToWrite );
+			charData.Remove(charToWrite);
 			continue;
 		}
 #if defined( _MSC_VER )
 		#pragma todo( "PlayerHTML Dumping needs to be reimplemented" )
 #endif
-		if( charToWrite->ShouldSave() ) 
-			charToWrite->Save( writeDestination );
+		if (charToWrite->ShouldSave()) 
+			charToWrite->Save(writeDestination);
 	}
 	charData.Pop();
 	itemData.Push();
-	for( CItem *itemToWrite = itemData.First(); !itemData.Finished(); itemToWrite = itemData.Next() )
+	for (CItem *itemToWrite = itemData.First(); !itemData.Finished(); itemToWrite = itemData.Next())
 	{
-		if( !ValidateObject( itemToWrite ) )
+		if (!ValidateObject(itemToWrite))
 		{
-			itemData.Remove( itemToWrite );
+			itemData.Remove(itemToWrite);
 			continue;
 		}
-		if( itemToWrite->ShouldSave() )
+
+		if (itemToWrite->ShouldSave())
 		{
-			if( itemToWrite->GetObjType() == OT_MULTI )
+			switch (itemToWrite->GetObjType())
 			{
-				CMultiObj *iMulti = static_cast<CMultiObj *>(itemToWrite);
-				iMulti->Save( houseDestination );
-			}
-			else if( itemToWrite->GetObjType() == OT_BOAT )
-			{
-				CBoatObj *iBoat = static_cast< CBoatObj * >(itemToWrite);
-				iBoat->Save( houseDestination );
-			}
-			else
-				itemToWrite->Save( writeDestination );
+			case OT_MULTI:
+				{
+					CMultiObj *iMulti = static_cast<CMultiObj *>(itemToWrite);
+					iMulti->Save(houseDestination);
+				}
+				break;
+			case OT_BOAT:
+				{
+					CBoatObj *iBoat = static_cast<CBoatObj *>(itemToWrite);
+					iBoat->Save(houseDestination);
+				}
+				break;
+			default:
+				itemToWrite->Save(writeDestination);
+				break;
+			}				
 		}
 	}
 	itemData.Pop();
 }
+#else
+void CMapRegion::SaveToDB()
+{
+	UString uStr;
+	charData.Push();
+	for (CChar* charToWrite = charData.First(); !charData.Finished(); charToWrite = charData.Next())
+	{
+		if (!ValidateObject(charToWrite))
+		{
+			charData.Remove(charToWrite);
+			continue;
+		}
 
+		if (charToWrite->ShouldSave()) 
+			uStr += charToWrite->Save();
+	}
+	charData.Pop();
+	itemData.Push();
+	for (CItem *itemToWrite = itemData.First(); !itemData.Finished(); itemToWrite = itemData.Next())
+	{
+		if (!ValidateObject(itemToWrite))
+		{
+			itemData.Remove(itemToWrite);
+			continue;
+		}
+
+		if (itemToWrite->ShouldSave())
+		{
+			switch (itemToWrite->GetObjType())
+			{
+			case OT_MULTI:
+				{
+					CMultiObj *iMulti = static_cast<CMultiObj *>(itemToWrite);
+					UString curr = iMulti->Save();
+					if (!curr.empty())
+						uStr += curr;
+				}
+				break;
+			case OT_BOAT:
+				{
+					CBoatObj *iBoat = static_cast<CBoatObj *>(itemToWrite);
+					UString curr = iBoat->Save();
+					if (!curr.empty())
+						uStr += curr;
+				}
+				break;
+			default:
+				uStr += itemToWrite->Save();
+				break;
+			}				
+		}
+	}
+	itemData.Pop();
+	
+	// Rest will make the saving process ~50% faster.
+	auto eachTable = SQLManager::getSingleton().Simplify(uStr);
+	for (auto itr = eachTable.begin(); itr != eachTable.end(); ++itr)
+		SQLManager::getSingleton().ExecuteQuery(*itr);
+}
+#endif
 //o--------------------------------------------------------------------------o
 //|	Function		-	CDataList< CItem * > * GetItemList( void )
 //|	Date			-	Unknown
@@ -629,13 +752,42 @@ REGIONLIST CMapHandler::PopulateList( SI16 x, SI16 y, UI08 worldNumber )
 //o--------------------------------------------------------------------------o
 void CMapHandler::Save( void )
 {
-	const SI16 AreaX				= UpperX / 8;	// we're storing 8x8 grid arrays together
-	const SI16 AreaY				= UpperY / 8;
+	const SI16 AreaX = UpperX / 8;	// we're storing 8x8 grid arrays together
+	const SI16 AreaY = UpperY / 8;
+
+	std::istringstream issDel;
+	std::string deletesql = "DELETE FROM attributes\nDELETE FROM baseobjects\nDELETE FROM boats\n"
+		"DELETE FROM characters\nDELETE FROM creatures\nDELETE FROM houses\nDELETE FROM items\n"
+		"DELETE FROM spawn_items";
+	issDel.str(deletesql);
+	while (std::getline(issDel, deletesql))
+		SQLManager::getSingleton().ExecuteQuery(deletesql);
+
+	Console << "Saving Character and Item Map Region data...   ";
+	UI32 StartTime = getclock();
+	SI32 baseX, baseY;
+#if ACT_SQL == 1
+	for (SI16 counter1 = 0; counter1 < AreaX; ++counter1)   // move left->right
+	{ 
+		baseX = counter1 * 8;
+		for (SI16 counter2 = 0; counter2 < AreaY; ++counter2) // move up->down
+		{
+			baseY = counter2 * 8;                            // calculate x grid offset
+			for (UI08 xCnt = 0; xCnt < 8; ++xCnt)             // walk through each part of the 8x8 grid, left->right
+				for (UI08 yCnt = 0; yCnt < 8; ++yCnt)         // walk the row
+					for (WORLDLIST_ITERATOR mIter = mapWorlds.begin(); mIter != mapWorlds.end(); ++mIter)
+						if (CMapRegion* mRegion = (*mIter)->GetMapRegion((baseX+xCnt), (baseY+yCnt)))
+							mRegion->SaveToDB();
+		}
+	}
+
+	overFlow.SaveToDB();
+#else
+	Console.TurnYellow();
 	std::ofstream writeDestination, houseDestination;
 	int onePercent = 0;
 	//const int onePercent			= (int)((float)(UpperX*UpperY*Map->MapCount())/100.0f);
-	UI08 i = 0;
-	for( i = 0; i < Map->MapCount(); ++i )
+	for(UI08 i = 0; i < Map->MapCount(); ++i )
 	{
 		MapData_st& mMap = Map->GetMapData( i );
 		onePercent += (int)(mMap.xBlock / MapColSize) * (mMap.yBlock / MapRowSize);
@@ -644,10 +796,7 @@ void CMapHandler::Save( void )
 
 	const char blockDiscriminator[] = "\n\n---REGION---\n\n";
 	UI32 count						= 0;
-	const UI32 s_t						= getclock();
 
-	Console << "Saving Character and Item Map Region data...   ";
-	Console.TurnYellow();
 	Console << "0%";
 
 	std::string basePath = cwmWorldState->ServerData()->Directory( CSDDP_SHARED );
@@ -713,16 +862,12 @@ void CMapHandler::Save( void )
 	
 	Console << "\b\b\b\b";
 	Console.PrintDone();
+#endif
 
-	const UI32 e_t = getclock();
-	Console.Print( "World saved in %.02fsec\n", ((float)(e_t-s_t))/1000.0f );
+	Console.Print("World saved in %.02fsec\n", ((float)(getclock()-StartTime))/1000.0f);
 
-	i = 0;
-	for( WORLDLIST_ITERATOR wIter = mapWorlds.begin(); wIter != mapWorlds.end(); ++wIter )
-	{
-		(*wIter)->SaveResources( i );
-		++i;
-	}
+	for (WORLDLIST_ITERATOR wIter = mapWorlds.begin(); wIter != mapWorlds.end(); ++wIter)
+		(*wIter)->SaveResources(wIter-mapWorlds.begin());
 }
 
 bool PostLoadFunctor( CBaseObject *a, UI32 &b, void *extraData )
@@ -745,14 +890,114 @@ bool PostLoadFunctor( CBaseObject *a, UI32 &b, void *extraData )
 //o--------------------------------------------------------------------------o
 void CMapHandler::Load( void )
 {
+	UI32 StartTime = getclock();
+#if ACT_SQL == 1
+	std::string strsql = "SELECT baseobjects.*, %s %s %s FROM baseobjects %s %s %s WHERE baseobjects.type = %u";
+	std::string column[3] = {"", "", ""};
+	std::string table[3] = {"", "", ""}; // last is not like the others...
+	bool Twice = false;
+	for (int objtype = OT_CHAR; objtype < OT_SPAWNER+1;)
+	{
+		for (int i = 0; i < 3; ++i)
+		{
+			column[i] = "";
+			table[i] = "";
+		}
+
+		switch (objtype)
+		{
+		case OT_CHAR: // Characters (Be aware: NPCs are also characters)
+			table[0] = "RIGHT JOIN attributes ON baseobjects.serial = attributes.serial";
+			column[0] = "guildfealty,speech,privileges,packitem,guildtitle,hunger,brkpeacechancegain,brkpeacechance,attributes.maxhp,maxmana,maxstam,town,summontimer,maylevitate,"
+				"stealth,reserved,region,advanceobject,advraceobject,baseskills,guildnumber,fonttype,towntitle,canrun,canattack,allmove,isnpc,isshop,dead,cantrain,"
+				"iswarring,guildtoggle,poisonstrength,willhunger,murdertimer,peacetimer,";
+
+			table[1] = "RIGHT JOIN characters ON baseobjects.serial = characters.serial";
+			column[1] = "account,robeserial,originalid,hair,beard,townvote,laston,UNIX_TIMESTAMP(laston),orgname,commandlevel,squelched,deaths,fixedlight,townprivileges,atrophy,skilllocks";
+
+			table[2] = "RIGHT JOIN creatures ON baseobjects.serial "+std::string(Twice ? "" : "!")+"= creatures.serial";
+			if (Twice)
+				column[2] = ",npcaitype,taming,peaceing,provoing,holdg,split,wanderarea,npcwander,spattack,questtype,questregions,fleeat,reattackat,npcflag,mounted,"
+					"stabled,tamedhungerrate,tamedhungerwildchance,foodlist,walkingspeed,runningspeed,fleeingspeed";
+			break;
+		case OT_MULTI: // Houses (Multis)
+		case OT_BOAT: // Boats
+			table[2] = "RIGHT JOIN houses ON baseobjects.serial = houses.serial"; // we'll use 3rd like this
+			column[2] = ",coowner,banned,lockeditem,maxlockeddown,deedname";
+			if (objtype == 4)
+			{
+				table[2] += " RIGHT JOIN boats ON baseobjects.serial = boats.serial"; // we'll use 3rd like this
+				column[2] += ",hold,planks,tiller";
+			}
+		case OT_SPAWNER: // SpawnItems
+			if (objtype == 5)
+			{
+				table[2] = "RIGHT JOIN spawn_items ON baseobjects.serial = spawn_items.serial"; // we'll use 3rd like this
+				column[2] = ",spawn_items.interval,spawnsection,issectionalist";
+			}
+		case OT_ITEM: // Items
+			table[1] = "RIGHT JOIN items ON baseobjects.serial = items.serial";
+			column[1] = "gridloc,layer,cont,more,creator,morexyz,glow,glowbc,ammo,ammofx,spells,name2,items.desc,items.type,offspell,amount,weightmax,baseweight,items.maxhp,speed,moveable,priv,value,"
+				"restock,ac,rank,sk_made,bools,good,glowtype,racedamage,entrymadefrom";
+			break;
+		}
+
+		size_t size = strsql.size()-12;
+		for (int i = 0; i < 3; ++i)
+			size += (strlen(column[i].c_str())+strlen(table[i].c_str())*2);
+		size += int(floor(log10(double(objtype)))+1);
+
+		char* sql = (char*)malloc(size+1);
+		sprintf_s(sql, size+1, strsql.c_str(), column[0].c_str(), column[1].c_str(), column[2].c_str(), table[0].c_str(), table[1].c_str(), table[2].c_str(), objtype);
+		int index = 0;
+		if (SQLManager::getSingleton().ExecuteQuery(sql, &index, false))
+		{
+			int ColumnCount = mysql_num_fields(SQLManager::getSingleton().GetMYSQLResult());
+			while (SQLManager::getSingleton().FetchRow(&index))
+			{
+				std::vector<UString> dataList;
+				for(int i = 0; i < ColumnCount; ++i)
+				{
+					UString value;
+					bool EmptyColumn = SQLManager::getSingleton().GetColumn(i, value, &index) == false ? true : false;
+					dataList.push_back(EmptyColumn == true ? "" : value);
+				}
+
+				switch (objtype)
+				{
+					case OT_CHAR:
+						LoadChar(dataList);
+						break;
+					case OT_ITEM:
+						LoadItem(dataList);
+						break;
+					case OT_MULTI:
+						LoadMulti(dataList);
+						break;
+					case OT_BOAT:
+						LoadBoat(dataList);
+						break;
+					case OT_SPAWNER:
+						LoadSpawnItem(dataList);
+						break;
+				}
+			}
+			SQLManager::getSingleton().QueryRelease(false);
+		}
+		free(sql);
+		if (objtype == OT_CHAR && !Twice)
+			Twice = true;
+		else
+			++objtype;
+	}
+#else
+	Console.TurnYellow();
 	const SI16 AreaX		= UpperX / 8;	// we're storing 8x8 grid arrays together
 	const SI16 AreaY		= UpperY / 8;
 //	const int onePercent	= (int)((float)(AreaX*AreaY)/100.0f);
 	UI32 count				= 0;
 	std::ifstream readDestination;
-	Console.TurnYellow();
 	Console << "0%";
-	UI32 s_t				= getclock();
 	std::string basePath	= cwmWorldState->ServerData()->Directory( CSDDP_SHARED );
 	std::string filename;
 
@@ -815,18 +1060,17 @@ void CMapHandler::Load( void )
 	filename	= basePath + "house.wsc";
 	std::ifstream houseDestination( filename.c_str() );
 	LoadFromDisk( houseDestination, -1, -1, -1 );
-
-	UI32 b		= 0;
-	ObjectFactory::getSingleton().IterateOver( OT_MULTI, b, NULL, &PostLoadFunctor );
-	ObjectFactory::getSingleton().IterateOver( OT_ITEM, b, NULL, &PostLoadFunctor );
-	ObjectFactory::getSingleton().IterateOver( OT_CHAR, b, NULL, &PostLoadFunctor );
 	houseDestination.close();
+#endif
+	UI32 b = 0;
+	ObjectFactory::getSingleton().IterateOver(OT_MULTI, b, NULL, &PostLoadFunctor);
+	ObjectFactory::getSingleton().IterateOver(OT_ITEM, b, NULL, &PostLoadFunctor);
+	ObjectFactory::getSingleton().IterateOver(OT_CHAR, b, NULL, &PostLoadFunctor);
 
-	UI32 e_t	= getclock();
-	Console.Print( "ASCII world loaded in %.02fsec\n", ((float)(e_t-s_t))/1000.0f );
+	Console.Print("ASCII world loaded in %.02fsec\n", ((float)(getclock()-StartTime))/1000.0f);
 
-	UI08 i		= 0;
-	for( WORLDLIST_ITERATOR wIter = mapWorlds.begin(); wIter != mapWorlds.end(); ++wIter )
+	UI08 i = 0;
+	for(WORLDLIST_ITERATOR wIter = mapWorlds.begin(); wIter != mapWorlds.end(); ++wIter)
 	{
 		(*wIter)->LoadResources( i );
 		++i;
@@ -841,6 +1085,7 @@ void CMapHandler::Load( void )
 //o--------------------------------------------------------------------------o
 //|	Purpose			-	Loads in objects from specified file
 //o--------------------------------------------------------------------------o
+#if ACT_SQL == 0
 void CMapHandler::LoadFromDisk( std::ifstream& readDestination, int baseValue, int fileSize, int maxSize )
 {
 	char line[1024];
@@ -883,5 +1128,5 @@ void CMapHandler::LoadFromDisk( std::ifstream& readDestination, int baseValue, i
 			continue;
 	}
 }
-
+#endif
 }

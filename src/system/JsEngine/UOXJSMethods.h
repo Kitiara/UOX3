@@ -254,15 +254,15 @@ JSMethodFunc CSocket_FirstTriggerWord;
 JSMethodFunc CSocket_NextTriggerWord;
 JSMethodFunc CSocket_FinishedTriggerWords;
 
-#if P_ODBC == 1
+#if ACT_SQL == 1
 
-JSMethodFunc CODBC_BeginTransaction;
-JSMethodFunc CODBC_FinaliseTransaction;
-JSMethodFunc CODBC_ExecuteQuery;
-JSMethodFunc CODBC_QueryRelease;
-JSMethodFunc CODBC_FetchRow;
-JSMethodFunc CODBC_GetColumn;
-JSMethodFunc CODBC_LastOK;
+JSMethodFunc CSQLM_BeginTransaction;
+JSMethodFunc CSQLM_FinaliseTransaction;
+JSMethodFunc CSQLM_ExecuteQuery;
+JSMethodFunc CSQLM_QueryRelease;
+JSMethodFunc CSQLM_FetchRow;
+JSMethodFunc CSQLM_GetColumn;
+JSMethodFunc CSQLM_LastOK;
 
 #endif
 
@@ -556,17 +556,17 @@ static JSFunctionSpec CParty_Methods[] =
 	{ NULL,				NULL,						0, 0, 0 }
 };
 
-#if P_ODBC == 1
+#if ACT_SQL == 1
 
-static JSFunctionSpec CODBC_Methods[] =  
+static JSFunctionSpec CSQLM_Methods[] =  
 { 	
-	{ "BeginTransaction",		CODBC_BeginTransaction,		0, 0, 0 },
-	{ "FinaliseTransaction",	CODBC_FinaliseTransaction,	1, 0, 0 },
-	{ "ExecuteQuery",			CODBC_ExecuteQuery,			1, 0, 0 },
-	{ "QueryRelease",			CODBC_QueryRelease,			0, 0, 0 },
-	{ "FetchRow",				CODBC_FetchRow,				1, 0, 0 },
-	{ "GetColumn",				CODBC_GetColumn,			2, 0, 0 },
-	{ "LastOK",					CODBC_LastOK,				0, 0, 0 },
+	{ "BeginTransaction",		CSQLM_BeginTransaction,		0, 0, 0 },
+	{ "FinaliseTransaction",	CSQLM_FinaliseTransaction,	1, 0, 0 },
+	{ "ExecuteQuery",			CSQLM_ExecuteQuery,			1, 0, 0 },
+	{ "QueryRelease",			CSQLM_QueryRelease,			0, 0, 0 },
+	{ "FetchRow",				CSQLM_FetchRow,				1, 0, 0 },
+	{ "GetColumn",				CSQLM_GetColumn,			2, 0, 0 },
+	{ "LastOK",					CSQLM_LastOK,				0, 0, 0 },
 	{ NULL,						NULL,						0, 0, 0 }
 };
 

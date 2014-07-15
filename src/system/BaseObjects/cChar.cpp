@@ -131,7 +131,7 @@ const UI08			DEFPLAYER_SPEECHID 			= 0;
 const SERIAL		DEFPLAYER_ROBE 				= INVALIDSERIAL;
 const UI16			DEFPLAYER_ACCOUNTNUM		= AB_INVALID_ID;
 const UI16			DEFPLAYER_ORIGSKIN			= 0;
-const UI16			DEFPLAYER_ORIGID			= 0x0190;
+const UI16			DEFPLAYER_ORIGID			= 0x190;
 const UI08			DEFPLAYER_FIXEDLIGHT 		= 255;
 const UI16			DEFPLAYER_DEATHS			= 0;
 const SERIAL		DEFPLAYER_TOWNVOTE 			= INVALIDSERIAL;
@@ -204,8 +204,8 @@ const UI16			DEFCHAR_MAXMANA				= 0;
 const UI16			DEFCHAR_MAXMANA_OLDINT 		= 0;
 const UI16			DEFCHAR_MAXSTAM				= 0;
 const UI16			DEFCHAR_MAXSTAM_OLDDEX 		= 0;
-const COLOUR		DEFCHAR_SAYCOLOUR 			= 0x0058;
-const COLOUR		DEFCHAR_EMOTECOLOUR			= 0x0023;
+const COLOUR		DEFCHAR_SAYCOLOUR 			= 0x58;
+const COLOUR		DEFCHAR_EMOTECOLOUR			= 0x23;
 const SI08			DEFCHAR_CELL 				= -1;
 const SERIAL		DEFCHAR_TARG 				= INVALIDSERIAL;
 const SERIAL		DEFCHAR_ATTACKER 			= INVALIDSERIAL;
@@ -228,7 +228,6 @@ const UI16			DEFCHAR_POISONCHANCE 		= 0;
 const UI08			DEFCHAR_POISONSTRENGTH 		= 0;
 
 CChar::CChar() : CBaseObject(),
-bools( DEFCHAR_BOOLS ), 
 fonttype( DEFCHAR_FONTTYPE ), maxHP( DEFCHAR_MAXHP ), maxHP_oldstr( DEFCHAR_MAXHP_OLDSTR ), 
 oldRace( DEFCHAR_OLDRACE ), maxMana( DEFCHAR_MAXMANA ), maxMana_oldint( DEFCHAR_MAXMANA_OLDINT ),
 maxStam( DEFCHAR_MAXSTAM ), maxStam_olddex( DEFCHAR_MAXSTAM_OLDDEX ), saycolor( DEFCHAR_SAYCOLOUR ), 
@@ -238,6 +237,13 @@ advobj( DEFCHAR_ADVOBJ ), guildfealty( DEFCHAR_GUILDFEALTY ), guildnumber( DEFCH
 spellCast( DEFCHAR_SPELLCAST ), nextact( DEFCHAR_NEXTACTION ), stealth( DEFCHAR_STEALTH ), running( DEFCHAR_RUNNING ), 
 raceGate( DEFCHAR_RACEGATE ), step( DEFCHAR_STEP ), priv( DEFCHAR_PRIV ), PoisonStrength( DEFCHAR_POISONSTRENGTH )
 {
+	char str[256];
+	_snprintf(str, sizeof(str), "%d", DEFCHAR_BOOLS);
+	std::stringstream strValue;
+	strValue << DEFCHAR_BOOLS;
+	int intValue;
+	strValue >> intValue;
+	bools = std::bitset<32>(intValue);
 	ownedItems.clear();
 	itemLayers.clear();
 	layerCtr = itemLayers.end();
@@ -1457,158 +1463,159 @@ void CChar::SetNoNeedReags( bool newValue )
 	priv.set( BIT_NONEEDREAGS, newValue );
 }
 
-CChar *CChar::Dupe( void )
+CChar *CChar::Dupe(void)
 {
-	CChar *target = static_cast< CChar * >(ObjectFactory::getSingleton().CreateObject( OT_CHAR ));
-	if( target == NULL )
+	CChar *target = static_cast<CChar *>(ObjectFactory::getSingleton().CreateObject(OT_CHAR));
+	if(target == NULL)
 		return NULL;
 
-	CBaseObject::CopyData( target );
-	CopyData( target );
+	CBaseObject::CopyData(target);
+	CopyData(target);
 
 	return target;
 }
 
-void CChar::CopyData( CChar *target )
+void CChar::CopyData(CChar *target)
 {
-	target->SetMulti( GetMultiObj() );
-	target->SetOwner( GetOwnerObj() );
-	target->SetSpawn( GetSpawn() );
-	target->SetPriv( GetPriv() );
-	target->SetName( name );
-	target->SetTitle( title );
-	target->SetLocation( this );
-	target->SetDir( dir );
-	target->SetID( id );
-	target->SetSkin( GetColour() );
-	target->SetFontType( fonttype );
-	target->SetSayColour( saycolor );
-	target->SetEmoteColour( emotecolor );
-	target->SetStrength( strength );
-	target->SetDexterity( dexterity );
-	target->SetIntelligence( intelligence );
-	if ( GetMaxHPFixed() )
-		target->SetFixedMaxHP(  maxHP );
-	if ( GetMaxManaFixed() )
-		target->SetFixedMaxMana(  maxMana );
-	if ( GetMaxStamFixed() )
-		target->SetFixedMaxStam(  maxStam );
-	target->SetHP(  hitpoints );
-	target->SetStamina( stamina );
-	target->SetMana( mana );
+	target->SetMulti(GetMultiObj());
+	target->SetOwner(GetOwnerObj());
+	target->SetSpawn(GetSpawn());
+	target->SetPriv(GetPriv());
+	target->SetName(name);
+	target->SetTitle(title);
+	target->SetLocation(this);
+	target->SetDir(dir);
+	target->SetID(id);
+	target->SetSkin(GetColour());
+	target->SetFontType(fonttype);
+	target->SetSayColour(saycolor);
+	target->SetEmoteColour(emotecolor);
+	target->SetStrength(strength);
+	target->SetDexterity(dexterity);
+	target->SetIntelligence(intelligence);
+	if (GetMaxHPFixed())
+		target->SetFixedMaxHP(maxHP);
+	if (GetMaxManaFixed())
+		target->SetFixedMaxMana(maxMana);
+	if (GetMaxStamFixed())
+		target->SetFixedMaxStam(maxStam);
+	target->SetHP(hitpoints);
+	target->SetStamina(stamina);
+	target->SetMana(mana);
 
-	target->SetStrength2( st2 );
-	target->SetDexterity2( dx2 );
-	target->SetIntelligence2( in2 );
+	target->SetStrength2(st2);
+	target->SetDexterity2(dx2);
+	target->SetIntelligence2(in2);
 	
-	target->SetHiDamage( hidamage );
-	target->SetLoDamage( lodamage );
+	target->SetHiDamage(hidamage);
+	target->SetLoDamage(lodamage);
 
-	for( UI08 i = 0; i < ALLSKILLS; ++i )
+	for(UI08 i = 0; i < ALLSKILLS; ++i)
 	{
-		target->SetBaseSkill( baseskill[i], i );
-		target->SetSkill( skill[i], i );
+		target->SetBaseSkill(baseskill[i], i);
+		target->SetSkill(skill[i], i);
 	}
 
-	target->SetCell( cell );
-	target->SetPackItem( packitem );
-	target->SetWeight( weight );
-	target->SetResist( GetResist( PHYSICAL), PHYSICAL );
-	target->SetTarg( GetTarg() );
-	target->SetRegen( regen[0], 0 );
-	target->SetRegen( regen[1], 1 );
-	target->SetRegen( regen[2], 2 );
-	target->SetAttacker( GetAttacker() );
-	target->SetVisible( GetVisible() );
+	target->SetCell(cell);
+	target->SetPackItem(packitem);
+	target->SetWeight(weight);
+	target->SetResist(GetResist(PHYSICAL), PHYSICAL);
+	target->SetTarg(GetTarg());
 
-	for( int mTID = (int)tCHAR_TIMEOUT; mTID < (int)tCHAR_COUNT; ++mTID )
-		target->SetTimer( (cC_TID)mTID, GetTimer( (cC_TID)mTID ) );
-	target->SetHunger( hunger );
-	target->SetBrkPeaceChance( GetBrkPeaceChance() );
-	target->SetBrkPeaceChanceGain( GetBrkPeaceChanceGain() );
-	target->SetRegion( regionNum );
-	target->SetTown( town );
-	target->SetAdvObj( advobj );
-	target->SetDisabled( isDisabled() );
-	target->SetCanTrain( CanTrain() );
-	target->SetLastOn( GetLastOn() );
-	target->SetLastOnSecs( GetLastOnSecs() );
-	target->SetGuildTitle( guildtitle );
-	target->SetGuildFealty( guildfealty );
-	target->SetGuildNumber( guildnumber );
-	target->SetFlag( flag );
-	target->SetCasting( IsCasting() );
-	target->SetJSCasting( IsJSCasting() );
-	target->SetSpellCast( spellCast );
-	target->SetNextAct( nextact );
-	target->SetSquelched( GetSquelched() );
-	target->SetMeditating( IsMeditating() );
-	target->SetStealth( stealth );
-	target->SetRunning( running );
-	target->SetRace( GetRace() );
-	target->SetRaceGate( raceGate );
-	target->SetCarve( carve );
-	for( UI08 counter2 = 0; counter2 < WEATHNUM; ++counter2 )
+	for (UI08 i = 0; i < 3; ++i)
+		target->SetRegen(regen[i], i);
+
+	target->SetAttacker(GetAttacker());
+	target->SetVisible(GetVisible());
+
+	for(int mTID = (int)tCHAR_TIMEOUT; mTID < (int)tCHAR_COUNT; ++mTID)
+		target->SetTimer((cC_TID)mTID, GetTimer((cC_TID)mTID));
+
+	target->SetHunger(hunger);
+	target->SetBrkPeaceChance(GetBrkPeaceChance());
+	target->SetBrkPeaceChanceGain(GetBrkPeaceChanceGain());
+	target->SetRegion(regionNum);
+	target->SetTown(town);
+	target->SetAdvObj(advobj);
+	target->SetDisabled(isDisabled());
+	target->SetCanTrain(CanTrain());
+	target->SetLastOnSecs(GetLastOnSecs());
+	target->SetGuildTitle(guildtitle);
+	target->SetGuildFealty(guildfealty);
+	target->SetGuildNumber(guildnumber);
+	target->SetFlag(flag);
+	target->SetCasting(IsCasting());
+	target->SetJSCasting(IsJSCasting());
+	target->SetSpellCast(spellCast);
+	target->SetNextAct(nextact);
+	target->SetSquelched(GetSquelched());
+	target->SetMeditating(IsMeditating());
+	target->SetStealth(stealth);
+	target->SetRunning(running);
+	target->SetRace(GetRace());
+	target->SetRaceGate(raceGate);
+	target->SetCarve(carve);
+
+	for(UI08 counter2 = 0; counter2 < WEATHNUM; ++counter2)
+		target->SetWeathDamage(weathDamage[counter2], counter2);
+
+	if(IsValidNPC())
 	{
-		target->SetWeathDamage( weathDamage[counter2], counter2 );
+		target->SetTamedHungerRate(GetTamedHungerRate());
+		target->SetTamedHungerWildChance(GetTamedHungerWildChance());
+		target->SetFood(GetFood());
+		target->SetFleeAt(GetFleeAt());
+		target->SetReattackAt(GetReattackAt());
+		target->SetFTarg(GetFTarg());
+		target->SetFx(GetFx(0), 0);
+		target->SetFx(GetFx(1), 1);
+		target->SetFy(GetFy(0), 0);
+		target->SetFy(GetFy(1), 1);
+		target->SetFz(GetFz());
+		target->SetNpcWander(GetNpcWander());
+		target->SetOldNpcWander(GetOldNpcWander());
+		target->SetTaming(GetTaming());
+		target->SetPeaceing(GetPeaceing());
+		target->SetProvoing(GetProvoing());
+		target->SetNPCAiType(GetNPCAiType());
+		target->SetSpAttack(GetSpAttack());
+		target->SetSpDelay(GetSpDelay());
+		target->SetSplit(GetSplit());
+		target->SetSplitChance(GetSplitChance());
+		target->SetTrainingPlayerIn(GetTrainingPlayerIn());
+		target->SetHoldG(GetHoldG());
+		target->SetQuestType(GetQuestType());
+		target->SetQuestDestRegion(GetQuestDestRegion());
+		target->SetQuestOrigRegion(GetQuestOrigRegion());
+		target->SetNPCFlag(GetNPCFlag());
+		target->SetWalkingSpeed(GetWalkingSpeed());
+		target->SetRunningSpeed(GetRunningSpeed());
+		target->SetFleeingSpeed(GetFleeingSpeed());
 	}
-	if( IsValidNPC() )
+	if(IsValidPlayer())
 	{
-		target->SetTamedHungerRate( GetTamedHungerRate() );
-		target->SetTamedHungerWildChance( GetTamedHungerWildChance() );
-		target->SetFood( GetFood() );
-		target->SetFleeAt( GetFleeAt() );
-		target->SetReattackAt( GetReattackAt() );
-		target->SetFTarg( GetFTarg() );
-		target->SetFx( GetFx( 0 ), 0 );
-		target->SetFx( GetFx( 1 ), 1 );
-		target->SetFy( GetFy( 0 ), 0 );
-		target->SetFy( GetFy( 1 ), 1 );
-		target->SetFz( GetFz() );
-		target->SetNpcWander( GetNpcWander() );
-		target->SetOldNpcWander( GetOldNpcWander() );
-		target->SetTaming( GetTaming() );
-		target->SetPeaceing( GetPeaceing() );
-		target->SetProvoing( GetProvoing() );
-		target->SetNPCAiType( GetNPCAiType() );
-		target->SetSpAttack( GetSpAttack() );
-		target->SetSpDelay( GetSpDelay() );
-		target->SetSplit( GetSplit() );
-		target->SetSplitChance( GetSplitChance() );
-		target->SetTrainingPlayerIn( GetTrainingPlayerIn() );
-		target->SetHoldG( GetHoldG() );
-		target->SetQuestType( GetQuestType() );
-		target->SetQuestDestRegion( GetQuestDestRegion() );
-		target->SetQuestOrigRegion( GetQuestOrigRegion() );
-		target->SetNPCFlag( GetNPCFlag() );
-		target->SetWalkingSpeed( GetWalkingSpeed() );
-		target->SetRunningSpeed( GetRunningSpeed() );
-		target->SetFleeingSpeed( GetFleeingSpeed() );
-	}
-	if( IsValidPlayer() )
-	{
-		target->SetTownpriv( GetTownPriv() );
-		target->SetTownVote( GetTownVote() );
-		target->SetDeaths( GetDeaths() );
-		target->SetFixedLight( GetFixedLight() );
-		target->SetGuarding( GetGuarding() );
-		target->SetOrgName( GetOrgName() );
-		target->SetRobe( GetRobe() );
-		target->SetAccount( GetAccount() );
-		target->SetOrgID( GetOrgID() );
-		target->SetCallNum( GetCallNum() );
-		target->SetPlayerCallNum( GetPlayerCallNum() );
-		target->SetCommandLevel( GetCommandLevel() );
-		target->SetPostType( GetPostType() );
-		target->SetTrackingTarget( GetTrackingTarget() );
-		for( UI08 counter = 0; counter < mPlayer->trackingTargets.size(); ++counter )
+		target->SetTownpriv(GetTownPriv());
+		target->SetTownVote(GetTownVote());
+		target->SetDeaths(GetDeaths());
+		target->SetFixedLight(GetFixedLight());
+		target->SetGuarding(GetGuarding());
+		target->SetOrgName(GetOrgName());
+		target->SetRobe(GetRobe());
+		target->SetAccount(GetAccount());
+		target->SetOrgID(GetOrgID());
+		target->SetCallNum(GetCallNum());
+		target->SetPlayerCallNum(GetPlayerCallNum());
+		target->SetCommandLevel(GetCommandLevel());
+		target->SetPostType(GetPostType());
+		target->SetTrackingTarget(GetTrackingTarget());
+
+		for(UI08 counter = 0; counter < mPlayer->trackingTargets.size(); ++counter)
+			target->SetTrackingTargets(mPlayer->trackingTargets[counter], counter);
+
+		for(UI08 j = STRENGTH; j <= INTELLECT; ++j)
 		{
-			target->SetTrackingTargets( mPlayer->trackingTargets[counter], counter );
-		}
-		for( UI08 j = STRENGTH; j <= INTELLECT; ++j )
-		{
-			target->SetAtrophy( mPlayer->atrophy[j], j );
-			target->SetSkillLock( mPlayer->lockState[j], j );
+			target->SetAtrophy(mPlayer->atrophy[j], j);
+			target->SetSkillLock(mPlayer->lockState[j], j);
 		}
 	}
 }
@@ -1950,7 +1957,7 @@ bool CChar::FinishedItems( void )
 {
 	return ( layerCtr == itemLayers.end() );
 }
-
+#if ACT_SQL == 0
 bool CChar::DumpHeader( std::ofstream &outStream ) const
 {
 	outStream << "[CHARACTER]" << '\n';
@@ -1959,7 +1966,7 @@ bool CChar::DumpHeader( std::ofstream &outStream ) const
 
 bool CChar::DumpBody( std::ofstream &outStream ) const
 {
-	CBaseObject::DumpBody( outStream );	// Make the default save of BaseObject members now
+	CBaseObject::DumpBody(outStream); // Make the default save of BaseObject members now
 
 	// Hexadecimal Values
 	outStream << std::hex;
@@ -2036,7 +2043,7 @@ bool CChar::DumpBody( std::ofstream &outStream ) const
 	return true;
 }
 
-void CChar::NPCValues_st::DumpBody( std::ofstream& outStream )
+void CChar::NPCValues_st::DumpBody(std::ofstream& outStream)
 {
 	// Hexadecimal Values
 	outStream << std::hex;
@@ -2067,7 +2074,7 @@ void CChar::NPCValues_st::DumpBody( std::ofstream& outStream )
 	outStream << "FleeingSpeed=" << fleeingSpeed << '\n';
 }
 
-void CChar::PlayerValues_st::DumpBody( std::ofstream& outStream )
+void CChar::PlayerValues_st::DumpBody(std::ofstream& outStream)
 {
 	// Hexadecimal Values
 	outStream << std::hex;
@@ -2106,6 +2113,266 @@ void CChar::PlayerValues_st::DumpBody( std::ofstream& outStream )
 	}
 	outStream << "[END]" << '\n';
 }
+#else
+std::stringstream CChar::DumpBody() const
+{
+	std::stringstream Str = CBaseObject::DumpBody(); // Make the default save of BaseObject members now
+	Str << "INSERT INTO attributes VALUES (";
+	if (serial == INVALIDSERIAL)
+		Str << "NULL, ";
+	else
+		Str << "'" << serial << "', ";
+
+	if (GetGuildFealty() == DEFCHAR_GUILDFEALTY)
+		Str << "NULL, ";
+	else
+		Str << "'" << GetGuildFealty() << "', ";
+
+	Str << "'" << GetSayColour() << ", " << GetEmoteColour() << "', ";
+	Str << "'" << GetPriv() << "', ";
+	if (ValidateObject(packitem))
+		Str << "'" << packitem->GetSerial() << "', ";
+	else
+		Str << "NULL, ";
+
+	std::string _guildtitle = GetGuildTitle();
+	std::string search = "\"";
+	if (_guildtitle.find(search) != std::string::npos)
+		_guildtitle.replace(_guildtitle.find(search), search.length(), "\\\"");
+
+	Str << "\"" << _guildtitle << "\", ";
+	Str << "'" << (SI16)GetHunger() << "', ";
+	Str << "'" << abs((SI16)GetBrkPeaceChanceGain()) << "', ";
+	Str << "'" << abs((SI16)GetBrkPeaceChance()) << "', ";
+	Str << "'" << abs((SI16)maxHP) << "', ";
+	Str << "'" << abs((SI16)maxMana) << "', ";
+	Str << "'" << abs((SI16)maxStam) << "', ";
+	Str << "'" << int((UI08)(SI16)GetTown()) << "', ";
+	Str << "'" << GetTimer(tNPC_SUMMONTIME) << "', ";
+	Str << "'" << (MayLevitate() ? 1 : 0) << "', ";
+	Str << "'" << int((SI08)(SI16)GetStealth()) << "', ";
+	Str << "'" << int((SI08)(SI16)GetCell()) << "', ";
+	Str << "'" << abs((SI16)GetRegionNum()) << "', ";
+	Str << "'" << abs(GetAdvObj()) << "', ";
+	Str << "'" << abs(GetRaceGate()) << "', ";
+
+	Str << "'";
+	for (UI08 bsc = 0; bsc < ALLSKILLS; ++bsc)
+	{
+		Str << (SI32)bsc << "," << GetBaseSkill(bsc);
+		if (bsc != ALLSKILLS-1)
+			Str << "-";
+	}
+	Str << "', ";
+
+	Str << "'" << GetGuildNumber() << "',";
+	Str << "'" << (SI16)GetFontType() << "',";
+	Str << "'" << (SI16)(GetTownTitle() ? 1 : 0) << "',";
+	Str << "'" << (SI16)((CanRun() && IsNpc()) ? 1 : 0) << "',";
+	Str << "'" << (SI16)(GetCanAttack() ? 1 : 0) << "',";
+	Str << "'" << (SI16)(AllMove() ? 1 : 0) << "',";
+	Str << "'" << (SI16)(IsNpc() ? 1 : 0) << "',";
+	Str << "'" << (SI16)(IsShop() ? 1 : 0) << "',";
+	Str << "'" << (SI16)(IsDead() ? 1 : 0) << "',";
+	Str << "'" << (SI16)(CanTrain() ? 1 : 0) << "',";
+	Str << "'" << (SI16)(IsAtWar() ? 1 : 0) << "',";
+	Str << "'" << (SI16)(GetGuildToggle() ? 1 : 0) << "',";
+	Str << "'" << (UI16)(GetPoisonStrength()) << "',";
+	Str << "'" << (SI16)(WillHunger() ? 1 : 0) << "',";
+
+	for (int i = tCHAR_MURDERRATE; i < tCHAR_PEACETIMER+1; ++i)
+	{
+		Str << "'";
+		TIMERVAL Time = GetTimer(UOX::cC_TID(i));
+		if(Time == 0 || Time < cwmWorldState->GetUICurrentTime())
+			Str << (SI16)0 << "'";
+		else
+			Str << (UI32)(Time - cwmWorldState->GetUICurrentTime()) << "'";
+
+		if (i != tCHAR_PEACETIMER)
+			Str << ",";
+	}
+	Str << ")\n";
+
+	if (IsValidPlayer())
+		mPlayer->DumpBody(Str, serial, GetName());
+	if (IsValidNPC() && mPlayer->accountNum == DEFPLAYER_ACCOUNTNUM) // Players has account, so don't add them into creatures.
+		mNPC->DumpBody(Str, serial);
+	return Str;
+}
+
+void CChar::NPCValues_st::DumpBody(std::stringstream &Str, UOX::SERIAL Serial)
+{
+	Str << "INSERT INTO creatures VALUES (";
+	Str << "'" << Serial << "', ";
+
+	Str << "'" << int((UI08)aiType) << "', ";
+	if (taming == DEFNPC_TAMING)
+		Str << "NULL, ";
+	else
+		Str << "'" << taming << "', ";
+
+	if (taming == DEFNPC_PEACEING)
+		Str << "NULL, ";
+	else
+		Str << "'" << peaceing << "', ";
+
+	if (taming == DEFNPC_PROVOING)
+		Str << "NULL, ";
+	else
+		Str << "'" << provoing << "', ";
+
+	Str << "'" << goldOnHand << "', ";
+
+	Str << "'";
+	if (splitNum != DEFNPC_SPLIT)
+		Str << (SI16)splitNum;
+	Str << ",";
+	if (splitChance != DEFNPC_SPLITCHANCE)
+		Str << (SI16)splitChance;
+	Str << "', ";
+
+	Str << "'";
+	if (fx[0] != DEFNPC_WANDERAREA)
+		Str << fx[0];
+	Str << ",";
+	if (fy[0] != DEFNPC_WANDERAREA)
+		Str << fy[0];
+	Str << ",";
+	if (fx[1] != DEFNPC_WANDERAREA)
+		Str << fx[1];
+	Str << ",";
+	if (fy[1] != DEFNPC_WANDERAREA)
+		Str << fy[1];
+	Str << ",";
+	if (fz != DEFNPC_FZ1)
+		Str << (SI16)fz;
+	Str << "', ";
+
+	Str << "'";
+	if (wanderMode != DEFNPC_WANDER)
+		Str << (SI16)wanderMode;
+	Str << ",";
+	if (oldWanderMode != DEFNPC_OLDWANDER)
+		Str << (SI16)oldWanderMode;
+	Str << "', ";
+
+	Str << "'";
+	if (spellAttack != DEFNPC_SPATTACK)
+		Str << spellAttack;
+	Str << ",";
+	if (spellDelay != DEFNPC_SPADELAY)
+		Str << (SI16)spellDelay;
+	Str << "', ";
+
+	Str << "'" << int((UI08)(SI16)questType) << "', ";
+
+	Str << "'";
+	if (questOrigRegion != DEFNPC_QUESTORIGREGION)
+		Str << questOrigRegion;
+	Str << ",";
+	if (questDestRegion != DEFNPC_QUESTDESTREGION)
+		Str << (SI16)questDestRegion;
+	Str << "', ";
+
+	Str << "'" << fleeAt << "', ";
+	Str << "'" << reAttackAt << "', ";
+	Str << "'" << int((UI08)(SI16)npcFlag) << "', ";
+	Str << "'" << (SI16)(boolFlags.test(BIT_MOUNTED) ? 1 : 0) << "', ";
+	Str << "'" << (SI16)(boolFlags.test(BIT_STABLED) ? 1 : 0) << "', ";
+	Str << "'" << int((SI08)tamedHungerRate) << "', ";
+	Str << "'" << int((SI08)(SI16)hungerWildChance) << "', ";
+
+	if (foodList.empty())
+		Str << "NULL, ";
+	else
+		Str << "\"" << foodList.c_str() << "\", ";
+
+	Str << "'" << walkingSpeed << "', ";
+	Str << "'" << runningSpeed << "', ";
+	Str << "'" << fleeingSpeed << "')\n";
+}
+
+void CChar::PlayerValues_st::DumpBody(std::stringstream &Str, UOX::SERIAL Serial, std::string Name)
+{
+	Str << "INSERT INTO characters VALUES (";
+	if (Serial == INVALIDSERIAL)
+		Str << "NULL, ";
+	else
+		Str << "'" << Serial << "', ";
+	Str << "'" << accountNum << "', ";
+	Str << "'" << Name << "', ";
+
+	if (robe == INVALIDSERIAL)
+		Str << "NULL, ";
+	else
+		Str << "'" << robe << "', ";
+
+	Str << "'";
+	if (origID != DEFPLAYER_ORIGID)
+		Str << origID;
+	Str << ",";
+	if (origSkin != DEFPLAYER_ORIGSKIN)
+		Str << origSkin;
+	Str << "', ";
+
+	Str << "'";
+	if (hairStyle != DEFPLAYER_HAIRSTYLE)
+		Str << hairStyle;
+	Str << ",";
+	if (hairColour != DEFPLAYER_HAIRCOLOUR)
+		Str << hairColour;
+	Str << "', ";
+
+	Str << "'";
+	if (beardStyle != DEFPLAYER_BEARDSTYLE)
+		Str << beardStyle;
+	Str << ",";
+	if (beardColour != DEFPLAYER_BEARDCOLOUR)
+		Str << beardColour;
+	Str << "', ";
+	
+	if (townvote == DEFPLAYER_TOWNVOTE)
+		Str << "NULL, ";
+	else
+		Str << "'" << townvote << "', ";
+
+	if (lastOnSecs == 0)
+		Str << "'0000-00-00 00:00:00', ";
+	else
+		Str << "FROM_UNIXTIME(" << lastOnSecs << "), ";
+
+	if (origName.empty())
+		Str << "NULL, ";
+	else
+		Str << "\"" << origName << "\", ";
+	
+	Str << "'" << int((UI08)(SI16)commandLevel) << "', ";
+	Str << "'" << int((UI08)(SI16)squelched) << "', ";
+	Str << "'" << deaths << "', ";
+	Str << "'" << int((UI08)(SI16)fixedLight) << "', ";
+	Str << "'" << int((SI08)(SI16)townpriv) << "', ";
+
+	Str << "'";
+	for (UI08 atc = 0; atc < INTELLECT+1; ++atc)
+	{
+		Str << (SI16)atrophy[atc];
+		if (atc != INTELLECT)
+			Str << "," ;
+	}
+	Str << "', '";
+	for (UI08 slc = 0; slc < INTELLECT+1; ++slc)
+	{
+		if(lockState[slc] <= 2)
+			Str  << (SI16)slc << "," << (SI16)lockState[slc];
+		else
+			Str << (SI16)slc << ",0";
+		if (slc != INTELLECT)
+			Str << "-";
+	}
+	Str << "')\n";
+}
+#endif
 
 //o-----------------------------------------------------------------------o
 //|	Function	-	Save( ofstream &outstream )
@@ -2114,6 +2381,7 @@ void CChar::PlayerValues_st::DumpBody( std::ofstream& outStream )
 //o-----------------------------------------------------------------------o
 //|	Returns		-	true/false indicating the success of the write operation
 //o-----------------------------------------------------------------------o
+#if ACT_SQL == 0
 bool CChar::Save( std::ofstream &outStream )
 {
 	bool rvalue = false;
@@ -2144,6 +2412,28 @@ bool CChar::Save( std::ofstream &outStream )
 	}
 	return rvalue;
 }
+#else
+UString CChar::Save(void)
+{
+	UString uStr;
+	if(!isFree())
+	{
+		SI16 mX = GetX();
+		SI16 mY = GetY();
+		MapData_st& mMap = Map->GetMapData( worldNumber );
+		if( mX >= 0 && ( mX < mMap.xBlock || mX >= 7000 ) )
+			if( mY >= 0 && ( mY < mMap.yBlock || mY >= 7000 ) )
+			{
+				uStr += DumpBody().str();
+
+				for (LAYERLIST_ITERATOR lIter = itemLayers.begin(); lIter != itemLayers.end(); ++lIter)
+					if (ValidateObject(lIter->second) && lIter->second->ShouldSave())
+						uStr += lIter->second->Save();
+			}
+	}
+	return uStr;
+}
+#endif
 
 //o---------------------------------------------------------------------------o
 //|   Function    -  void BreakConcentration( CSocket *sock = NULL )
@@ -2607,7 +2897,7 @@ void CChar::StopSpell( void )
 	SetCasting( false );
 	SetSpellCast( -1 );
 }
-
+#if ACT_SQL == 0
 bool CChar::HandleLine( UString &UTag, UString& data )
 {
 	bool rvalue = CBaseObject::HandleLine( UTag, data );
@@ -3186,7 +3476,431 @@ bool CChar::HandleLine( UString &UTag, UString& data )
 	}
 	return rvalue;
 }
+#else
+void CChar::HandleLine(std::vector<UString> dataList)
+{
+	CBaseObject::HandleLine(dataList);
+	for (std::vector<UString>::iterator itr = dataList.begin(); itr != dataList.end(); ++itr)
+	{
+		switch (itr-dataList.begin())
+		{
+		case 28: // attributes.guildfealty
+			SetGuildFealty(itr->empty() ? DEFCHAR_GUILDFEALTY : itr->toULong());
+			break;
+		case 29: // attributes.speech
+			{
+				COLOUR newvalue[2] = {88, 35};
+				if(!itr->empty())
+					for (int i = 0; i < itr->sectionCount(",")+1; ++i)
+					{
+						UString uStr = itr->section(",", i, i).stripWhiteSpace();
+						if (!uStr.empty())
+							newvalue[i] = uStr.toUShort();
+					}
 
+				SetSayColour(newvalue[0]);
+				SetEmoteColour(newvalue[1]);
+			}
+			break;
+		case 30: // attributes.privileges
+			SetPriv(itr->toUShort());
+			break;
+		case 31: // attributes.packitem
+			{
+				packitem = itr->empty() ? NULL : (CItem *)itr->toULong();
+			}
+			break;
+		case 32: // attributes.guildtitle
+			SetGuildTitle(itr->empty() ? "" : itr->c_str());
+			break;
+		case 33: // attributes.hunger
+			SetHunger(itr->toShort());
+			break;
+		case 34: // attributes.brkpeacechancegain
+			SetBrkPeaceChanceGain(itr->toUShort());
+			break;
+		case 35: // attributes.brkpeacechance
+			SetBrkPeaceChance(itr->toUShort());
+			break;
+		case 36: // attributes.maxhp
+			SetFixedMaxHP(itr->toUShort());
+			break;
+		case 37: // attributes.maxmana
+			SetFixedMaxMana(itr->toUShort());
+			break;
+		case 38: // attributes.maxstam
+			SetFixedMaxStam(itr->toUShort());
+			break;
+		case 39: // attributes.town
+			SetTown(itr->toUByte());
+			break;
+		case 40: // attributes.summontimer
+			SetTimer(tNPC_SUMMONTIME, itr->toULong());
+			break;
+		case 41: // attributes.maylevitate
+			SetLevitate(itr->toUByte() == 1);
+			break;
+		case 42: // attributes.stealth
+			SetStealth(itr->toByte());
+			break;
+		case 43: // attributes.reserved
+			SetCell(itr->toByte());
+			break;
+		case 44: // attributes.region
+			SetRegion(itr->toUShort());
+			break;
+		case 45: // attributes.advanceobject
+			SetAdvObj(itr->toUShort());
+			break;
+		case 46: // attributes.advraceobject
+			SetRaceGate(itr->toUShort());
+			break;
+		case 47: // attributes.baseskills
+			{
+				SKILLVAL newvalue[ALLSKILLS];
+				for (int i = 0; i < ALLSKILLS; ++i)
+					newvalue[i] = 0;
+
+				if(!itr->empty())
+					for (UI08 skillCtr = 0; skillCtr < itr->sectionCount("-")+1; ++skillCtr)
+					{
+						UString tempdata = itr->section("-", skillCtr, skillCtr).stripWhiteSpace();
+						if(tempdata.empty())
+							break;
+
+						UString tempnum = tempdata.section(",", 0, 0);
+						UString tempval = tempdata.section(",", 1, 1);
+						if (!tempval.empty() && !tempnum.empty())
+							newvalue[int(tempnum.toUByte())] = tempval.toUShort();
+					}
+
+				for (int skill = 0; skill < ALLSKILLS; ++skill)
+					SetBaseSkill(newvalue[skill], UI08(skill));
+			}
+			break;
+		case 48: // attributes.guildnumber
+			SetGuildNumber(itr->toShort());
+			break;
+		case 49: // attributes.fonttype
+			SetFontType(itr->toByte());
+			break;
+		case 50: // attributes.towntitle
+			SetTownTitle(itr->toUByte() == 1);
+			break;
+		case 51: // attributes.canrun
+			SetRun(itr->toUByte() == 1);
+			break;
+		case 52: // attributes.canattack
+			SetCanAttack(itr->toUByte() == 1);
+			break;
+		case 53: // attributes.allmove
+			SetAllMove(itr->toUByte() == 1);
+			break;
+		case 54: // attributes.isnpc
+			SetNpc(itr->toUByte() == 1);
+			break;
+		case 55: // attributes.isshop
+			SetShop(itr->toUByte() == 1);
+			break;
+		case 56: // attributes.dead
+			SetDead(itr->toUByte() == 1);
+			break;
+		case 57: // attributes.cantrain
+			SetCanTrain(itr->toUByte() == 1);
+			break;
+		case 58: // attributes.iswarring
+			SetWar(itr->toUByte() == 1);
+			break;
+		case 59: // attributes.guildtoggle
+			SetGuildToggle(itr->toUByte() == 1);
+			break;
+		case 60: // attributes.poisonstrength
+			SetPoisonStrength(itr->toUByte());
+			break;
+		case 61: // attributes.willhunger
+			SetHungerStatus(itr->toUByte() == 1);
+			break;
+		case 62: // attributes.murdertimer
+			SetTimer(tCHAR_MURDERRATE, BuildTimeValue(itr->toFloat()));
+			break;
+		case 63: // attributes.peacetimer
+			SetTimer(tCHAR_PEACETIMER, BuildTimeValue(itr->toFloat()));
+			break;
+
+		case 64: // characters.account
+			SetAccountNum(itr->empty() ? DEFPLAYER_ACCOUNTNUM : itr->toUShort());
+			break;
+		case 65: // characters.robeserial
+			SetRobe(itr->empty() ? INVALIDSERIAL : itr->toULong());
+			break;
+		case 66: // characters.originalid
+			{
+				UI16 newvalue[2] = {DEFPLAYER_ORIGID, DEFPLAYER_ORIGSKIN};
+				if(!itr->empty())
+					for (int i = 0; i < itr->sectionCount(",")+1; ++i)
+					{
+						UString uStr = itr->section(",", i, i).stripWhiteSpace();
+						if (!uStr.empty())
+							newvalue[i] = uStr.toUShort();
+					}
+
+				SetOrgID(newvalue[0]);
+				SetOrgSkin(newvalue[1]);
+			}
+			break;
+		case 67: // characters.hair
+			{
+				UI16 newvalue[2] = {DEFPLAYER_HAIRSTYLE, DEFPLAYER_HAIRCOLOUR};
+				if(!itr->empty())
+					for (int i = 0; i < itr->sectionCount(",")+1; ++i)
+					{
+						UString uStr = itr->section(",", i, i).stripWhiteSpace();
+						if (!uStr.empty())
+							newvalue[i] = uStr.toUShort();
+					}
+
+				SetHairStyle(newvalue[0]);
+				SetHairColour(newvalue[1]);
+			}
+			break;
+		case 68: // characters.beard
+			{
+				UI16 newvalue[2] = {DEFPLAYER_BEARDSTYLE, DEFPLAYER_BEARDCOLOUR};
+				if(!itr->empty())
+					for (int i = 0; i < itr->sectionCount(",")+1; ++i)
+					{
+						UString uStr = itr->section(",", i, i).stripWhiteSpace();
+						if (!uStr.empty())
+							newvalue[i] = uStr.toUShort();
+					}
+
+				SetBeardStyle(newvalue[0]);
+				SetBeardColour(newvalue[1]);
+			}
+			break;
+		case 69: // characters.townvote
+			SetTownVote(itr->empty() ? DEFPLAYER_TOWNVOTE : itr->toULong());
+			break;
+		case 70: // characters.laston
+			SetLastOn(itr->c_str());
+			break;
+		case 71: // characters.laston(secs)
+			SetLastOnSecs(itr->toLong());
+			break;
+		case 72: // characters.orgname
+			SetOrgName(itr->empty() ? "" : itr->c_str());
+			break;
+		case 73: // characters.commandlevel
+			SetCommandLevel(itr->toUByte());
+			break;
+		case 74: // characters.squelched
+			SetSquelched(itr->toUByte());
+			break;
+		case 75: // characters.deaths
+			SetDeaths(itr->toUShort());
+			break;
+		case 76: // characters.fixedlight
+			SetFixedLight(itr->toUByte());
+			break;
+		case 77: // characters.townprivileges
+			SetTownpriv(itr->toByte());
+			break;
+		case 78: // characters.atrophy
+			{
+				UI08 newvalue[INTELLECT+1];
+				for (int i = 0; i < INTELLECT+1; ++i)
+					newvalue[i] = i;
+
+				if (!itr->empty())
+					for(int i = 0; i < itr->sectionCount(",")+1; ++i)
+					{
+						UString uStr = itr->section(",", i, i);
+						if(!uStr.empty())
+							newvalue[i] = uStr.stripWhiteSpace().toUShort();
+					}
+
+				for(int i = 0; i < INTELLECT+1; ++i)
+					SetAtrophy(newvalue[i], i);
+			}
+			break;
+		case 79: // characters.skilllocks
+			{
+				SkillLock newvalue[INTELLECT+1];
+				for (int i = 0; i < INTELLECT+1; ++i)
+					newvalue[i] = SKILL_INCREASE;
+
+				if(!itr->empty())
+					for(UI08 lockCtr = 0; lockCtr < itr->sectionCount("-")+1; ++lockCtr)
+					{
+						UString tempdata = itr->section("-", lockCtr, lockCtr).stripWhiteSpace();
+						if(tempdata.empty())
+							break;
+
+						UString tempnum = tempdata.section(",", 0, 0);
+						UString tempval = tempdata.section(",", 1, 1);
+						if (!tempval.empty() && !tempnum.empty())
+							newvalue[int(tempnum.toUByte())] = (SkillLock)tempval.toUByte();
+					}
+
+				for (int skill = 0; skill < INTELLECT+1; ++skill)
+					SetSkillLock(newvalue[skill], skill);
+			}
+			break;
+
+		case 80: // creatures.npcaitype
+			SetNPCAiType(itr->toUByte());
+			break;
+		case 81: // creatures.taming
+			SetTaming(itr->empty() ? DEFNPC_TAMING : itr->toShort());
+			break;
+		case 82: // creatures.peaceing
+			SetPeaceing(itr->empty() ? DEFNPC_PEACEING : itr->toShort());
+			break;
+		case 83: // creatures.provoing
+			SetProvoing(itr->empty() ? DEFNPC_PROVOING : itr->toShort());
+			break;
+		case 84: // creatures.holdg
+			SetHoldG(itr->toLong());
+			break;
+		case 85: // creatures.split
+			if (itr->sectionCount(",") == 0)
+				SetSplit(itr->empty() ? DEFNPC_SPLIT : itr->toUByte());
+			else
+			{
+				UI08 newvalue[2] = {DEFNPC_SPLIT, DEFNPC_SPLITCHANCE};
+				if(!itr->empty())
+					for (int i = 0; i < itr->sectionCount(",")+1; ++i)
+					{
+						UString uStr = itr->section(",", i, i).stripWhiteSpace();
+						if (!uStr.empty())
+							newvalue[i] = uStr.toUByte();
+					}
+
+				SetSplit(newvalue[0]);
+				SetSplitChance(newvalue[1]);
+			}
+			break;
+		case 86: // creatures.wanderarea
+			{
+				SI16 newvalue[4] = {DEFNPC_WANDERAREA, DEFNPC_WANDERAREA, DEFNPC_WANDERAREA, DEFNPC_WANDERAREA};
+				SI08 newvalue5 = DEFNPC_WANDERAREA;
+				if(!itr->empty())
+					for (int i = 0; i < itr->sectionCount(",")+1; ++i)
+					{
+						UString uStr = itr->section(",", i, i).stripWhiteSpace();
+						if (!uStr.empty())
+							if (i != 4)
+							{
+								if (!uStr.empty())
+									newvalue[i] = uStr.toShort();
+							}
+							else if (i == 4 && !uStr.empty())
+								newvalue5 = uStr.toByte();
+					}
+
+				SetFx(newvalue[0], 0);
+				SetFy(newvalue[1], 0);
+				SetFx(newvalue[2], 1);
+				SetFy(newvalue[3], 1);
+				SetFz(newvalue5);
+			}
+			break;
+		case 87: // creatures.npcwander
+			if (itr->sectionCount(",") == 0)
+				SetNpcWander(itr->toByte());
+			else
+			{
+				SI08 newvalue[2] = {DEFNPC_WANDER, DEFNPC_OLDWANDER};
+				if(!itr->empty())
+					for (int i = 0; i < itr->sectionCount(",")+1; ++i)
+					{
+						UString uStr = itr->section(",", i, i).stripWhiteSpace();
+						if (!uStr.empty())
+							newvalue[i] = uStr.toByte();
+					}
+
+				SetNpcWander(newvalue[0]);
+				SetOldNpcWander(newvalue[1]);
+			}
+			break;
+		case 88: // creatures.spattack
+			if (itr->sectionCount(",") == 0)
+				SetSpAttack(itr->empty() ? DEFNPC_SPATTACK : itr->toShort());
+			else
+			{
+				SI16 newvalue1 = DEFNPC_SPATTACK;
+				SI08 newvalue2 = DEFNPC_SPADELAY;
+				if(!itr->empty())
+					for (int i = 0; i < itr->sectionCount(",")+1; ++i)
+					{
+						UString uStr = itr->section(",", i, i).stripWhiteSpace();
+						if (!uStr.empty())
+							if (i == 0)
+								newvalue1 = uStr.toShort();
+							else if (i == 1)
+								newvalue2 = uStr.toByte();
+					}
+
+				SetSpAttack(newvalue1);
+				SetSpDelay(newvalue2);
+			}
+			break;
+		case 89: // creatures.questtype
+			SetQuestType(itr->toUByte());
+			break;
+		case 90: // creatures.questregions
+			{
+				SI08 newvalue[2] = {DEFNPC_QUESTORIGREGION, DEFNPC_QUESTDESTREGION};
+				if(!itr->empty())
+					for (int i = 0; i < itr->sectionCount(",")+1; ++i)
+					{
+						UString uStr = itr->section(",", i, i).stripWhiteSpace();
+						if (!uStr.empty())
+							newvalue[i] = uStr.toUByte();
+					}
+
+				SetQuestOrigRegion(newvalue[0]);
+				SetQuestDestRegion(newvalue[1]);
+			}
+			break;
+		case 91: // creatures.fleeat
+			SetFleeAt(itr->toShort());
+			break;
+		case 92: // creatures.reattackat
+			SetReattackAt(itr->toShort());
+			break;
+		case 93: // creatures.npcflag
+			SetNPCFlag((cNPC_FLAG)itr->toUByte());
+			UpdateFlag(this);
+			break;
+		case 94: // creatures.mounted
+			SetMounted(itr->toUByte() == 1);
+			break;
+		case 95: // creatures.stabled
+			SetStabled(itr->toUByte() == 1);
+			break;
+		case 96: // creatures.tamedhungerrate
+			SetTamedHungerRate(itr->toByte());
+			break;
+		case 97: // creatures.tamedhungerwildchance
+			SetTamedHungerWildChance(itr->toByte());
+			break;
+		case 98: // creatures.foodlist
+			SetFood(itr->empty() ? "" : itr->substr(0, MAX_NAME));
+			break;
+		case 99: // creatures.walkingspeed
+			SetWalkingSpeed(itr->toFloat());
+			break;
+		case 100: // creatures.runningspeed
+			SetRunningSpeed(itr->toFloat());
+			break;
+		case 101: // creatures.fleeingspeed
+			SetFleeingSpeed(itr->toFloat());
+			break;
+		}
+	}
+}
+#endif
 //o--------------------------------------------------------------------------
 //|	Function		-	bool LoadRemnants( UI32 arrayOffset )
 //|	Date			-	21st January, 2002
@@ -3241,11 +3955,10 @@ bool CChar::LoadRemnants( void )
 			else
 				SetLocation( 1000, 1000, 0 );
 		}
+
 		if( rvalue )
-		{
 			if( !IsNpc() )
 				Accounts->AddCharacter( GetAccountNum(), this );	// account ID, and account object.
-		}
 	}
 	return rvalue;
 }

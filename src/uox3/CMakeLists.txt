@@ -67,38 +67,8 @@ endif()
 
 if( UNIX )
   install(TARGETS uox3 DESTINATION bin)
-  install(FILES content/archives
-              content/accounts
-              content/books
-              content/dfndata
-              content/dictionaries
-              content/docs
-              content/help
-              content/html
-              content/js
-              content/logs
-              content/msgboards
-              content/shared
-              content/banlist.ini
-              content/js32.dll
-              content/libmysql.dll
-              content/uox.ini DESTINATION ${CONF_DIR})
+  install(FILES content/* DESTINATION ${CONF_DIR})
 elseif( WIN32 )
   install(TARGETS uox3 DESTINATION "${CMAKE_INSTALL_PREFIX}")
-  install(FILES content/archives
-              content/accounts
-              content/books
-              content/dfndata
-              content/dictionaries
-              content/docs
-              content/help
-              content/html
-              content/js
-              content/logs
-              content/msgboards
-              content/shared
-              content/banlist.ini
-              content/js32.dll
-              content/libmysql.dll
-              content/uox.ini DESTINATION "${CMAKE_INSTALL_PREFIX}")
+  install(FILES content/* DESTINATION "${CMAKE_INSTALL_PREFIX}")
 endif()

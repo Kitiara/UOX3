@@ -46,7 +46,11 @@ public:
 	JailOccupant *Occupant( size_t occupantID );
 	void	PeriodicCheck( void );
 	void	AddOccupant( JailOccupant *toAdd );
-	void	WriteData( std::ofstream &outStream, size_t cellNum );
+#if ACT_SQL == 0
+	void	WriteData( std::ofstream &outStream, size_t cellNumber );
+#else
+	UString	WriteData(size_t cellNumber);
+#endif
 };
 
 class JailSystem
