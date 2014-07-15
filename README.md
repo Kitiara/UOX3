@@ -14,6 +14,15 @@ Even though Marcus Rating created UOX2 & 3, he released the sourcecode for the s
 
 Another thing that came with the release of the UOX3 source-code, was that no one can run a public UO server with modifed UOX3 code, without releasing that modified code to whoever requests to see it, which will hopefully help make UOX3 a public/common effort instead of having a few "elitist"-shards, each with their own carefully treasured secrets.
 
+## System Requirements
+
+Platform: Windows or Linux
+MySQL: 5.1.0 or higher
+CMake: 3.0.0 or higher
+OpenSSL: 1.0.0 or higher
+Visual Studio: 2010 or higher
+GCC: 4.7.2 or higher
+
 ## Copyright
 
 License: GPL 2.0
