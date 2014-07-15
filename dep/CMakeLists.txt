@@ -1,0 +1,2 @@
+#ADD_SUBDIRECTORY(spidermonkey)
+#ADD_SUBDIRECTORY(lib)

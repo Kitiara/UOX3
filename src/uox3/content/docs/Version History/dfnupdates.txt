@@ -1,0 +1,323 @@
+// This file contains the update logs for the entire DFNDATA folder
+// with the exception of the ITEMS and NPC folders, which have their
+// own update-log files.
+
+-=====================-
+-= 29/01/06 DFNs v0.98-3.2 =-
+-=====================-
+	Duplicate itemmenu 5022 in npcmenu.bulk.dfn containing champion-NPCs changed to 5023 (longshot)
+	Changed DEF values of all NPCs to an average of 10 (some a little weaker, some a little stronger) (Xuri)
+	Boneaxeman-stats lowered to that of a skeleton, has been moved to weakundeadlist (Xuri)
+	Mummy has been moved to strongundeadlist (Xuri)
+	Removed gazer and wisp from strongundeadlist (Xuri)
+	Moved common tags in malevendors.dfn and femalevendors.dfn to new NPC; basevendor (Xuri)
+	Moved common tags in malehuman.dfn and femalehuman.dfn to new NPC; basehuman (Xuri)
+	Fixed several teleport locations (Xuri)
+	Fixed missing = in locations.dfn (Fish)
+	Included an example script that takes the old 1->9 keys and implements them through the new JS routines (Maarc)
+	Included an example script that takes the old shutdown keys and implements them through the JS routines (Maarc)
+
+-=====================-
+-= 22/10/05 DFNs v0.98-3.1 =-
+-=====================-
+	Added customizable list of ores to skills.dfn
+	Added champion NPCs in champions.dfn (VERY experimental stats, no special abilities yet) and in add-menu.
+	Added new NPCs: ophidian zealot, ophidian justicar, whipping vine, quagmire, bog thing, bogling, silver wolf,
+				shadow wisp, evil mage, evil mage lord, giant black widow, energy vortex,
+				shadow fiend
+	Added new mounts: giant fire beetle, hiryu, chimera, cu sidhe, mondain's steed
+	Added items/misc/equippable-mounts.dfn which contains items used to make mounted NPCs possible
+	Modified many body-ids for various creatures to make them appear properly in 3D client.
+	NEUTRAL flags added to all monsters and aggressive animals; they will now highlight grey after spawning.
+	Updated creatures.dfn with all valid body-ids in the UO client, added data for new sound-tags.
+	Human NPCs will now have proper skincolors - updated colorlist 16 in colors.dfn.
+	Changed a spawnobj in spawners.dfn from invalid "giantscorpion"  to valid "scorpion".
+	Changed banker-spawner (spawners.dfn) to only spawn 2 bankers instead of 100!
+	Fixed erroneous item-ids in digginglist.dfn.
+	Corrected the layer values of various dresses, robes and shrouds.
+	Bulletin Board-ids added to harditems.dfn (giwo)
+	New file added; maps/maps.dfn (giwo)
+
+-=====================-
+-= 14/08/05 DFNs v0.98-3.0g =-
+-=====================-
+	Added the Samurai Empire weapons to the add-menu
+	Added many AoS and SE-weapons to the blacksmithing-menu
+	Added composite bow, repeating crossbow and yumi to the bowcraft-menu
+	Selecting a shaft in the skills/resources/fletching add-menu will now produce an arrow shaft instead of a feather
+	Crafting 5, 20 and 50 arrow shafts, crossbow bolts and arrows should now work.
+
+-=====================-
+-= 05/08/05 DFNs v0.98-3.0e =-
+-=====================-
+	Fixed some errenous item-ids in bowcraft.dfn which caused an error while fletching (Xuri)
+	Added new npclists to npclists.dfn; poorfolk, richfolk, alltownfolk, articlist (Grimson)
+	Added two new NPCs; m_townthief and f_townthief. Thief NPCs with no AI.  (Grimson)
+	Removed duplicate smith hammers from dfndata/items/skills/tools/blacksmithy.dfn (giwo)
+	Players are now protected by "the town guards" instead of "The Town guards" ;) (Sydius)
+
+-=====================-
+-= 15/07/05 DFNs v0.98-3.0c =-
+-=====================-
+	Added correct crafting sounds. (dfndata\create\*.dfn)
+	Reagents now use get=base_reagent instead of get=base_item. Fixes various issues with reagents.
+	Added new shoplist; TavernKeepShopping (ShadowBranch)
+	Added two new vendors: m_tavernkeeper and f_tavernkeeper (ShadowBranch)
+
+-=====================-
+-= 12/06/05 DFNs v0.98-3.0a =-
+-=====================-
+	(malehumans.dfn & femalehumans.dfn) 
+	 Removed NPCAI 2 from thieves, allowing them to spawn in town without getting guard-whacked.
+
+-=====================-
+-= 12/06/05 DFNs v0.98-3.0 =-
+-=====================-
+	(gargoyles.dfn) Added some missing starting brackets { for many of the npc sections
+	(reptiles.dfn) Corrected spelling of [icenake] to [icesnake] (Grimson)
+	(npclists.dfn)
+		Updated barnlist & farmlist (Grimson)
+		Changed "giantscorpion" to "scorpion". (Grimson)
+		New sections: insects, fails, poorfolk, richfolk, alltownfolk, destard1, covetous2, wrong2, hyth1, hyth2,
+		hyth3, hyth4, shame1, shame2, shame3, shame5 (Grimson)
+	(malehumans.dfn) Fixed so the NPCs will actually move around (Grimson)
+
+-=====================-
+-= 21/05/05 DFNs v0.98-2.8h =-
+-=====================-
+	(itemmenu.bulk.dfn) Cleaned up the item-menu slightly in some places. (Skills -> resources / tools )
+	(itemmenu.bulk.dfn) Removed item sections 0x1022 -> 0x1025 from ADD-menu (skills -> resources -> fletching) as
+	 they are not in reality fletching resources. 
+	(itemmenu.bulk.dfn) Moved the All-Spell-scroll to the top of the Scrolls-menu.
+	(commands.dfn) Changed BODYCOLOUR value of [PLAYER] section to 0x83ea, to give chars a human skin colour when made player.
+	(commands.dfn) Changed the BODYCOLOUR value of new GMs (under [GM] section) to 0x8021, i.e. red, instead of default grey.
+	(commands.dfn) Added STRIPITEMS and STRIPHAIR to [GM] section
+	(axes.dfn) Added type=216 to all axes, so lumberjacking will work again.
+	(fletching.dfn) Added item sections 0x1BD4-5, 0x1BD4-20, 0x1BD4-50 as fletching resource-items to fix creation
+	 of multiple arrow shafts at once.
+	(bowcraft.dfn) Fixed creation of 5, 20 and 50 arrow shafts + crossbow bolts.
+	(harditems.dfn) Added Kindling (0x0de1) to make it pileable upon creation. Also gave weight, decay & value tags.
+	(newbie.dfn) Changed newbie ingot ID to 0x1bf2, which is the one used in smithing/tinkering.
+	
+-=====================-
+-= 16/04/05 DFNs v0.98-2.8g =-
+-=====================-
+-LOCATION:
+	Instead of 21 location-dfn files, we now have only one; location.dfn.
+-HARDITEMS:
+	Added ingots and gold to harditems.dfn to safeguard against stacking issues.
+
+-=====================-
+-= 15/04/05 DFNs v0.98-2.8f =-
+-=====================-
+(Version number changed back to match UOX3 executable version)
+-TITLES:
+	-Now follows the tag=data pattern that the other dfns uses.
+
+-=========================-
+-= 08/04/05 DFNs v0.98.3b+++++ =-
+-=========================-
+-CREATURES:
+	-Commented out basesounds for human characters, as they would stand around moaning all day long =)
+
+-========================-
+-= 05/02/05 DFNs v0.98.3b++++ =-
+-========================
+-ITEMS:
+	-Added SCRIPT=4000 to all clean bandages.
+
+-========================-
+-= 05/02/05 DFNs v0.98.3b+++ =-
+-========================
+-ITEMS:
+	-Added mount-statues.dfn, contains statues for pets bought from animal-trainer, which will turn into live
+	 pets when double-clicked.
+
+-========================-
+-= 05/02/05 DFNs v0.98.3b++ =-
+-========================
+-NPC:
+	-Added missing mounts; Ridgeback, Savage Ridgeback, Ethereal Ridgeback, Swamp Dragon, Armored Swamp Dragon, 
+	 Ethereal Swamp Dragon.
+-MENUS
+	-/polymorph.dfn - Fixed some erroneous character IDs, added missing menu-headers which caused client-crash, 
+	 changed POLYMORPHID= to POLY=.
+
+-========================-
+-= 01/01/05 DFNs v0.98.3b+ =-
+-========================
+-ITEMS:
+	-/skills/resources/smithing.dfn had two instances of iron ingot with ID 0x1BF2. Changed one of the entries to 0x1BEF,
+	 thus fixing an issue with new smithing characters, who didn't get their starting ingots.
+	-Added /gear/weapons/se_weapons.dfn, contains data for the Samurai Empire weapons.
+	-Updated price-values of weapons, from uo.stratics.com
+-HARDITEMS:
+	-Fixed erroneous IDs for logs, doors and gates
+	-Added all door IDs, including new SE doors (Thanks Evil)
+
+-========================-
+-= 28/10/04 DFNs v0.98.3b =-
+-========================-
+-HARDITEMS
+	-Updated non-working PILE=1 tag to working PILEABLE=1 tag.
+-ITEMS
+	-Fixed UOX3 crashing from menus SIEGE2 and STONEART  and STONEWALLS (Split all the menus into several)
+	-Fixed several Previous-buttons in the Add-menu (GM Skins, Hairs/Beards, Quest-Items, Travel-menu, Plants,++)
+	-Moongates-button in GM-Menu was unreachable
+	-Mohawk-hair in the add-menu used wrong ID
+	-Short-beard in the add-menu used wrong ID
+
+-========================-
+-= 16/10/04 DFNs v0.98.3a =-
+-========================-
+-ITEMS
+	-Split the DOORS menu into several sub-menus, to avoid having the UO Client crash because of too many listed items. 
+	 Also makes it easier to locate/add specific doors.
+	-Split the MONSTERSTATUES menu into sub-menus to avoid having the UO Client crash because of too many listed items.
+	-Commented out parts of the (NON-WORKING!) GM Polymorph-menu (polymorphmenu.dfn) to avoid UO client crashes.
+
+-========================-
+-= 26/8/04 DFNs v0.98.3 =-
+-========================-
+-CREATURES
+	-Fixed basesounds for: Skeletons (got wrong death sound), Humans (had no bassound)
+
+-ITEMS
+	-Added TYPE 208 to dyes, so they actually work ;P
+
+-========================-
+-= 26/7/04 DFNs v0.98.2 =-
+-========================-
+-NPC
+	Added basic speech script (SCRIPT=3000) to all male & female non-vendor humans.
+
+-========================-
+-= 11/7/04 DFNs v0.98.1 =-
+-========================-
+- Generic Changes:
+	Consolidated /digging/ and /fishing/ into a new sub-folder of /items/itemlists
+	Consolidated /polymorph/ and /tracking/ into /menus/
+	Removed POLYMORPHDURATION from /menus/polymorph.dfn as it is no longer used.
+- Items
+	Modified spawners.dfn in /items/gmmenu/ to match with new CSpawnItem attributes.
+
+-========================-
+-= 15/4/03  DFNs v0.98 =-
+-========================-
+-New Files/Folders:
+	-creatures/creatures.dfn - for defining base-sounds & animations for NPC models
+
+-Generic Changes:
+	-Commands.dfn cleaned up to support re-organized command set
+	-Fixed last two options in the paperdoll's help menu, which is set in menus.dfn
+	-Many of the npc-dfn's have been slightly updated.
+
+-SKILLS
+	-MADEWORD-tags added. Used for maker's marks in crafting skills
+
+-TITLES
+	-You can now define the skill-levels at which someone gains a specific "prowess"-title. (Journeyman, Master, etc)
+
+-========================-
+-= 15/4/03  DFNs v0.98 =-
+-========================-
+-ToDo:
+	-Rewrite/Fix up NPC equipment/loot
+	-Collect Gargoyle names from U7/U9?
+	-Add toprov, topeace, fleeat, reattackat tags & values to all npcs.
+	
+-New Files/Folders:
+	-necro/necro.DFN split into fishing/fishing.dfn and digging/digging.dfn
+	-npc/gargoyles.dfn
+	-npc/arachnids.dfn
+	-npc/humanoids.dfn
+	-npc/reptiles.dfn
+	-npc/miscmonsters.dfn
+
+-Generic Changes:
+	-Updated version info of all DFNs to 0.98
+	-Changed all ITEM= tags to EQUIPITEM= (goes hand in hand with PACKITEM=).
+	-Removed old npclist entries
+
+-CARVE
+	-Rewrote file using UOSS Hunter's Guide as reference for both sorting
+	 and which items to give when corpse is carved, for all animals and all monsters
+	 that are reported to give carved-loot.
+
+-COMMANDS
+	-Added HOWTO= command with privilege level 1
+	-Added some privilege/detail stuff concerning what happens when a character is made
+	 GM, Counselor or Player.
+	-Removed some unused commands (USE, Trigger-related commands, XSBANK, TILEDATA, SETHEXMOREXYZ, SETSPEECH
+
+-CREATE
+	-Fixed some wrong item-ids in alchemy.dfn
+	-Added inscribe.dfn, which replaces the old inscribe.gmp file in /UOX3/GUMPS
+
+-HARDITEMS
+	-Added logs and ores with default OSI weight values.
+	-Updated IDs of Doors and Gates from "x###" to "0x####" (i.e. to complete IDs)
+
+-HOUSE
+	-Updated tags that pointed to deed-items from old item-ids (ex. 6000) to new (ex. smallbrickdeed)
+
+-ITEMS
+	-Numerous changes, check dfndata/items/item-updates.txt for more details
+
+-INSCRIBE
+	-Fixed some broken hex-ids
+	-Updated all scrolls to use SKILL 23 (inscription) instead of SKILL 0 (alchemy =)
+
+-MISC
+	-Added BOOKS.DFN - holds data for all the prewritten books.
+
+-NEWBIE
+	-Rewrote the entire file using current OSI starting equipment as reference.
+
+-NPC
+	-Added some missing NPCs; large hellcat, ophidian knight, ratman archer, ore-elementals,
+	 skeletal dragon, serpentine dragon, white/shadow wyrm, chaos daemon, arcane daemon, moloch, 
+	 exodus, jack rabbit, lava/ice snakes, silver serpent, rat, ethereal warrior, pixie, centaur,
+	 succubus, unicorn, ki-rin, dread spider, ilshenar gargoyles(from older DFNs by $ymbiotic),
+	 dark/silver steeds, warhorses, skeletal mount, sea horse, giant beetle, fire steed, ghoul
+	-Added CARVE= tags to all animals and monsters that should have them.
+	-Added new Namelists to namelist.dfn for the following NPC-types: Daemon, Ratman, small birds,
+	 ethereal warrior, centaur, pixie, fire-gargoyles - and applied them to the respective NPCs.
+	-Added BACKPACK entries to all NPCs.
+	-Fixed SPATTACK= values for all NPCs, seeing as it's functionality has changed. The value now
+	 represents the amount of spell circles the NPC is able to cast from. Updated docs on this can
+	 be found in /UOX3/DOCS/MISC/NPCSpellAttack.txt
+	-Updated SPADELY= value to 7 from 10(delay between each spell cast by an NPC) for all spellcasting NPCs
+	-Updated total number of random orc names to 716
+	-Updated total number of random lizardman names to 284
+	-Updated the values of tags that pointed to old itemlists, to the new ones.
+	-Updated the values of stats, skills, fame, karma and damage to match new OSI playguide
+	-Renamed the wrong SHOPPINGLIST= for malevendors.dfn to SHOPLIST=
+	-Renamed monster.dfn to miscmonsters.dfn
+	-Merged Slayer, Collector of Souls and Lord of the Abyss into one NPC: Balron, with name randomly
+	 chosen between those three.
+	-Merged orcs, lizard-men, rat-men into humanoids.dfn
+	-Merged ophidiands.dfn and terathan.dfn into t2a.dfn
+	-Merged slimes&oozes.dfn into miscmonsters.dfn
+	-Merged Namelist.dfn into Namelists.dfn
+	-Moved all NPCLISTS to NPCLISTS.DFN (+Added some new NPClists +Updated old ones)
+	-Removed /FLETCHING from the BOWCRAFT skill-tag for male & female bowyers
+	-Removed all SPEECH= tags as they are no longer used. NPC speech is now handled through the JS Engine.
+	-Removed Orckin.dfn - contains just duplicate NPCs
+	-Removed npc.dfn - ancient relic from days past
+	-Removed overworld.dfn
+	-Removed t2a.dfn - contents split into other files
+
+-RACES
+	-Defined 19 new races, with no special properties for each race - and placed all npcs into
+	 either of these races - preliminary work for racial/virtue/slayer weapons etc. For instance,
+	 giving a sword the tag RACE=11 will make it do twice the amount of damage against NPCs that
+	 belong to RACE 11 (which are the undeads, so we're talking about silver weapons).
+
+-REGIONS
+	-Changed REGION 7 to the town of YEW instead of the town of DIABLO as was previously setup.
+	-Removed all advanced-trade-stuff
+	-Removed all ABWEATH= tags, needs to be setup better.
+
+-TITLES
+	-Added different murderer-titles for different amount of killed people =)

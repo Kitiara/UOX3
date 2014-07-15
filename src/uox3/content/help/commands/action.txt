@@ -1,0 +1,6 @@
+  Example:
+        ACTION 0x0D
+
+  Purpose: 
+        Makes character play specified character
+        animation.

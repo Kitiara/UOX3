@@ -1,0 +1,5 @@
+if ( MSVC )
+  include(${CMAKE_SOURCE_DIR}/cmake/compiler/msvc/settings.cmake)
+elseif ( MINGW )
+  include(${CMAKE_SOURCE_DIR}/cmake/compiler/mingw/settings.cmake)
+endif()

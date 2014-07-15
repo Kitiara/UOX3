@@ -1,0 +1,3099 @@
+History of changes: (Use this to list changes you made to the source)
+=============================================================================================================================================
+UOX3 V0.37 Alpha
+ - First public version
+
+UOX3 V0.38 Alpha
+ - New solve for client crash listed in "Setup Instructions" chapter
+ - "Select (Mess) failed bug" might be fixed now (Cant test here)
+ - More starting locations included
+ - Number of Accounts/Servers/Startpoints was limited to 8; 32 now for each
+ - Some minor fixes for stuff that might have caused trouble in the future
+
+UOX3 V0.39 Alpha
+ - /KILL and /RESURRECT commands implemented (No corpses or death robe yet)
+ - After a password failure you no longer need to restart the client now
+ - Small enhancement to encryption
+ - Fixed a loophole that allowed backpack snooping for everyone
+ - Added pack horse and llama to creature list
+
+UOX3 V0.40 Alpha (Special Edition)
+ - Changed UOX3 to operate with client 1.25.13
+ - Fixed the reason for some error messages at login with other
+   players logged in ("Z pos change received for non-player object")
+ - Quadrupled the maximum number of items in the world from 512 to 2048
+ - Some chair items added to list
+ - Newly created chars get one out of 7 halloween masks in this version
+
+UOX3 V0.41 Alpha
+ - Some different (random) colors on starting clothes
+ - Fixed a bug which resulted in incorrect names on character list
+ - Removed masks from starting equipment again
+ - /BOLT command for GMs (Harmless for now; no real damage done)
+
+UOX3 V0.42 Alpha
+ * Data wipe is forced with this version! Replace all *.UOX files!
+ * System of keys has changed. Read "Key Instructions" again!
+ - Multiplayer functions should not cause client crashes anymore
+ - Fixed another bug that enabled snooping into backpacks
+ - First implementation of usable spellbook (Spells dont work yet)
+ - Death Shroud/Resurrect Robe now in for /kill command
+ - /SETFONT command added
+ - Item usage disallowed for ghosts
+ - 2 People playing on one account is now prevented
+ - Some minor changes and explanations all over the docs
+ - Some more variety in startup clothing
+ - Maximum number of players raised to 32 (Will require much CPU power)
+ - Had to create default world completely new, so there will be changes
+ - Item names can now be 50 chars long instead of 30
+ - Some speed optimizations included to compensate for more players
+ - Sound effect added to /BOLT command
+ - /SFX command added
+ - /LIGHT command added
+
+UOX3 V0.43 Alpha
+ * Data wipe is forced with this version! Replace all *.UOX files!
+ - Walking in multiplayer should not cause client crashes anymore
+ - Removed some leftover debug messages
+ - Corpses are now in. Use /KILL command to see them.
+ - Items of killed people are placed on corpse now.
+ - /SETPRIV syntax changed
+ - Titles for Skills have been added
+ - /ISTATS and /CSTATS enhanced with a bit more info
+ - Some improvements to setup instructions
+ - Item Piles added (Gold Coins etc.)
+ - /SETAMOUNT and /SETPILE commands added
+ - Added some gold to starting equipment
+ - Rebuilt default world again
+
+UOX3 V0.44 Alpha
+ - Brought back version number display on startup.
+ - /KICK command added
+ - /DRY, /RAIN and /SNOW commands added
+
+UOX3 V0.45 Alpha
+ - Script file handling added. Read new chapter "Script Format".
+ - Customizable GM Page menus added
+ - Customizable Item Creation menus added
+
+UOX3 V0.46 Alpha
+ * GM and item menu scripts now use the same commands. Replace UOX3.SCP!
+ - ATT and DEF tokens added to item scripting
+ - Default script file improved
+ - /GMMENU, /ITEMMENU and /ADDITEM commands added
+
+UOX3 V0.47 Alpha
+ - All characters created by Account 1 will have GM power
+ - Loginserver checking added to verify account. Read "Authentication".
+ - Theoretical maximum number of players raised to 128. Enough I guess. :-)
+ - Maximum number of accounts in INI raised to 512
+ - Maximum number of starting locations in INI raised to 64
+ - Maximum number of items raised to 4096
+ - Added some info to "Legal Information"
+ - Sound Effect list added to bottom of file
+ - /COMMAND command added
+ - First decorative NPC functionality added (Example Orc in Script)
+ - BATCH, INFORMATION and NPC script commands added
+
+UOX3 V0.48 Alpha
+ - First NPC reactions (Speech) and Items added
+ - LAYER token added to item description (Needed to use item on NPC)
+ - ITEM, COLOR and SPEECH tokens added to NPC description
+ - 'L' keyboard command added to display item layers
+ - Item menus now show their number in the title bar
+ - NPC names on click limited until first space. Use underscore for spacing.
+ - Added some decoration to default ITEMDATA.UOX
+
+UOX3 V0.49 Alpha
+ - NPCs without SPEECH token no longer crash server when talked to
+ - POLY, SKIN, LIGHT, DRY, RAIN and SNOW script commands added
+ - NPC speech parser is now checking for words in middle of sentence, too
+ - Another reason for crashes when talking to NPCs was fixed
+ - Reorganization of menus in default script
+ - Generator Module for UOXMENUS.LST (Run UOX3 with "UOX3 #" to use it)
+
+UOX3 V0.50 Alpha
+ - List generator now creates a short and a long version of the list
+ - List generator now creates a list of highest section numbers in script
+ - EOF token now required at end of script file
+ - Not existant script sections now lead to error message instead of crash
+ - Item Accessibility check added. Read new chapter "Garbage Collection".
+ - /GCOLLECT command and GCOLLECT script command added
+ - Character Deletion implemented
+ - /KILL command now properly removes the NPC and only leaves the corpse
+ - 'I' keyboard command added
+ - /ALLMOVEON and /ALLMOVEOFF commands added
+ - Added MOVABLE token to item description - Makes heavy items movable by all
+ - Added /SETMOVABLE command
+ - Fixed a reason for server crashes when cancelling out of item menus
+ - LOTS of enhancements to the default script file
+ - Redesigned "Coming Soon" section
+ - Added /KILL zapping a lightning bolt on the target on popular demand :-)
+ - First version of maps added (Item TYPE 10)
+ - Made necessary changes for client version 1.25.20 and up
+ - UOX3 icon added
+ - GMs can now rename characters via their status window
+ - Fixed Counselor color to make them look more like in the real game
+ - World database now saved as .WSC instead of .UOX
+ - UOXTOWSC.EXE added to distribution
+ - Various exotic crash issues fixed
+ - First read-only books implemented
+ - /SETTYPE changed to use decimal parameter
+ - Update and Tip Scrolls added
+
+UOX3 V0.51 Alpha
+ - Fixed bug that arose if accountname equals beginning of other accountname
+ - Fixed "Cant find UOX3.BSC" error which sometimes appeared at login
+
+UOX3 V0.52 Alpha
+ * ADDED SOME FILENAMES TO UOX3.INI. CHANGE YOUR FILE OR UOX3 WILL NOT WORK!
+ - Correct setting of player height in multiplayer (Not for player buildings)
+ - Fixed a problem which causes running players to be shown as walking
+ - Fixed the problem which messed status windows up for everyone
+ - Fixed bug which caused offline players to stay (Relict from debugging)
+
+UOX3 V0.53 Alpha
+ - Arms Lore added
+ - Minor improvements to Z positioning
+ - Added graphical effect to /TELE command
+ - Updated weapons in default script with offensive and defensive values
+ - Armor Class and Gold Amount now calculated correctly in status window
+ - /GOPLACE locations can now be configured through the UOX3.SCP script
+
+UOX3 V0.54 Alpha
+ - Removed PACKITEM from WSC file as it was only a temp variable anyway
+ - Riding on horses is now implemented (Doubleclick on the horse)
+ - /UNMOUNT and /SETOWNER commands added
+ - Running was fixed once again (Forgot to uncomment some code)
+ - Prevented notoriety query from popping up for attacks
+
+UOX3 V0.55 Alpha
+ - Counselors may now use /POLY and /SKIN commands too
+ - Documentation on the /SETOWNER command clarified
+ - Version number is now displayed on the title bar
+ - M/F display in status window fixed
+ - Rewrote code for outbound packets (Should reduce client crashes)
+ - Added an example to the chapter "Authentication" in the manual (READ IT!)
+ - /SETID and /DYE should now work on characters as well
+ - Fixed a bug related to the names on human NPC paperdolls
+ - Clothing now included in UOX3.SCP (Under non-combat equipment)
+ - Removed UOXTOWSC.EXE from distribution archive again
+
+UOX3 V0.56 Alpha
+ - More fixes to multiplayer speed and stability
+ - Foodstuff section added to UOX3.SCP
+ - /SETMOVABLE 2 added which makes an item NEVER movable (Except by GMs)
+ - Fixed a bug which showed weird chars when running a script batch
+ - Characters now have intrinsic ATT and DEF values (for monsters mainly)
+ - ATT, DEF and WAR now saved with character info in WSC file
+ - Some changes made to the "Known Bugs" section
+ - Visibility range increased to prevent items appearing out of thin air
+ - Lots of code for fighting added [But its still disabled]
+
+UOX3 V0.57 Alpha
+ - "Vanishing Castle" bug of the last version has been fixed
+
+UOX3 V0.58 Alpha
+ - Equipment is now shown ON corpses (Still buggy)
+ - Changes were required to follow changed response from loginservers
+ - Fixed players logging in as NPCs sometimes on failed Authentication
+
+UOX3 V0.59 Alpha
+ - Minor change that will hopefully improve client stability and speed
+ - Another Authentication problem has been fixed (Got them all now I think)
+
+UOX3 V0.60 Alpha
+ - The loginserver check does no longer block the entire server
+ - DYE token added to item descriptions
+ - Default script updated for dyeable clothes
+ - Dyes and dye vat are now functional (and included in script)
+ - NPC speech parsing has been fixed
+ - /ADDNPC command added
+ - /ISTATS now returns item IDs for static items as well
+ - Fixed a loophole that allowed to dye your hair/skin to illegal colors
+ - Flags like [invulnerable] are now displayed when singleclicking a char
+ - Another possible cause of lag/crashes has been fixed
+ - Expanded default UOX3.SCP by some entries
+ - The default world in UOX3.WSC has been completely rebuilt
+ - Added GOPLACE to the script commands (For teleporting on paging a GM)
+ - Fixed a bug with /SETMOVABLE 2 where items still showed as movable
+
+UOX3 V0.61 Alpha
+ - /FREEZE and /UNFREEZE commands added
+ - Changed login procedure for new server list format
+ - Made program compatible with client version 1.25.31
+ - Some multiplayer stability fixes
+
+UOX3 V0.62 Alpha
+ - In offline/LAN operation, the server now allows 4 players to connect
+ - Added a public version of the /add command. Read UOX3.SCP for details!
+ - Fixed a bug where deleting a character appeared (!) to delete all of them
+ - UOX3 is now automatically listening to all available IPs
+ - The servers IP now HAS to be entered in the UOX3.INI (No more '*')
+ - A Linux port of UOX3 is now available
+ - /READINI command added
+
+UOX3 V0.63 Alpha
+ - Documentation fixed a bit
+ - Changed encryption again for client 1.25.32
+ - Added gump menu functionality
+ - Added /GUMPMENU command
+
+UOX3 V0.63a Alpha
+ - Small but important fix to the encryption system; should work now
+
+UOX3 V0.64 Alpha
+ - Added functionality for working doors. Use the /add menu to create them.
+ - Doors can be locked. Follow the same instructions as for containers.
+ - Added some doors to Castle Britannia in the default WSC file.
+ - Included a fix for a client crash condition in multiplayer mode.
+
+UOX3 V0.65 Alpha
+ - Fix for one of the IP related login problems
+ - Some code cleanups
+ - /SET command added
+ - Changed encryption to work with client 1.25.33
+ - Finally added some people to the credits list again :)
+
+UOX3 V0.66 Alpha
+ - /SET command finally enabled (Forgot to really add it in the last version)
+ - Fixed teleport bug (Teleported chars remained at old location for others)
+ - ATT and DEF basic values can now be specified for NPCs in the SCP file
+ - Several fixes for crashing bugs (Too lazy to list them)
+ - First crude version of the combat system added
+ - License agreement changed. Read chapter "Legal Information" in this file.
+
+UOX3 V0.67 Alpha
+ - Fixed a typo with the /SET COOKING command
+ - Some source fixes; Should compile on more systems now
+ - Added food at TYPE 14. (Just disappears when doubleclicking it)
+ - Elemental corpses are being removed
+ - Autosave timer at end of UOX3.INI in seconds
+ - Some more filenames are required in the UOX3.INI now
+ - Item heights are now included for movement (Some things still need fixing)
+ - Dozens of fixes to stability (and for other bugs)
+ - UOX3 is now using default UO names for Items (Set name to '#' to use this)
+ - Added the following 3rd party expansions: (Read the credits section!)
+  - Mark
+  - Recall
+  - Gate
+  - Item Identification
+  - Automatic world saving
+  - Taming (Horses only)
+  - Some sounds and animations
+  - Scrolls
+  - Fishing
+  - Summoning
+  - Anatomy
+  - Evaluating Intelligence
+  - First working dungeon entrances
+  - Smithing
+  - Mining
+  - Working spellbook
+  - Heal spell
+  - Unmounting horses by doubleclicking
+
+UOX3 V0.67a Alpha
+ - Quick fix for the backpack bug
+
+Marcus Rating - cironian@warlords.com - 0.67a Original
+Morac - mkraft@writeme.com - 0.67c 
+  -Object-base Teleporter system by Jerrith the Healer (ars@nwu.edu)
+  -NPC titles by Anthtracks (anthracks@gormanweb.com)
+  -dungeon teleporters code by TMB (????)
+  -create food and teleport spell by Cray XMP1 (binggeli@ix.netcom.com)
+  -MSVC++ tile problem fix by Anthracks
+  -NPC movement by Jerrith the Healer
+
+The following by Morac(mkraft@writeme.com)
+  -NPCs will chase you when attacked
+  -GCC tile problem fix for GCC
+  -item (corpse) decay
+  -Karma/Fame
+  -Murder count and Death count tracking
+  -Rune renaming 
+  -Spell casting and opening spellbook from macros (keyboard) 
+  -NPCACTION command (see readme) by Morac
+  -some bug fixes and optimizations 
+  -reduced bandwidth use by replacing most call to all_items_all and all_items
+   with senditem, so doesn't have to send entire item database on only 1 item change.
+  -Rewrite of walking2 to take a character, not a socket as a parameter.
+
+Jerrith - ars@nwu.edu - 0.67d
+  -Rewrite of walking to take a character, not a socket as a parameter.  This
+   results in the deletion of npcWalking as it is no longer needed.
+  -Rewrite of teleport, to take a character, not a socket as a parameter.  NPCs can be
+   teleported now.
+  -Addition of the following parameters to char_st: 
+                npcWander: 0=no movement, 1=follow target, 2=wander freely, 3=wander in box, 
+                                   4=wander in radius
+                ftarg1-4 : Serial number of target being followed for mode 1
+                fx1, fy1, fz1: Point #1 for wander in box, center point for wander in radius
+                fx2, fy2 : Point #2 for wander in box, fx2=radius for wander in radius, fy2 is unused.
+                                   fy2 is also used in follow mode, to store range to target.  Basically,
+                                   if something is following you, and you walk into a teleporter, it will 
+                                   take 1 more step in the direction it last went, hoping it will end up on the
+                                   teleporter as well. 
+  -Function tileBlock: takes a tile number as a parameter, returns non-zero if it's
+   blocking tile.
+  -Function staBlock(x, y, z): takes a coordinate, returns non-zero if there is an 
+   impassible static in the way.
+  -Function calcSocketFromChar: takes a character index( the s, from chars[s] ) and returns 
+   socket( the i from chars[currchar[i]] ).  Returns -1 if there's no match. (NPC or offline)
+  -Modified mount and unmount horse to preserve NPC wandering data
+  -checkBoundingBox and checkBoundingCircle functions
+  -ownership and visibility variables added to item_st for upcoming features.
+  -Fixes for a few misc bugs.
+  -Shoving take 10 stamina
+
+Anthracks - fred1117@tiac.net - 0.67e
+  -Added functions to set the variables required by Jerrith's NPC code
+        npcwandertarget() - Sets the npcWander member of char_st (set with the /NPCWANDER command)
+    npctarget() - Makes an npc follow a player (set with the /NPCTARGET command)
+    npcrecttarget() - Sets the bounding rectangle for an NPC (set with the /NPCRECT command)
+    npccircletarget() - Sets the bounding circle for an NPC (set with the /NPCCIRCLE command)
+    npcshape[] array - used to store the coords of the npc's bouding shape
+
+Jerrith - ars@nwu.edu - 0.67f
+  -Improvements to stablock.  Still not perfect, cliff avoidance is MUCH better. 
+  -Implemented visibility / basic ownership:
+    visible: 0=visible to all.  1=visible to owner & GMs, 2=visible to GMs only
+  -Added the following to the magic(movable) parameter:
+    magic: 3=movable by owner (or someone with allmoveon) only.
+  -Fixed bug where you had to shove to change directions when on top of another character.
+  -Added Morac's two bug fixes (hey, I'm not perfect) to the published source.
+  -Added /setvisible command.  Works just like /setmovable
+  -Added item capability to /setowner.  Now works for both NPCs and object.
+  -Circle bounded NPCs will pop back to their center locations if they would move in circle 
+   wander mode, and are outside of the circle.
+
+Jerrith - ars@nwu.edu - 0.67g
+  -Improvements to checkskill.  Now takes two additional parameters, low and high, the 
+   skill values at which you will fail 100% of the time, and succeed 100% of the time.
+  -Fully functional spellbooks.   Spellbooks will only let spell scrolls be dropped on them.
+   There's a special scroll (the one after Water elemental) which will give you book ever spell.
+  -Necromantic entries in spell book.  5 spells, S, R, I P, S, E.  (Speak, Raise, Ingest Poison, 
+   Summon, EVIL).   They don't do anything yet, but if you get them, you can cast them by clicking
+   where their icon would be in the book.  They aren't indexed either, just go to the end of the book.
+  -Removal of scroll item types.  Scrolls now cast their spell, if they have the code to do it, based
+   on their ID.  
+  -Addition of all scrolls to script file (uox3.scp). You'll probably want to use this. :)
+
+Cironian - cironian@stratics.com - 0.67h
+  -Fixed a paperdoll reputation display problem
+  -Fixed a bug with encryption key generation (I guess it should work for any IP adress now)
+  -Better invisibility (Item is now shown in grey to GMs. Other players are still blocked by the invisible item.
+  -Dramatic speedup to spellbook opening. (It used to go through all items some hundred times...)
+  -Change shove code to respect GM and ghost body capabilities
+  -Included /point command for RELEASED version as it can be useful quite often
+  -Fixed a bug with the new teleport code
+
+Jerrith - ars@nwu.edu - 0.67i
+  -Another dramatic speedup to spellbook opening.  (My first went through 140 loops, Cironian's had 70, this has 2)
+  -Caching for the stablock function. (Used in NPC movement).  
+  -/cachestats - Find out how many hits, misses and access to the cache there have been.
+  -First pass at dungeon blackness avoidance.  They won't go in it, but they still walk on the edges.
+  -Script fixes (for scrolls) and new NPCs by Gitchigoomi. (verrice2@aol.com)
+  -NPC add scripts now let you set NPCWANDER, FX1, FX2, FY1, FY2, FZ1
+  -NPC 1 (whoever the orc) changed to wander mode 2 by default.
+  -Item spawner added at item type 61.  Item will respawn when it is taken off it's spawn location.  Set morex of
+   the spawner to the # of the item from the script file that you want.
+  -NPC spawner added at item type 62.  NPC will respawn when killed.  Set morex to the # of the NPC from the 
+   script file you want.
+  -Fixes for readscript and readwscline by Monte Cristo (no email address)
+  -Script fixes (for scrolls) and new NPCs by Gitchigoomi. (verrice2@aol.com)
+  -Container Gumps Code by Okaria Dragon. (okdragon@dreamwrld.com)
+
+Cironian - cironian@stratics.com - 0.67j
+  -/TWEAK command added (Please dont add stuff to this yourself, I will add more properties through the next versions)
+
+Morac - mkraft@writeme.com - 0.67k *UNRELEASED*
+  The following items in 0.67k are unimplemented in 0.67l:
+  -Script error checking.  If section not found in a script, don't try to process it.
+   (This prevents freezes when trying to spawn invalid NPCs and items, read invalid books, etc.)
+  -Implemented the hidden skill (stay permanently hidden if priv2 0x08 bit is set)
+  -Implemented Invisibility spell
+  -split NPCMOVEMENT procedure into 2 smaller procedures (just saving space :) )
+  -must have spell in spellbook to cast it now.
+  -keeps track of who is attacking and who is defending now.
+  -First circle spell still screwed up, fixed them 
+
+Jerrith - ars@nwu.edu 0.67l
+  -Many fixes to make UOX3 compile on Linux, Watcom, and MSVC++ systems without requiring changes.
+  -Bug fixes in deathstuff, and backpack2, to significantly reduce the number of corpse crashes.
+  -Fixes in checkmessage
+  -Modified version of Zarn's House Icon code - Zarn (zarn@mailcity.com)
+    -Uses /hidehs and /showhs commands and bit 0x04 on priv2.
+  -/setmorex, /setmorey, /setmorez, and /setmorexyz commands.
+  -GNDN fix for getmsg - Crimson Guard (smorey@igate.sprint.com)
+  -Various script file fixes for NPCs.
+
+  The following items in 0.67k are implemented in 0.67l:
+  -Took history out of uox3.cpp (why have it in 2 places?)
+  -/setmorex - To set the morex value of an item.
+  -Add "GM" or "Counselor" to name when making someone a GM or Counselor.
+  -fixed bug with checkskill (another socket/char screwup :) )
+
+Morac - mkraft@writeme.com - 0.67m
+  -Stuff from K version that I forgot to post :)
+  -Fixed bug is backpack2 code from 0.67l.
+  -can now set priv2 with /setpriv command (assuming this was a bug).
+  -added a few sounds and fixed some older ones.  
+  -fixed bug in spellbook (night sight would never be displayed).
+  -minor update for checkbook (spells always seemed to be off by 1).
+  -fixed bug in gatecollision cause by socket/char change a few updates ago.
+
+Jerrith - ars@nwu.edu 0.67n
+  -Corpse crashes finally totally fixed by Drylock (erwin@andreasen.com)
+  -Fixes for dragging scrolls in to spellbookx sitting on the ground in pack_item.
+  -Setting fx1 to -1 in NPC scripts results in the NPC using its add location as
+   it's center point, for radius based wander mode only.
+  -Big update to the cast spell part of getmsg, and the castspell function.
+  -Bug fix to checkBook
+  -inititem function to initialize items. 
+  -Female character now start (randomly) a kilt or a skirt, by Ash (defiant@eisa.net.au)
+  -Visible mode 2 was changed earlier by Cironian.  Only GM bodies can see it.
+  -Visible mode 3 added, to behave like the old visible mode 2. (checks priv bit 1)
+  -Bug fix for Morac's spellbook fix.
+  -Added Okaria_Dragon's wisp npc. (okdragon@dreamwrld.com)
+  -Fixed a few sound effects for spells.
+  -npctalkall function.  Send text to all in range.
+  -Added words of power to working spells.
+
+Jerrith - ars@nwu.edu 0.67o
+  -Removed spellcasting action from invistarget
+  -Changes to summonmonster
+  -Blade Spirits spell added, Energy Vortex now targeted.
+  -New functions staticeffect, movingeffect, and bolteffect for visual
+   special effects.
+  -Explosion and Flame Strike by Ash (defiant@eisa.net.au)
+  -Makefile for linux by Drylock (erwin@andreasen.com)
+  -Lightning Bolt and Magic Arrow spells.
+  -Fixes for clock() to get the timer working correctly in Linux again.
+  -Script fixes for first circle scrolls & wisps
+  -Signs added to script file by Gitchigoomi (verrice2@aol.com)
+  -Musicianship skill by El_Barto (elbarto@provide.net)
+
+Morac - mkraft@writeme.com 0.67p
+  -Energy bolt and fireball by Ash (defiant@eisa.net.au).
+  -Towns added to script file by Rhuarc (bataeu@yahoo.com)
+  -More signs added to script file by Gitchigoomi (verrice2@aol.com)
+  -Compacted scroll usage code into 1 check for all scrolls (now calls castspell).
+  -deleitem function for sending removeitem to clients.
+  -formatted code so that it's all formatted the same way.
+  -bug that cause crash if corpse of gate was in uox3.wsc on startup was fixed.
+  -bug where if you killed something you could never hide again was fixed.
+
+RofGilead - matlarso@wsd.waupaca.k12.wi.us 0.67q
+  -Night and Daylight changes added (RofGilead)
+  -settime and showtime commands added (RofGilead)
+  -4 hour UO daylength, with timer added (RofGilead)
+  -Lumberjacking added (Ash)
+  -Corpse carving for birds, animals, and monsters added (Ash)
+
+Morac - mkraft@writeme.com 0.67r
+  -More monsters in polymorph menu by Rhuarc (bataeu@yahoo.com)
+  -NPC flee mode by zarn (zarn@mailcity.com)
+  -Horses no longer go into backpack when you die :) 
+  -Ghosts can no longer ride horses 
+  -Ghosts cannot use skills
+  -Reveal spell
+  -Detect hidden skill
+  -fixed a resource bug in smithmenutarget. Also compacted it.
+  -fixed bug in get_item where bp1 through bp4 would get wrong value and open
+   wrong container upon moving stackable items.
+  -fixed fighting while on horses to display correct animation.
+  -spellbooks now stay with ghost instead of corpse.
+  -spellbooks can be opened without opening backpack.
+  -fixed bug where items could not be moved on or placed on corpses.
+
+Morac - mkraft@writeme.com 0.67r+ (bugfix)
+  -fixed bugs mentioned by Jerrith (ars@nwu.edu) based on his description where the fixes
+   should go. Specifically npc's walking through walls, Open spellbook causing items in 
+   pack to disappear and putting scrolls in spellbook causing spellbook container to open.
+  -"/SBOPEN" command added, which lets GMs open the spellbook container to access
+   the scrolls inside.
+  -hunger implemented based on code from El Barto (
+  -initchar function  to initialize characters.
+  -made it so boundingbox function will work even if fx1>fx2 and/or fy1>fy2
+  -made it so when npcs are blocked, they will immediately try to go a different direction.
+  -backpack will no longer open automatically when dragging item onto it. They're still
+   updated if already open.
+
+Jerrith - ars@nwu.edu 0.67s
+  -The following 0.67r+ features are present, through taking code from 0.67r+ and 
+   applying it to my (almost finished) 0.67s.  I think I got everything important
+   except npcs trying another direction if they're blocked.
+     - /SBOPEN command
+	 - hunger code
+	 - initchar function
+	 - backpack no longer automatically opening.
+	 - npcboundingbox change
+  -The following were present in 0.67r+, but not listed or credited:
+     - Clock code by TMB
+	 - Swordtarget code by Ash 
+  -Cleaned the following functions: axetarget, carvetarget, lightningtarget, 
+   explosiontarget, flamestriketarget, gatedestruction, unmounthorse,
+   bolttarget, ghosttarget, killtarget, removetarget, teletarget and npcMovement
+  -Fixed bug in npcwalk where NPCs in wander modes 3 and 4 didn't avoid walls.
+  -Fixed bug with opening spellbooks (spellbook, backpack2, send_item) 
+   that would make all but your spellbook and gold disappear from your backpack.
+  -Fixed bug in pack_item where dropping a spell on a spellbook would result in 
+   the opening of a strange container showing you all your spell scrolls.
+   (Make sure the code you rewrite works, Morac! ;-) )
+  -Peacemaking skill (skilluse and peacemaking)
+  -Added functions for calcCharFromSer and calcSerFromChar (both taking an int as
+   a parameter.)
+  -Provocation and Enticement skills (skilluse, multitarget, provocationtarget1 & 2,
+   enticementtarget1 & 2).
+  -Fixed bug in that attacker stored the index representing an attacker, not the
+   serial number. (A couple functions.  Just search for attacker.)
+  -Fixed deathstuff so that any NPCs attacking something that dies stop attacking.
+  -Added /heal command to fully heal targeted character.
+  -Added/Changed Heal and Greater Heal spells, to heal appropriate amounts of damage.
+  -Added Harm spell.
+  -spellfail function by El_BaRtO (elbarto@provide.net)
+  -changes to castspell to indicate if you are casting via spellbook, scroll, or wand.
+  -Added skill checks to castspell.  2 circles easier, if from scroll.  
+  -Fixed bug in 0.67r+'s summonmonster code. (Didn't set npc property). 
+  -Wands are available.  Set the type of the item to 15, set the morex to the circle 
+   of the spell you want it to cast (1-8, 9 for necro), and set the morey to the 
+   spell within the circle (1-8).  Set the morez to the number of charges on the 
+   wand object.
+  -Removed double action in resurrect.
+  -Items of type 16 are resurrection objects.  If you are a ghost, doubleclick one to
+   resurrect.  Based on code from Okaria Dragon (okdragon@dreamwrld.com)
+  -MOREX, MOREY, and MOREZ cam now be set in additem scripts.  This means you can
+   create wands, recall runes, spawners and other items from the /add menu now.
+   I've done some wands as examples. :)
+
+Jerrith - ars@nwu.edu 0.67t
+  -Fixed bug in deathstuff regarding deleting of corpses that don't exist.
+  -Fixed bug that prevented containers from being placed on corpses. (deathstuff)
+  -Note, to clean up world files that are buggy because of this bug, you'll
+	 need to kill each character who has ever died.  This should also hopefully 
+	 fix the problem where a player had a full spellbook, but couldn't cast any 
+	 spells from it.  (You can also just delete characters, and make everyone recreate.)
+  -Fixed bug in doubleclick regarding sword targeting.
+  -Added "Removing item" message to removetarget.
+  -Added updateskill function, to send skill changes to the client. (allsettarget,
+   checkskill)
+  -Change to spellfail visual effect, to make it more OSI-like in speed and duration.
+  -Fixed bug regarding range for walking, and addition of items at the edge of range.
+  The next 3 at Morac's suggestion:
+  -Change to provocation2target to stop suicidal NPCs.
+  -Change to peacemaking to make it affect players as well.
+  -Change to getmsg regarding spellcasting, so it finds the spellbook.
+  -Changed send_item function.  Fixing bugs and adding features.
+  -Added dir variable to objects, for rotation and light source selection.  Only
+   works with light sources right now.
+  -/setdir command works on objects and players.
+  -Improvement for walking function.
+  -Added support for respawn delay.  Set morey to the minimum # of minutes you want
+   the respawn to wait, and set morez to the maximum # of minutes. 
+  -Widened the z range of object teleporters.  Should work with more items now.
+
+Morac - mkraft@writeme.com 0.67u
+  -New sendbpitem function that will send only 1 item in a container.
+   This uses a completely new server message. (Thanks to Jerrith for the
+   UO packet sniffer).
+  -Changed senditem to call sendbpitem if item is in container.
+  -Changed backpack2 back to the way it was, since it is no longer used for this.
+  -Changed pack_item, dump_item, spellbook, smithmenutarget, mine, smeltore, treetarget,
+   get_item and carvetarget to use senditem (and thereby sendbpitem).
+  -Because of this bp1,bp2,bp3 and bp4 are no longer needed.
+  -refixed bug in deathstuff that caused fame to be affected by karma.
+  -HUNGER state for chars is now saved in world file.
+  -Added backpack get/drop sound (in get_item and sendbpitem).
+  -changed so npcwalk timer is only reset if they successfully move (this makes them try
+   a new direction faster).
+  -New calcItemfromSer function.
+  -Changed unmounthorse to use initchar function
+  -Added debug code to display outgoing server messages.
+  -fixed compile error in 0.67t when compiling with compilers who don't
+   define CLOCKS_PER_SEC as an integer.
+  -item direction now saved and loaded from WSC file. (saved Jerrith the trouble ;) )
+  -item direction can now be scripted in SCP file.
+
+Jerrith - ars@nwu.edu 0.67v
+  -Swordtarget fix by Ash. (defiant@eisa.net.au)
+  -Change to senditem to let you /setdir any object, mainly other lights.
+  -Added priv to item_st.  Bit 0=object decay.  Bit 1=newbie equipment.
+   Bit 2=dispellable
+  -Specify DECAY or NEWBIE on an item to give it that property in the SCP file.
+  -Spawned items can now have item direction set.
+  -Note, old spellbooks are not marked NEWBIE by default.  You'll have to set 
+   them manually, with /setpriv 2, followed by clicking on the object.
+  -You can now specify the str, dex, and int of npcs by using any of the following
+   keywords in the script file:  STR, DEX, INT, STRENGTH, DEXTERITY, INTELLIGENCE
+  -Fixed a bug with the reactive armor spell scroll.  Now works correctly.
+  -New priv2 bit used on chars (priv2&0x10), for spellcasting without using mana.
+  -New priv2 bit used on chars (priv2&0x20), for dispellable.  
+  -New priv2 bit used on chars (priv2&0x40), for magic reflection.  
+  -impaction function for spellcasting action.
+  -Removed incorrect animations from recall and mark.
+  -Fixed bug in unmounthorse.
+  -Added spells: Magic Reflection, dispell, fire field, wall of stone, para field,
+   energy field, dispel field, paralyze, mind blast, and poison field. (some visual
+   and sound effects not complete on the non-field spells).  (No damage)
+
+Jerrith - ars@nwu.edu 0.67w
+  -Change for fishing sound effect by Ash. (defiant@eisa.net.au)
+  -Fixed light types for field spells
+  -Added DISPELLABLE parameter for items in the script file.
+  -Fix for incorrect backpack sound by Morac (mkraft@writeme.com)
+  -Added temporary effects support.
+  -Added temporary paralyze effect.
+  -Added resendweathertime, and code to checkauto to make weather repeat, not stop.
+   Changed command, scriptcommand, and weather as part of this.
+  -Updated fire field sound effect.
+  -Fix for blood decay by Morac (mkraft@writeme.com)
+  -/darklight, /brightlight, /dungeonlight, sets the standard levels for these 
+   places/times.  Can range from 0x00 to 0x1B on the first two, 0x00 to 0x1F on
+   the /dungeonlight.
+  -/secondsperuominute.  Set how fast time passes.  Default is 5.
+  -Using /light disables day/night lighting, and sets a fixed level.  Type
+   /light -1 to change back to day/night lighting.
+  -The time system now also keeps track of the day, and two moons.
+  -The two moons affect the lighting level (darkening it by 2, if both are empty).
+  -The night & day system now smoothly transitions between the set light levels.
+  -If you are hit while paralyzed, you are freed.
+  -Dread Lord title fix by Morac (mkraft@writeme.com)
+  -Added spells: Clumsy, Feeblemind, Weaken, Agility, Cunning, and Strength.
+  -System Broadcast from console snippet by Maytrix(mshulman@ohc.com)
+  -Fixed bug in fielddir function.
+  -Object limit raised to 8192, by popular demand.
+
+Morac - mkraft@writeme.com 0.67w+  (bug fixes)
+  -Fix for blood decay (not actually in 0.67w).
+  -Fix for smelting ore outside of backpack.
+  -Fix for not seeing other people's pack's update when items move in them.
+  -Fix for DISPELLABLE and NEWBIE script not working.
+  -Changed rune renaming to use only 1 variable.
+  -Changed unmounthorse code to call initchar.
+  -Backpack no longer automatically opens on smelting or carving corpses.
+  -Fix for animating wrong character hit during fighting.
+
+Jerrith - ars@nwu.edu 0.67x
+  -Included uox3d.exe, a version of the executable built in debug mode.  If you
+   experience server crashes, try this version.  Let me know if it helps.
+  -0.67w+ fix for not seeing other people's pack's update when items move in them
+   removed due to the 100's of other bugs it caused.
+  -More fixes by Morac to: wearitem, command, npctalkall, npcemoteall, talking
+   mounthorse, getmsg, and provocationtarget2.  (mkraft@writeme.com)
+  -statwindow function changed, to take destination socket, and player whose status
+   to send as parameters
+  -checktempeffects and tempeffect rewritten to take advantage of new statwindow
+   function.
+  -Shortened magic reflection visual effect.
+  -checkmagicreflect function, takes off magic reflect and returns 1 if it was present.
+  -npcattacktarget function, called when an attack spell is cast.
+  -Added Pug's change to summoned monsters, to give them combat power (jcpirate@bsc.net)
+  -Added dispelable wall spawner and wall in scp, items 2001 and 2002 by 
+   Fearicon(fearicon@hotmail.com)
+  -Added checkresist, and magicdamage functions.
+  -Added magic resistance checks to all spells where appropriate.
+  -Added magic reflection checks to all spells where appropriate.
+  -Added damage to all spells, where appropriate. (Poison field has no effect)
+  -Added field spell effects
+  -Bug fixes for resurrecttarget.
+  -Added npcresurrecttarget function.
+  -Added npcaitype parameter to char_st:
+    0x01 = healer (resurrects dead players within range) 
+	0x02 = evil monster (attacks all non-evil monsters & all players)
+	0x04 = guard (attacks all evil monsters)
+	Note: you can combine these...  Make a healer/guard, for instance.
+    Note 2: They won't attack invulnerable players.
+  -Added /setnpcai function.
+  -Added basic NPC AI.  Types listed above.
+  -Made decay take less processor time.
+  -NPC AI can be set in the script file.  The female guard is set as a guard, 
+   the orc is set as an evil monster, and the basic female is set as a healer
+   in the included script file.
+  -Current list of working spells, by circle: (41 total out of UO's 64)
+   1: Clumsy, Create Food, Feeblemind, Heal, Magic Arrow, Night Sight, Weaken
+   2: Agility, Cunning, Harm, Strength
+   3: Fireball, Teleport, Wall of Stone
+   4: Fire Field, Greater Heal, Lightning, Recall
+   5: Blade Spirits, Dispel Field, Magic Reflect, Mind Blast, Paralyze, Poison Field
+   6: Dispel, Energy Bolt, Explosion, Invisiblity, Mark, Paralyze Field, Reveal
+   7: Energy Field, Flamestrike, Gate Travel
+   8: Energy Vortex, Resurrect, Summon Air Ele, Summon Daemon, Summon Earth Ele,
+      Summon Fire Ele, Summon Water Ele
+
+Jerrith - ars@nwu.edu 0.67x+ (somehow lost from 0.67y)
+  -Rewrote NPC AI attack functions so they would attack the closest target, not
+   the last valid target in the character array.
+  -Rewrote subtract mana function to work correctly, and update status window.
+  -Really did: Added Pug's change to summoned monsters, to give them combat power (jcpirate@bsc.net)
+  -Bug fix for NPCs gettting incorrect fx1, fy1, and fz1 values from script.
+
+Tal Strake - tal@gdi.net 0.67y   (actually include all the x plus ;-) )
+  -Made doors openable only when characters are close to the door
+  -Characters can only use a key on an object near them now
+  -Per request, players have to be near the horse to get on it
+  -Added and tested the new heartbeat code.
+  -Added console toggle for the heartbeat, key 'H'
+  -Added new entry in UOX3.ini for default heartbeat action.
+
+Morac - mkraft@writeme.com (7/30/98)
+  -Split off most of the constants, global variables, declarations, ect into uox3.h file
+  -Fixed Karma/Fame scale so it matches OSI's.
+  -Fixed bugs introduced in 0.67x++ (mainly that 0.67x+ wasn't included).
+  -Fixed bug in peacemaking where message wasn't sent to right people.
+  -Fixed bug in checkauto where you could never hide after being attacked or attacking.
+  -Fixed bug in checknpcai where npcs would attack offline players.
+  -Fixed bug in npcattacktarget dealing with hiding.
+  -Fixed bug in deathstuff where you could never hide after being attacked or attacking
+   caused by Jerrith's fix in 0.67s.
+   (Make sure the code you rewrite works, Jerrith! ;-) ) 
+  -Fixed bug that caused sound effects not to occur for fireball and magic reflect.
+  -Fixed bug that cause magic reflect cast effect not to occur.
+
+Jerrith - ars@nwu.edu 0.67.026 (0.67z)
+  -Added EOF error checking to readstring().
+  -Integrated banker code written by Ashran. (amir@tirol.com)
+  -Fixed another flaw in fz1 readin from script file on NPCs.
+  -Increased door range to 2.
+  -Increased key range to 2.
+  -Increased horse range to 2.
+  -Added death animations with much help from Beosil. (unlisted)
+  -Fixed death bug with resurrection robe.
+  -Added fade to black, and res choices. (Note, you must choose ghost at this time.)
+  -Type 17 = full mortar.
+  -Started to integrate alchemy code written by Ashran (amir@tirol.com)
+   (does everything but make the finished potion at the moment.)
+  -/movetobag and /dupe by Ashran.
+  -NPC spawn amount, set the amount on a NPC spawner, and it will spawn up to 
+   that many of the NPC in morex. (100 orcs in LB's courtyard is fun.:) )
+  -Note the itemmenus added to the script file.  These are required for alchemy to work.
+
+Tal Strake - tal@gdi.net 0.67.027 
+  -Added in item enchantment type 18
+  -Enhanced Item ID skill to tell you about the enchantment
+   - Use it like this  /settype 18  (tells the game it has a spell
+     attached to it)
+   - /setmorex 1   (internal number of the spell)
+   - /setmorey 10  (applys 10 charges to the item)
+
+Jerrith - ars@nwu.edu 0.67.028
+  -Removed most of Tal Strake's 0.67.027 code as it was redundant.  Modified
+   current code to have its added features.
+  -Error checking for functions called from multitarget that require an x-y location.
+  -/newz now works on characters as well.
+  -/makegm and /makecns only give their titles once (no more "GM GM GM Blah")
+  -Changed multitarget to move xy checking to appropriate subfunctions.  Fixes
+   problems with functions that target objects or characters that aren't at XY
+   locations.
+  -tempeffect2, takes an player and an object instead of 2 players.
+  -changes to most alchemy functions to track the mortar.
+  -SAYCOLOR and EMOTECOLOR properties now available for NPCs in scripts.
+  -Bug fix for pack updating by Morac. (mkraft@writeme.com)
+  -Alchemy now produces potions, type 19.  Potions have three properties, 
+   morex=skill of maker(0 to 1000), more1=potion type, more2=potion subtype.
+   potion type is like healing, or strength.  subtype is like greater, or 
+   lesser, or deadly.
+  -Included the script team's 0.090
+  -Nice new item id code.  The better your skill, the more you learn.
+  -Added a check to hopefully prevent some spawning problems in respawn().
+  -Added very basic highlighting for combat.  Bankers, Guards, and Healers 
+   should appear blue.  Evil monsters should appear red. (May not always work yet)
+
+Krozy - krozy@axiomstudios.com 0.67.029
+  -Added Random NPC Spawning
+   A mock NPC must be added to the uox3.scp file (This is due to the way the npc
+   spawnpoint type (62) uses the morex value).  The name property of this npc must
+   be set to 'RANDOMNPC' (without the quotes).  It is case sensitive.
+  -Added NPCLIST property to NPCs.
+   This property is ignored if the NPC is not used for random spawning.
+   It is required if NPC NAME is set to 'RANDOMNPC'.  The value is a reference to
+   the NPC List to use.
+  -Added NPCLIST section.
+     This section contains a list of all NPCs that may be spawned.  One NPC within
+     this list will be randomly chosen.
+  -Added Random NPC Naming for Spawned NPCs.
+   Random NPC names are useful for male and female npc humans, as well as named
+   monsters such as lizardmen, orcs, ratmen, deamons, etc.  Set the NAME property
+   of an NPC to 'RANDOM' (without quotes).  It is case sensitive.
+  -Added NAMELIST property to NPCs
+   This property is ignored if the NPC name is not set to 'RANDOM'.
+   It is required if NPC NAME is set to 'RANDOM'.  The value is a reference to
+   the NPC Name list to use.
+  -Added RANDOMNAME section
+     This section contains a list of all the names to be used by any NPC that is
+     spawned with a name of RANDOM using this list.
+  -Added LOOT property for Spawned NPCs
+   When present, the value of the LOOT property is a reference to the LOOTLIST
+   to pick a random item that will be added to the NPC.  Sample Syntax:
+  -Added LOOTLIST section
+     This section contains a list of items defined in the script.  One item will
+     be randomly chosen to be added to the NPC.
+  -Added GOLD property for Spawned NPCs.
+   When present, a random amount of gold will be added as loot for this npc.  The
+   value of this property is used as the max.  The internal formula is:
+   amount = randomnumber between GOLD/2 and GOLD. (a value of 300 can yeild 150-300).
+  -Added the /GOPAGE command.
+   This command teleports a GM to the origin of the most recent page.  More handy
+   then typing a /gochar 00 00 00 06, but rather limited in abilities.
+  -Added crystal ball prophecies (ok, they werent in demand, they aren't in UO, but
+   I just had to add them after all the bitching that goes on about them not doing
+   a damn thing in UO :)
+
+Jerrith - ars@nwu.edu 0.67.030
+  -Shortened Krozy's 0.67.029 update listing.  This file is not the place for
+   script examples, it's already long enough.
+  -Fixed dungeon lighting bug.
+  -Potion info is now stored in morex, morey, and morez on the potion.
+  -Wrote function impowncreate, replaces the owncreate and wornitem messages with
+   one more efficient owncreate, needed for shopkeepers.
+  -Rewrite of read2 and readscript, and changes to str2num to (hopefully) prevent
+   script crashes.
+  -Changed crystal ball code to work on objects set to type 18 instead of just
+   crystal ball objects.  Changed some messages to be more generic as a result.
+  -Added functionality to GOLD tag.  If you specify one number, it works the same
+   as before.  Specify two numbers, and you are saying the min amount, and the 
+   max amount.  (GOLD 150 200) would generate between 150 and 200 gold.
+  -You no longer need to specify RANDOM or RANDOMNPC to get the random name or
+   random npc effect, just add appropriate NAMELIST or NPCLIST tag.
+  -NPC declarations can now be recursive.  The simple example is, setup a random
+   NPC. After the NPCLIST tag, put in the normal things you want, overriding the
+   random npc's values.  This can be used to do say, a random npc, and the same
+   random npc who always carries 2000 gold, in addition.
+  -deathstuff and resurrection handling of items rewritten to prevent having
+   multiple layer 0 objects on a character.
+  -Some cleanup on the above mentioned function areas.
+  -Beginnings of code for recursive items.
+  
+Missing from original 0.67.030 update file, but present:
+  -BACKPACK tag for NPCs in scripts.  Give the NPC a BACKPACK for his loot and gold.
+  -PACKITEM tag for NPCS in scripts.  If the item isn't something that is being
+   equipped (weapon, armor, clothing), create it with PACKITEM instead of ITEM.
+
+Anthracks - fred1117@tiac.net 0.67.031
+  -Updated the GM paging system to be a bit more like that of UO's
+    -Each call is placed in a queue (list) with the newest calls at the end of the list
+    -GM's can view the queue with the /q command
+    -To go to the next call in the queue simply type /next and you will be teleported to the
+     player and their call will be removed from the queue.    
+    -Also, you can now enter the problem description yourself if you choose "Other" on the menu.
+  -You can now start commands with a . as well as a / (don't worry I made it so you can still                   type "..." if you want; someone was griping about that :)
+  -Removed Krozy's GM code as this new one made it somewhat redundant (sorry Krozy).
+  -Added /time command to show the current UO time
+
+Jerrith - ars@nwu.edu 0.67.032
+  -Added Zarn's improved code for multitarget and checkkey using switches to 
+   increase speed.  (zarn@mailcity.com)
+  -Items created in packs by using the PACKITEM tag will now have proper random
+   xy positions in packs.
+  -BACKPACK tracking in monster spawning has improved, no duplicate packs.
+  -Gold spawned with the GOLD tag will now decay.
+  -/GMOPEN - open the backpack of the character you click on.  Note, if the 
+   character has other containers on him at different layers, you can specify the
+   layer as a parameter for this command and open that container instead.
+  -/TILEDATA command is always available, instead of just in releases compiled 
+   with UNRELEASED.
+  -/MANA command by Krozy.  Click on the character to restore all mana to.
+  -/STAMINA command by Krozy.  Click on the character to refresh.
+  -Added value to item_st.
+  -/makeshop command to add shopkeeper buy containers to a NPC.
+  -Quick shop test/demo instructions.  Make a jar of honey (0x09EC), Make a NPC, 
+   use /makeshop on the NPC, use /gmopen 1A on the NPC.  Put the jar of honey in
+   the container that opens.  Close the container, use the command /testtarget, 
+   and click on the NPC.
+
+Ashran - amir@tirol.com 0.67.033
+  -Added a parser for commands: look at the void response(int s) for more
+   information. 
+  -Added npc response to commands:  If you own a npc use the commands like in UO.
+   Working at this time are: pet release, pet attack/kill, pet follow, pet
+   follow me, pet stop, and pet transfer.  All other commans are checked but
+   have no code.
+  -changed the summon monster so it sets you as the NPC's owner.
+
+Jerrith - ars@nwu.edu 0.67.034
+  -Changed the GM page functions to use getclock().
+  -Reformatted new code written by Ashran.
+  -Replaced _strtime function with a set of calls that are compatible on both 
+   Windows and Linux platforms.  Written by Drylock (erwin@andreasen.com)
+  -You can now BUY from NPC shopkeepers! :) :) :)
+  -/setshoprestockrate.  Number of minutes between shop restocks. (default 5)
+  -/restockall.  Restock all shops to max instantly.
+  -/restock.  Do a normal restock (recover roughly 1/2 of all restock items sold).
+  -/setrestock.  Set the number of restocks to be added to the current amount, over
+   time.
+  -/setvalue.  Set the price an object can be bought at.
+  -/buy command.  Open the buy window of a NPC shopkeeper.
+  -Items put in the container opened by /gmopen 1a on a npc shopkeeper will 
+   automatically restock over time.  Items put in the container opened by
+   /gmopen 1b will never restock.
+  -New script tags for NPCs:
+   -SHOPKEEPER - Give them the containers they need to be a shopkeeper.
+   -RSHOPITEM #- A shop item that will respawn. (fill in # like for ITEM or PACKITEM)
+   -SHOPITEM #- A shop item that will not respawn.
+  -New script tags for Items:
+   -VALUE - Set the price/value of an item.
+   -RESTOCK - Set the number of restocks this starts with.  (Basically, you could 
+    setup a shop to start with 10 of something, and 10 restocks, and it would 
+	gradually work up to having 20 of the item in stock, but wouldn't instantly.)
+  -Object teleporter collision detection fix by Krozy. (krozy@axiomstudios.com)
+  -New sendbpitem code by Morac (mkraft@writeme.com)
+  -You can say any of the following words to get a shopkeeper's attention: vendor,
+   shopkeeper, npc.  Include "buy" in the same line of text, and he will open 
+   his shop window.  (Just say "vendor buy" or "npc buy", etc.)
+  -/who command to list all connected users by Maytrix (maytrix@uox3.com)
+  -/gms command to list all connected GMs and counselors 
+
+Jerrith - ars@nwu.edu 0.67.035
+  -Fixed bug in shops where item names didn't match up with the rest of the item.
+  -Fixed bug in shops where buying more than one of a non-stackable object gave 
+   you one of the object, sorta stacked.
+  -Fixed bug where no matter what you said to a vendor, he would interpret it as
+   a buy request.
+  -Fixed bug where shopkeepers would have their inventory on their corpses.
+  -Fixed bug regarding value and restock being read from scripts.
+  -Fixed bug where you'd crash if you killed the shopkeeper you were buying from.
+  -Fixed bug regarding putting items on a shopkeeper from a script.
+  -Fixed bug in that you could /setshoprestockrate without value.
+  -Fixed bug regarding not saving script position with LOOT tag in scripts.
+  -Fixed bug preventing multiple LOOT tags on one script.
+  -Added handling message 0x69 from the client, sent when the client changes 
+   text or emote colors.
+
+Jerrith - ars@nwu.edu 0.67.036
+  -Calculated new gold key for client!  You must use the new UO client 
+   (version 1.25.34) to connect to UOX.
+  -Telltime fixes by Krozy. (krozy@axiomstudios.com)
+  -Some server freeze up fixes in height/z positioning functions.
+  -Fixed restock tag for scripts.
+  -Removed buytest and testtarget, as they aren't needed and can only cause
+   crashes... :)
+  -Banks are now stored at layer 0x1D on each player.  No more bank boxes on 
+   the ground.  By Morac.  (mkraft@writeme.com)
+  -Items dropped into pack are now placed at random xy locations, instead of 
+   the same spot each time.  By Morac.  (mkraft@writeme.com)
+
+Jerrith - ars@nwu.edu 0.67.037
+  -Turned off #define DEBUG.  No more console trace messages.
+  -Changed type in /istats to display in decimal, not hex.
+  -Added missing doors to dooruse function.  (Inward opening doors for the 
+   currently working doors, and all the secret doors.)
+  -Changed fireball spell effect sound.
+  -Bank fix by Morac.
+  -Reagent use code based on code by Krozy
+  -Use priv2 bit 0x80 to specify spellcasting without reagents.
+  -Non-GMs can now put spells in the spellbooks while the spellbook is in their
+   main backpack in addition to when it is in their hands.
+  -Doors are now updated on all client screens.
+  -Added automatic door closing for all doors.
+  -Fixed gold total in buy window
+  -Fixed starting lighting level being wrong.
+  -Fixed recall rune naming.
+  -Added npcwander and npcai to /cstats
+  -Added priv to /istats
+  -Flamestrike damage fixed.  No longer an insta-death spell. :)
+  -Monsters now make appropriate sound effects in combat and on death.  Code
+   by El_Barto (elbarto@provide.net)
+
+Jerrith - ars@nwu.edu 0.67.038
+  -Added selling to NPC shopkeepers.  Use vendor sell, instead of vendor buy, etc,
+   or the /sell command to use one.  Items in the container at /gmopen 1C are the
+   items the vendor will consider buying.  He will offer the price the item in 
+   the 1C container has as its value.
+   -Note: Only items in your main pack will be checked to see if the vendor will
+    buy them, and only the first 75 he will consider buying will be displayed.
+  -Added SELLITEM tag for scripts.  NPCs will put this item in their 1C sell 
+   containers.  Note, the value of the object is automatically divided by two.
+   (So if you put the same item in the buy and sell bags, the npc will by 
+   default offer to pay half price to buy it back.)
+  -Added VALUE tag to NPCs.  This tag lets you change the value of the last
+   item added to the NPC with PACKITEM, ITEM, SELLITEM, etc.
+  -Fixed bug with scrolls in doubleclick.
+
+Jerrith - ars@nwu.edu 0.67.039
+  -Added more text about readstring EOF stuff.
+  -Added more text for heartbeat and broadcast messages
+  -Removed line of debugging code from selling items. (Noticed by Morac)
+  -Fixed items dropped on players going to bank boxes instead of backpacks, 
+   by Morac. (mkraft@writeme.com)
+  -Field effects should no longer hit logged out players.
+  -Fix for stackable items being dragged into packs by Morac(mkraft@writeme.com)
+  -Fixed bug where you couldn't buy if you had the exact amount of gold that
+   was needed.  (Noticed by Krozy)
+  -/midi # # command.  Plays the midi file specified by the two numbers on your
+   system.  (from 0 0 to about 0 50, I think...)
+  -/tradetest.  Test of bringing up the trade system.  Doesn't work yet, be sure
+   to close it before walking away from the NPC you opened it on. :)
+  -Monster NPCs should no longer attack logged out players. 
+  -Added Krozy's improved code for corpses.
+  -Fixed alchemy bug where canceling would display the not enough reagents message.
+   (Noticed by Krozy)
+  -Doing /cstats will automatically open the status window for the character.
+  -added Basic potion use.  
+  -/tradetest and /gumpopen testing commands....
+  -calcValue function designed to handle price/value modifiers for objects.  
+   Basically, any object should be assigned it's value as if it were normal, 
+   nonmagical, and the price change should be calculated in calcValue.
+
+Anthracks - fred1117@tiac.net 0.67.040
+  -Further updates to GM/Counselor paging system.
+   -Added a Counselor queue to go along with the GM one.
+   -Added /jail and /release commands for Counselors and GM's.
+   -When in jail prisoners cannot cast magic and cannot talk to others in jail.
+   -Added /gotocur command to teleport you to the player who paged you should they leave while
+    you are talking to them.
+   -Added /clear command. Now, your current call remains in the queue until you /clear it or.
+    go to the next call with /next.
+   -Added /gmtransfer command for Counselors. If a counselor goes to a call and feels it needs
+    to be handled by a GM then this command will transfer the call to the GM queue.
+  -Reorganized some of the commands. Now Counselors can only use /next, /clear, /q, /jail,
+   /release, /gotocur, /cstats, /istats, /goplace and /gmtransfer.
+  -Enhanced /addnpc command. Now if you give it just one number, it will add the npc of that
+   number from the script.
+  -Updated the GMMENU sections of the .scp file (included is the Script Team's 0.14 script).
+  -Added Secure Trading windows, the ones that pop up when you give another player an item.
+   By Jerrith (ars@nwu.edu).
+  -Bug fixes in pack_item and sendbpitem functions. By Jerrith (ars@nwu.edu).
+
+Maytrix - maytrix@uox3.com 0.67.041
+  -Updated combat to use new function combat()
+  -added SWORDSMANSHIP check to combat
+  -added TACTICS check to combat (causes more damage if skill is used up to a max of 10)
+  -added updatestat() function to increase stats based on a percentage passed to function
+  -added skilldelay, statdelay and skillincreasedelay to char_st
+  -modified checkskill() to use the new skilldelay function
+  -modified skill usage in general (hiding, Taming..etc) to use skilldelay
+  -implemented fix on deathstuff to stop lag when monsters die (by Krozy)
+  -added /wipe command to remove all items left on ground (note: this will anything on the ground)
+  -added /respawn command and respawnnow() function to have all spawn points spawn instantly
+
+Jerrith - ars@nwu.edu 0.67.042
+  -Added 0.67.041 information to update file.
+  -Removed notes on secure trading from goldkey.h (Oops!) :)
+  -New UOX3 file, regions.scp.  Use this combination script/ini file to specify in game
+   regions, and their properties.  See sample included file.  Note, in this release, 
+   regional weather is not yet implemented, and guards are not summoned in guarded 
+   areas...   Those features are coming soon. :)
+  -Sample regions.scp file provided by Anthracks. (fred1117@tiac.net)
+  -Dropping an item on a NPC no longer brings up the secure trading window.
+  -Removed Maytrix's 0.67.041 combat code changes.  Code is both incorrect, as 
+   not all weapons use swordsmanship, and tactics does not add a damage bonus, and
+   also buggy, as it adds a character's index to it's chance of hitting. (Basically, the
+   200th monster in the game, regardless of it's dex, would hit 100% of the time.)
+  -Removed Maytrix's 0.67.041 deathstuff fix by Krozy.  Krozy and I had talked and agreed
+   the fix he posted would not actually work correctly all the time.
+  -New deathstuff fix to cut down on lag caused by deaths, written by myself and Krozy.
+  -Removed Maytrix's 0.67.041 skill and stat increase changes.  Again, bugs and incorrectly
+   implemented features.  Stats should not go down when a skill fails, no advancement curve
+   present at all from 50.0 skill to 100.0 skill, current hp, mana, and stamina can rise
+   above maximum, skill and stats increase delay timers are not present in UO and a bad idea
+   as well.
+  -Added bug fix to checkskill function so that it will correctly update the client's 
+   display of skills when a skill under 30.0 increases on a failed attempt of use.
+  -Fixed bug in skill delay not being initialized for characters.  Could prevent a 
+   character from ever using skills.
+
+Jerrith - ars@nwu.edu 0.67.043
+  -Bug fix to fix region display on startup.
+  -Combat now checks Tactics for a hit 50% of the time, and Swordsmanship 50% of 
+   the time (basically what it does in UO for sword weapons...)  Skill check 
+   difficulty varies based on opponents tactics score.  Two GM tactics people
+   would hit each other roughly every 2 out of 3 swings.
+  -NPC skills can now be set in the script file.  SKILL # AMOUNT.  So for say,
+   tactics, SKILL 27 1000 for 100.0 tactics.  uox3.h has a list of the skills and
+   their numbers.
+  -Blacksmithing changed to subtract appropriate amounts of ingots.  Set with 
+   INGOTS in blacksmithing script file.
+  -Skill needed to smith an item now set in the script with MINSKILL MAXSKILL, 
+   the skill you will always fail at, and the skill you should always succeed at.
+  -Updated uox3.bss to use new parameters.
+  -Summoned monsters are weaker, but now have tactics, swordsmanship, and 
+   magic resistance skill scores.
+  -Fixed bug causing corpse update problem on the death of monsters.
+  -/kick command works again.
+  -Added all shovels, pickaxes, and smithing tools to doubleclick, written by
+   Krozy.
+  -Added new UOX file, skills.scp.  Use this to specify skill and stat advancement
+   curves.  Values after SKILLPOINT are: #1 base skill this curve point takes effect
+   at, #2 skill gain for a success, #3, skill gain for a failure.  failure value
+   is not use for stat advancement.
+  -Default skills.scp by Anthracks.
+  -New checkskill function and subfunctions to handle skill advancement.
+
+Morac - mkraft@writeme.com 0.67.044
+  -There are a lot of changes in here (and I mean a lot), I recommend moving your stuff into
+   this uox3.cpp instead of other way around when updating so you don't miss anything.
+  -If adding an item with "/add h1 h2" and the item is stackable it will be now.
+  -Pileable items no longer have to be marked with "PILE" in script. the pileable status
+   is taken from the verdata.mul file.
+  -Items layer are set to 0, when item is not being created and worn on npc/player.
+  -Game now checks when you walk into a firefield or paralyze field
+  -Sped up searching for characters and items.  You probably won't see the
+   difference unless you have a lot of items and/or characters.
+  -Formatted code so it is easier to read.
+  -Changed "uox3.bss" to "create.scp" as it will soon contain more than just blacksmithy.
+   Changed menuitems to MAKEMENUITEM, changed smithmenu to makemenu and smithmenutarget to
+   make menutarget. They both take an additional parameter which is the SKILL that's making
+   the item. Left alchemy the way it is cause it had delays and other complicated stuff.
+  -Change SMITHMENUOFFSET to MAKEMENUOFFSET and increased it to 2048 because the MENUITEM's
+   in the script file were approaching 1024 and potions overlapped it.
+  -I took the items out of the "uox3.scp" and put them in "items.scp". This
+   should noticeably speed up menu processing for items (since they were at the 
+   end of the uox3.scp file).
+  -Removed items from create.scp, now all menus there point to items in items.scp. Also
+   MAKEMENUs now contain a RESOURCE and SKILL. RESOURCE is how many of ingots/wood/ect. the
+   player needs and SKILL is the minimum skill required to make the item. Max is set a
+   3x min. choice and makemenu were modified to only show items you can make with your
+   current resources and skills.
+  -Skills shown in skill window are now the baseskills plus stat modifiers. Both baseskills
+   and stat modified skills tracked.
+  -Fixed make GM and Make counselor.  They would only add GM or Counselor if you already
+   had one in your name. Also set priv2 so you can do GM things.
+  -Skills list and status window updated when set with "/SET" command
+  -NPCs no longer walk through (or over) walls, doors and other dynamic objects.
+  -NPCs will open doors.
+  -NPCs will now attempt to go around objects when blocked while following/chasing player.
+  -You can no longer use items equipped by other players.
+  -Gold in status window is updated when added or removed from your pack.
+  -Fixed a minor bug in advance skils and stats which would cause skill/stats to go over 100.
+  -Fixed skills.scp so it matches current OSI skill percentages. 
+  -Tactics should NOT affect chance to hit (it hasn't been this way since Nov 97),
+   It is a damage modifier. I adjusted that.
+   (Note the Origon's Official guide is hopelessly out of date, you uoss.stratics.com for stats).
+
+Anthracks - fred1117@tiac.net 0.67.045
+  -Implemented Healing/Veterinary, use scissors on cloth to make bandage and use the bandage
+   to heal.
+  -Possible fix for people crashing when they talk.
+  -Added spirit speak by SirGonads (email?)
+  -Changed the value of the z npc's were restricted to from 2 to 5 (Jerrith).
+  -Added the /jail and /release commands I left out last time (sorry!)
+  -/setamount2 command. things like bolts of cloth use this value to track how many yards are
+   left.
+  -Default gold and starting privlidges in the .ini!
+    After the heartbeat line, the next line should be the amount of gold to start with, then
+    the next 2 are the devault privs, priv1 and priv2.
+
+Morac - 0.67.045a
+  -Fix for damage bug (not causing any damage)
+  -Made NPCs smarter (they remember what direction worked last time they were blocked)
+  -Doors won't open and close multiple times (well more than twice) when autoclosing.
+  -"Idiot" bug fix by Milan Rabaa (milan@orpg.de)
+
+Sir Joseph - sirjoseph@dzonline.com 0.67.045b
+  *Fix for spirit speak causing server crash at startup by Anthracks.
+  *Fix for /jail and /release commands by Anthracks (fred1117@tiac.net).
+  -New "/fullstats" command, wich will refresh mana, stamina and HPs to max.
+   This command does not have any animation or sound, like "/mana", as I
+   don't think a GM needs that.
+  -Implementation of first *basic* version of Special Attack Attribute.
+   Use "/setspattack 1" to set special attack to Phisical Fireball, wich
+   makes Remaining HPs/10 Damage(a Dragon with 450hp would make 45 damage).
+
+* This 2 fixes were included on 45a but not commented.
+
+Cironian - cironian@stratics.com - 0.68
+  -Raised item limit from 4096 to 16384
+  -/ADDX command added (Like /ADD, but creates item at your current position)
+  -Server side /ALLNAMES command replaced with /SHOWIDS
+  -Many small fixes
+  -When /ADDing multis, they are now shown as ghost image at the cursor
+  -/FREEZE works on NPCs now
+  -Rewrite of the movement code, MUCH (!) better but a bit slower too
+  -New encryption system by Beosil (With a change to allow easy compile-time selection of client version)
+
+Morac mkraft@writeme.com - 0.68.001 (merged 0.67.045b into 0.68)
+
+Sir Joseph - sirjoseph@dzonline.com - 0.68.002
+  -Compiled with MSVC++ 5.0 to avoid CRTDLL.DLL crashes caused by MINGW32(68.001)
+  -Added missing "The " to Lord/Lady titles
+  -Added Sextent item use (/where is now avaliable to Counselors and GMs) by Krozy
+  -Added "GM Tells" command (/TELL playersocket message) by Krozy
+  -/WHO command now shows players socket - by Krozy
+
+Sir Joseph - sirjoseph@dzonline.com - 0.68.003
+  -Added missing code from Morac's .002
+  -Correct animation for flamestrike and explosion, also flamestrike is now weaker
+  -Hitting an enemy with a viking sword now haves sound
+  -Added skill check/auto-advancement for Anatomy, Evaluating Intelligence and Arms Lore
+  -Arms Lore now gives a different message, not just "Attack [x] Defense [x]"
+
+Anthracks - fred1117@tiac.net 0.68.04
+  -Access violation bug fixes in teleport and dolight - Morac (mkraft@writeme.com)
+  -NPCs will now not get DENY walk message (caused server crashes)  - Morac (mkraft@writeme.com)
+  -Changed readwscline, readw3 and readw2 to prevent crash when compiling with Borland  - Morac (mkraft@writeme.com)
+  -Animal tame fix
+  -GOCHAR fix
+  -Stat advancement fix - Jerrith (ars@nwu.edu)
+  -Revamped combat (uses different skill depending on your weapon) 
+     Halin Talismoon (cscott@fit.edu)
+  -/hide and /unhide commands for GM's
+  -Possible fix for Disappearing beards.
+  -Ghosts can no longer fight or be killed.
+  -Blood now appears under corpse when carving it.
+  -Canceling jailing should no longer jail you.
+
+Maytrix - maytrix@uox3.com 0.68.005
+  -Modified combat code and made some additions (added getshield() and getcombatskill())
+      Both functions based on code by Halin Talismoon
+  -Added the following script commands for NPC's (used in combat) 
+      HISTR, LOSTR, HIDEX, LODEX, HIINT, LOINT (Set hi and low values and it will assign 
+      a random value in between)
+      Also added LODAMAGE and HIDAMAGE (Amount of damage an npc can do)
+      And finally WRESTLING, TACTICS, MAGERY, PARRYING and MAGICRESTISTANCE (Only values needed for NPCS)
+  -Added the following script commands for items
+      LODAMAGE, HIDAMAGE (Again, used for combat.)
+      HP, STR (all for later implementation hp=hp's of item str=strength needed to use item)
+  -Updated Taming to use new npc script command TAMING (min skill required to tame)
+  -Fixed Special Attack - Will no longer target invulnerable players
+  -Removed ghost appearance for npc's.
+  -added special attack 2 - lightning. (Sample lich included NPC 24)
+     -- actually code is there, but for some reason isn't working - maybe someone can find the problem?
+  -Added /setwipe command (0=wipe; 1=never wipe - for use with /wipe command)
+  -modified /wipe command
+  -Included newscript.txt to describe new script commands in more detail.  
+
+Tal Strake - tal@gdi.net 0.68.006
+  -Re-created heartbeat code from scratch, UOX no longer uses beat.dat
+  -NOTE TO PROGRAMMERS: anything you wish to be logged thru UOXmon,
+   simply do a Writeslot("Insert text here") and UOXmon will add it to
+   the UOX3.log file.  However it must not be numbers and has to be
+   over 7 characters long to register...
+
+Maytrix - maytrix@uox3.com 0.68.007  - compiled by Morac
+  -Fixed damage calculations (no more 1 hit death-rabbits :) )
+  -Minor fix to autosave (Morac)
+
+Maytrix - maytrix@uox3.com 0.68.008
+  -Added HP subtraction for shields
+  -Added additional NPC script commands
+   LOWRESTLING, HIWRESTLING, HIMAGERY, LOMAGERY, LOPARRYING,
+   HIPARRYING, LOTACTICS, HITACTICS, LORESIST, HIRESIST
+  -Implemented fix for Writeslot command (Morac)
+  -Fixed bug with 1 hit death (not fully fixed in 007)
+  -Added some missing variables to initchar and inititem
+
+Maytrix - maytrix@uox3.com 0.68.009
+  -Fixed NPC/Item spawn bug where new script commands (LO/HIDAMAGE etc.) were not used.
+  -Added container spawning 
+   2 new types. 63=spawn container  64=locked spawn container.  Set the type and then
+   set the morexyz values.
+  -Added new script command - ITEMLIST - allows you to set a spawn to spawn a random item
+   based on ITEMLIST (Works just like NPCLIST)
+  -Fixed bug where summoned monsters would not disappear. They now disappear after
+   a number of seconds based directly on your Magery skill.
+  -Separated scripts - uox3.scp is no longer used.  The new scripts are:
+   location.scp, npc.scp, menus.scp and speech.scp
+  -Fixed bug where STR and HP values were not read from items.scp
+  -Fixed combat bug where repeatedly pressing tab would cause you to attack a lighting
+   fast speeds.
+ 
+Cironian - cironian@stratics.com - 0.68.010
+  -/TELL fixed (It used to ignore the command if you tried to tell more than one word)
+  -Fixed a bug in void telltime (== was used for an assignment there)
+  -Same in void keytarget
+  -Ghosts and Counselors can walk through closed doors again
+  -Quick fix for the GM exploit
+   (Other programmers still might want to check void multitarget if I really got all cursor types)
+  -Allowed GMs to bypass the following checks:
+   Item range
+   Character range
+   Skill delay
+   Gold checks when buying stuff (Everything is free)
+
+Polaris - harrison@erim-int.com 0.68.011
+ - Magery: Lots of basic logic errors fixed.
+ - Magery: Spell circle used for calculations is now calculated correctly
+ - Magery: Skill and Mana checking now implemented correctly
+ - Magery: Mana is now only subtracted if a spell or scroll is cast successfully
+ - Magery: Reagents are now only used on book spells, and only if the spell is cast successfully
+ - Magery: Most of the Spell-Casting routines are now bypassed if mana is not available on initial check
+ - Magery: Reagents are now used on spell fizzles
+
+ - uox3.h file fixed so that Linux compiling won't barf
+ - Included Tal Strake's latest code snippet for his heartbeat code.
+
+Kathrrak & Tal Strake - tal@gdi.net 0.68.012
+ - Nothing, release had the wrong .cpp file.
+
+SirGonads - spoogie_@yahoo.com 0.68.013
+ -Added server scriptable functions, so users change hardcoded values without recompiling (e.g. DECAYTIMER,INVISTIMER,ect)
+ -New commands	RELOADSERVER - reloads the servers server.scp script
+		LOADDEFAULT - loads the default values from the server
+ -Added Tracking, currently scripted in uox3.tra
+ -Added Begging
+ -Added Animal Lore
+ -Changed Armslore, now checks skill
+ -Changed Fishing, now has a fishing delay
+ -Changed Evaluate Intelligence, can no longer use the skill on self to gain skill
+ -Changed Anatomy, can no longer use the skill on self to gain skill and removed an extra loop that was doing nothing
+ -Moved global variables from uox3.cpp to uox3.h
+ -Added missing function prototypes
+ -Removed all unneccessary char temp[###], since it is already a global variable
+ -Removed&replaced all char temptext[###],tempbuffer[###],tmp[###],tstring[###],txt[###],statement[###]
+   with the global char temp[512];
+ -Optimized 	skilluse(int,int),gmmenu(int,int),itemmenu(int,int),scriptcommand(int s,char *,char *)
+		command(int),makemenu(int,int,int)
+
+Tal Strake & Kathrrack tal@gdi.net .68.014
+ -Changed makemenutarget() friendlier toward item creation and skills
+ -Added SirGonad's .013 snippets for TELL and Counselor command fix
+ -Added Inscription
+ -Added new feature, Engraving
+ -Added new code, im.cpp and im.h, which gives us an easy and FAST
+  gump menu system, see inscribe.gmp for details on format.
+ -See the NOTE.TXT included with this release only for important info
+
+TANiS tanis@mediacom.it 0.68.015 - RETIRED! -
+ - Added some typecasting to avoid warnings and bugs in almost every function
+ - Should compile fine under LINUX
+
+TANiS tanis@mediacom.it 0.68.016
+ - Version 0.68.015 was bugged and therefore retired.
+ - This one has the same enhancements to the main code as v0.68.015
+   but it's working fine with no lock-ups or world deletion.
+ - The code is now clear from wrong typecasting and stuff like that
+   and should be a good base to work with expecially when developing
+   under Linux. 
+ - Please use this code as the base for further working on the code
+   because I've done some clean-up here and there throughout all the
+   25000+ lines of code!
+
+Krozy krozy@questworld.ml.org 0.68.017
+ - Compiled by Krozy, Jim (jim_coh@hotmail.com), Polaris (harrison@erim-int.com)
+ - Reverted back to 0.68.014 for the base. (Both 68015 & 68016 caused problems for myself
+   and several others trying to use it.  I could not successfully get the code to run on
+   either version.  Version 68015 is null as 68016 replaces it.  Since the changes to
+   68016 were some kind of typecasting which seems to be unecessary as it worked on linux
+   prior to this, I felt it best to revert.  If anyone has anything to say on behalf of
+   68016, please consult me (Lucas Moten - krozy@questworld.ml.org - ICQ:3826730).
+ - Introduction of Townstones (Phase 1) (Items 0EDD & 0EDE)
+   Features & Documentation included in townstones.txt
+ - Hair Dye with color of your choice (use color dyes on hair dye bottle, then use hair dye).
+ - GM see all players (even logged out ones) functionality.  Useful for modifying (fixing)
+   players who have logged out.  Players who are logged out get '(OFF)' appended to allname.
+ - Modified Sextent location display (doesnt show the z position).
+ - tweakbutton and tweakinput functions have been renamed to gumpbutton and gumpinput as it
+   will be a more appropriate name for future coding.
+ - Put in a fix to void backpack code that will show items that may have been previously
+   out of range to be displayed.  Players who 'lost' items may now get them back, and there
+   may be some items that finally show up that were of the world 'lost long ago'.  GMs should
+   be alert from this patch for calls made referring to odd objects in player packs.  This
+   is a quickie fix.
+ - Modified savenewworld function to display on the console when an automatic save is performed.
+   Also made it broadcast a system message to logged on players 'System: World Saving', and
+   'System: World Saved'.
+ - Linux Compile line: gcc -w -lm -funsigned-char -ouox3 uox3.cpp im.cpp
+
+Morac - mkraft@writeme.com 0.68.018
+  -Fishing fix by Brad
+  -"/SETSPEECH" command added to change npcs speech (by request)
+  -GOCHAR now works with socket numbers as well as serial numbers
+  -No longer get "can't use items equipped by others" message when double clicking on characters.
+  -Fixed npcmenutarget to work with old NPC scripts (ones without lo/histr, ect..)
+  -Made spawned NPCs use new script commands from 0.68.005
+  -Merged menunpctarget and addrespawnnpc into 1 function.
+  -Moved magic stuff into magic.cpp and skill stuff into skills.cpp (requires less memory to compile, also faster)
+  -Update makefile to work with new files
+  -Made server message strings that are only used in one function, non-global. Moved all global 
+   server message strings to uox3.h
+  -Added XTELE command, which teleports someone to your current position (by itself gives you cursor
+   or use serial number or socket number to transport specific character).
+  -summoned creature says its attacking when its not fix - Kathrrak (miller@tecgraf.puc-rio.br)
+  -stat update fix - Kathrakk
+  -Fix for invalid account information some people were getting when compiling with
+   other compilers (ex: Borland) in psplit.
+  -Another fix for Borland (maybe other compilers) in scriptcommand, showcname, singleclick and command.
+  -Fixed bug in advancestats.
+  -Skills higher than 100.0 will no longer cause stat penalties.
+  -Fixed problem with updatestats (would show incorrect hitpoints).
+  -Pets now respond to commands.
+  -Can no longer cast spells with weapons equipped (except GMs).
+  -GM exploit fix for kicking, jailing, releasing and tweaking
+  -Should ignore multitarget client messages sent by themselves (should fix some exploits).
+  -Fixed combat so it doesn't ignore armor if you're wearing a shield.  Also
+   fixed calcdef so it doesn't add DEF of shield when determining damage.  It
+   does add DEF when showing AR in status window.
+  -Changed combat formula to match OSI's formula.
+   NOTE: monsters DEF values are very high at the moment (lich is 70)
+         so you won't do much damage.
+  -Fixed bugs in armslore and tracking
+  -Complete makeover on inscription :)
+  -Because of my changes don't need "fromuox3.h" anymore im.cpp now includes "uox3.h"
+  -Carpentry skill added
+  -Renamed "uox3.tra" to "tracking.scp" so its like the rest of the .scp files.
+  -Jack's spellcasting monsters code (email unknown)
+  -fixed textflags so all flags can be displayed at same time  
+  -fixed bug with magic update from a few releases back where there was only 1 variable for everyone
+   in the game.
+  -Cause mining doesn't check for mountains I put in the 1 for 1 fix Friend put in 17a.
+  -Put in "proper" daemon summoning fix by Friend
+  -Summoned creatures stronger fix by Friend. Actually summoned monsters should
+   come from npc file, but I'm not doing that now :)
+
+Morac - mkraft@writeme.com 0.68.019 
+  -ALLSET fix (allsettarget)
+  -INSCRIPTION can be used again (skilluse)
+  -Combat fix (checkauto)
+  -Removed (char) typecasting hopefully to fix negative number problems.
+  -added scriptcaching by Drylock <erwin@andreasen.com> (excellent stuff)
+  -linux strupr function
+
+Sir Joseph - sirjoseph@dzonline.com 0.68.019a
+  -Townstone mayor voting targeting fix by Krozy
+  -Fix for inscription so MSVC will compile by Morac
+  -Combat code is now located at "combat.cpp"
+  (easier to work on a more advanced combat system later, and add archery)
+  -Added archery to getcombatskill
+  -Added SPATTDELAY to script (to set the delay between special attack use,
+   previous version was set to 120 by default, wich was too slow for most
+   monsters.)
+
+Morac - 0.68.020 (failed release)
+
+Morac -mkraft@writeme.com 0.68.021
+  -Completely removed all 0.68.016 code. Should be much more stable.
+  -Add "/add menu" fix by Drylock (erwin@andreasen.com) 
+  -Fixed Makefile to work with 0.68.19a+
+  -Numberous exploits to gain GM status and/or max stats fixed. Thanks to Beosil.
+  -Fixed bug in loadchar where loading a player who had townvote of 0 would set
+   charcount2 to 1 (-1 to 0, ect..)
+  -1 line Fix in towninit to prevent access violation happening while debugging.
+  -Fix in addrespawnnpc for npcs with hist==lost, hiin==loin, or ... so
+   won't get divide by 0 error.
+  -Added stuff to initchar
+  -Fixed combat so divide by 0 does not occur. 
+  -Moved calcatt, calcdef and timerok to combat.cpp since they're combat functions.
+  -Shows offline players as gray (hidden) to GMs. (impowncreate)
+  -Tracking works again.
+  -Help menus work again.
+  -made skills an array of 50 in uox3.h and globals.cpp. This fixes improper stat
+   gain, where character would continue to gain stats forever.
+
+Sir Joseph - sirjoseph@dzonline.com 0.68.022
+  -Fix for inscription/engraving(will no longer crash server) by Tal Strake
+  -First basic version of Archery implemented
+   + All types of bows are working (bow, crossbow, heavy crossbow)
+   + All animations and sound included
+   + Checks for and uses arrows/bolts
+   + If hit missed, there is a chance of 1 on 3 for arrow/bolt to be left on ground :)
+   - No special archery hit check implemented (using same hit check as melee combat)
+   - No line of sight
+   Tips: Arrow: 0F 3F - Crossbow Bolt: 1B FB :)
+  -Started to add sound to combat. For now only sounds avaliable are viking sword
+   hit(used for all melee combat skills) and sword miss.
+
+Polaris - harrison@erim-int.com 0.68.023
+Tal Strake - tal@gdi.net
+  -Fixed problem being able to cast spells with weapon equipped (Morac's snippet with FIXES)
+  -Fixed problem with NPCs being invisible (Morac's snippet)
+  -Fixed Sound for Daemon Summon to be correct (from Friend)
+  -Fixed an exploit where casting unimplemented spells would raise Magery skill.
+  -Added sysmessage notifying caster of unimplemented spell cast.
+  -Fixed problem with skills shooting to 4000 or so (typecast problem)   
+  -Removed several residual typecasts held over from version 068.016.
+		+ diff'd 068.016 with .068.017(not based on 068.016)
+		+ crosschecked each 068.016 change with .068.022
+		+ removed straggling 068.016 changes.
+  -Added in new code - house.cpp.
+  -Added in basic house deeds, including doors and signs.
+  -NEW FUNCTION: addthere(s,x,y,z,type)  Use for placing items ingame not in pack or
+   at players feet (which is what addhere() does)
+  -Modified function: makemenutarget()  if you set chars[currchar[s]].making=999 before calling
+   this function, it will create the item in your pack and not say it was created. (used for
+   key and sign with house creation)
+  -Please read the file House.txt included with this release.
+
+Tal Strake - tal@gdi.net 0.68.024
+  -Fixed house.cpp for placement of doors and signs
+  -Modified getmsg() and keytarget() to allowplayers to change house signs with
+   their housekey
+  -Changed Writeslot not to show HB onthe console, only Messages
+
+The UOX Development Team - 0.68.025.001
+  - new scripts added
+  - more stable code base developed
+    - fixed many incorrect code base changes
+  - cosmetic code changes
+  - code optimization
+    - rewrite getclock, not used in windows for big performance gains
+  - removed goldkey.h from the package release
+  - bug fixes (to name a but a few)
+    - fix for fields not affecting NPCs
+    - fix for cpage and gmpage /other command
+    - fix for a wear_item bug
+    - fix for respawn npc with no cloths bug
+    - fix for npc to player bug
+    - fix for the jail bug
+    - fix for npcs only following but not attacking combat bug
+    - fix for fish decay
+    - fix for the kill me a hundred times bug
+    - fix for GMs casting in jail or with weapons equipped
+  - currently house code is disabled, but
+    - corrected corrupted vars in house.cpp which was randomly misplacing doors and signs.
+    - corrected using runenumb, which was causing some problems with sign changing.
+    - house deeds all work correctly now, except tower, which has to be manually created.
+
+Cironian & Ridcully - 0.68.025.002
+  - Filenames are 8.3 dos-format now
+    - scriptcache.* renamed to scriptc.*
+    - some files in /docs
+  - Renamed list.h to uoxlist.h because of conflicts with the c++ list.h
+  - Stability fix for T2A clients
+  - Added dev/uox3.rc back in for windows distribution
+  - Added dev/uox3.wpj and dev/uox3.tgt (Watcom project files)
+  - Changed "bool" types everywhere to char (bool is not a standard type)
+  - Made UOX not choke on messages B6 and B8 (sent by T2A client)
+
+CVS system version - 0.68.025.003 ?
+  - Fix for "broken pipe" problem under Unix (Drylock)
+  - Fix for /ADDITEM (Anthracks)
+  - LO<skillname> and HI<skillname> now correctly set baseskill
+  - Skills that are set to 10 (the default value) do not save in the .wsc,
+    saving a bit of space
+  - updateSkillLevel() function replaces all the duplicate code taht calculated
+    skill[] from baseskill[] and fixes a problem with /set skill
+  - File docs/testplan.txt contains some of the fixed bugs, how they were fixed,
+    and what was done to verify the fix
+  - Current time and light-levels are saved in Server.scp (Ridcully)
+  - Added data.cpp; when we move the items and charactes to hash maps they will
+    go there. Now there are functions as tools for making the change step by step.
+  - Removed Makefile.other and Makefile.ming32. Replaced with just one
+    Makefile (Drylock)
+  - Added Maytrix' fix to dupeitem()
+  - Summoned monsters now have stats like actual monsters.
+  - 2 new AI types 0x08 - attack smartest (EV) and 0x10 - attack strongest (BS).
+  - Fix for double fame loss on res.    
+  - Fix for new script loading system
+
+Vagrant <vagrant@ctel.net> - 0.68.025.005
+(took the current cvs version and merged it with Maytrix' 0.68.025.004 release)
+(everything in the cvs version was included, along with the following from Maytrix:)  
+  - Fixed /tell command to show who the message was coming from - Now displays as "GM Name tells user text"
+  - Added Lockpicking skill (Will not work on locked items that have a more value of anything but 0 0 0 0)
+  - Added Unlock spell (Works the same as Lockpicking)
+  - Modified container spawns
+    - They will now lock each time an item is spawned
+    - Using /setamount on a spawn container will now allow you to spawn that many items (remove the hard code of 6)
+    - Modified singleclick, so that spawn containers will look like 1 item even if /setamount is greater than 1
+        - More work still needed here
+  - Implemented weapon speed
+    - Added SPD script entry (defaults to 30 if nothing is specified) - NOTE: Scripts were not updated to use it
+    - Added speed calculation to combat
+    - Attackers with no weapon (i.e. Wrestling skill) have speed determined directly upon their wrestling skill
+        - Varies between 30 (skill > 200) and 50 (skill > 800) 
+  - Modified special attack spattack to use a time delay in seconds. (Set SPADELAY to the number of seconds between attacks)
+    - This makes all current SPATTACK entries in the script obsolete (They will work, but the delay will be very long.)
+(and, added the following from Armageddons 0.68.025.003a release:)
+  - Fixed problem with players not being able to walk in caves
+(and, the following is from me:)
+  - Fixed problem with carpentry allways thinking you do not have enough logs (was checking ingots, not logs)
+
+McCleod - 0.68.025.006- Newbie Items
+  -Added newbie items when a char is created
+  -Only file modified are globals.cpp, uox3.cpp, uox3.h
+  -Added new script file, newbie.scp, can be customized by adding more PACKITEMS under each skill section
+  -Anything new added is mark with newbie in some way
+  -The only known bug is if PARRYING is set as the highest skill when creating a new char, it causes no items togo into the new chars pack
+    I suggest not to set it as the highest skill,  if you set it as the secong or third it works fine.
+    I have no idea why this happens but I'll try to fix it soon.
+    Email me if you fing out why or how to fix it.
+  -Read the Newbie.txt
+  
+Hunter - 0.68.025.007- hunter666@mailcity.com
+  -Added 5% chance of finding Gold ore while mining
+  -Added gfx of ingots
+  -Added Smelting for Gold ore
+  -Can only make gold coins for now
+       change/add wot ever u want in create.scp
+
+Friend(Brother Kane) - 0.68.025.008 - Tailoring
+
+  - Added tailoring skill and now one can enjoy making clothing and leather armor
+  - Now how this works
+
+		-  First of all you need to kill some animals for either hides or wool,
+		   or you can possibly buy some cloth from a local tailor or some 
+		   hides from the tanner.
+		-  When you get wool, you will need to find the nearest spinning wheel(all 
+               are defined) and spin some yarn.
+		-  Take the yarn and goto the nearest Loom and make your cloth.
+		-  In order to produce clothing, you will need a set of knitting tools.
+		-  When you knit your clothing it will bring up a menu to show what your able
+               to make based on your tailoring skill.
+		-  I also include cotton as a resource to make cloth. You will use the spinning wheel
+               for this also and it will produce thread instead of yarn.  Works the same way.
+		-  I am working on making a new resorce(Cotton fields to get cotton from) Like
+               how lumberjack works.
+
+  - Leather Amour
+
+		- You will have to again kill your game(as in animal) that produces hides, and then take your
+		  sewing kit to bring up a menu to make the product.  This is also based on tailoring skill.
+
+  - Fixed the bandage thing to make it more realistic
+
+		- Added sounds to sissors to make it sound like your cuting them.
+		- Made bandages stackable
+        	- Set Tailoring skill to it.
+
+  - A few more notes:
+
+		- Make sure you have the needed create.scp to make this all happen or you'll crash.
+		- I'll be working more on tailoring to finish it up, but this is a start.
+		- Also I might not have the exact ratio correct but that is easy to change just let
+		  me know.
+		- Also have started into Cooking and Baking skill. What works in cooking is taking meat and making ribs on a campfire.
+		- It is almost done.
+
+Friend(Brother Kane) - 0.68.025.008b - Tailoring
+
+	- Fixed the bug with hides not being consumed
+	- I added some more cooking:
+		- The only thing I have done is making pizza, hehe wasn't going to release put i am not taking it out 
+		  and put it back in.
+		- You have you create sausages and a bag of flour(not right just testing) and use
+		  sausage on clour to make pizza, then create a stove and bake it on(not all stoves are 
+		  included since i am not done yet.  But the bags of flour are openable and closable. ;)
+
+	- added the left out bandage fix from last update.
+	- can't think of any more , Just play around and have fun!
+McCleod - 0.68.025.009 - Custom Titles
+ - Added new script, titles.scp.
+  -Set with original titles, but can be edited for shard specific titles.
+ -Read titles.txt for clarification. The script itself is easy to read.
+ -That's it
+
+Tao - 0.68.025.010 (kolourz@gte.net)
+- fix for the War Axe returning swordsmanship rather than macefighting
+- combat animations for on and off horses & depending on weapon held by character
+- sphere of influence: calculated radius, only calculated around 
+  logged in players, helping performance. did not change this to dynamic yet.
+  it is a virtual circle around players, if an NPC is within they are
+  then "processed" for movement otherwise they are not. the radius variable
+  is set in the npcmovement function.
+- change in worlddarklevel and worldbrightlevel to a more acceptable level.
+- slight change in main function from sleep(20) to sleep(50): 
+  allowing the server some needed breathing time.
+- included the new MASTERKEY for version 1.25.35 (by DasRaetsel, seek@mfn.de) (thanks!)
+- added basic combat "feedback" in form of short text messages during battle.
+
+
+Bud- 0.68.025. 011 (jeff001@megsinet.net)
+-fix for combat miss generated arrows and bolts not decaying
+-sound effect for arrow misses should now work correctly
+-revamp of magery damages, both npc and pc, using a more unified formula thats easy to
+tweak, along with formula made lots of needed damage changes.(I plan on fine tuning damage
+after i recieve some input from shards).
+
+Tao - 0.68.025.012 (kolourz@gte.net)
+-optimized sphere of influence loop-checking
+-fix: monsters now 'wander freely' when in the player's
+ sphere of influence.
+-modularized/randomized combatonfoot & combatonhorse:
+	combatonfoot now plays more than one combat animation
+	for the appropiate weapon type held by player.
+	combatonhorse was just modularized as there seems to
+	only be one good animation depending on weapon.
+-combat.cpp: with the new modularized combat animation
+ functions only these functions need to be called to play an
+ animation combat sequence.
+-fix: replaced a combat message.
+-tweaked the main's sleep function in the loop to 40 (from
+ 50) as a some reported a slight jerkyness on lowbandwidth
+ connections to the server.
+-i did not inline (_inline) any functions. therefore, it is
+ up to the dude (or dudete) who compiles the code to deceide
+ what to and not to inline, depending on their coding style.
+
+SpaceDog - 068.025.012a
+- compiled the souce from 068.025.12
+- added decay to carved items (feathers, raw ribs, hides, fur & unspun wool).
+
+Bud- 0.68.025.013 (jeff001@megsinet.net) 
+-added both Tao's fixes for combat animation(on and off horse)
+-added Tao's fix for Wrestling skill not going up
+-added Spacedogs fix to Tao's fixes to reinable npc animation in combat
+-added Spacedogs fix for EV's being considered bank box's
+-added a fix for combat not doing damage to players( an if combat, changed to if combat=1)
+-added a change to parry reduced damage, 50% of damage reduced is now randomly calculated.
+
+TANiS - 0.68.025.014 (tanis@mediacom.it)
+- Fixed client crash bug in impowncreate()
+- Fixed the bad horse corpse bug (I thought someone already corrected it)
+- Added Teleporting Guards code (NPCAI 0x40)
+- Fixed walking() to avoid stall if bad parameters are passed to function seekmulti()
+- Fixed pile amount count bug in pack_item()
+- Fixed checktempeffects() to avoid bad characters numbers. This avoid a lot of instances of
+  character data corruption and should fix some of the trading troubles.
+
+TANiS - 0.68.025.014a (tanis@mediacom.it)
+- Fixed division by zero bug when fighting with bare hands.
+
+TANiS - 0.68.025.015 (tanis@mediacom.it)
+- Added Logging Functions for hunting bugs LogMessage, LogWarning, LogCritical (use them! :))
+- Added performance profiling. Press 'P' to see some stats from the console. (Not working under
+  LINUX yet)
+- Added "who" ('W' key from the console) to see who's logged on.
+- A note: NPCAITYPE 0x40 is RESERVED for teleporting guards. Do not add any npc with such
+  NPCAITYPE because it would get removed instantly. Teleporting Guard are still being worked on
+  so if you need standard guards use NPCAITYPE 0x04 instead.
+- Reformatted combat() section to make it readable
+- Added two new files debug.cpp and debug.h
+- Fixed makemenutarget() to take into account HIDAMAGE, LODAMAGE, DAMAGE&ATT, skill level of
+  the item creator, DECAY, HP, STR.
+- Fixed TACTICS not going up during combat. (Bud)
+- Updated makefile to reflect debug.cpp addition and packaged everything with Script v20a
+
+Friend(Brother Kane) - 0.68.025.016 - Cannons/And some addons
+
+- I have added the cannon code into this: 
+- First of all you need to create a cannon
+- Next all you need to do is load it( Load the cannon by simply dbl clicking on the cannon
+ball (0e 73), and it will ask you what cannon to load. Then just click on cannon. 
+-Well, the cannon damage is based on your tactics skill. Since their is no cannon skill. ;(
+You can dodge the cannon ball if your parry is high enough(kind of like magic resist.
+-  Ok if you want to make a cannon from scratch this is what you have to do:
+
+	-  You need atleast a 700+ skill in smithy and have 250 ingots.
+	- When you finally  make a cannon, you'll recieve a cannon deed in your backpack.
+	- The you have to place it somewhere, sell it, or place in a safe place(bank).
+		- Just simply dbl click on the deed and click the place you want to place it.
+		- I have added this all in the items and create script file.  Make sure you have it in your dir!  
+		- Ohh forgot, yes you can make cannon balls too!  I think I have them set at 10 ingots each! ;)
+- Alot more to it, but i am releaseing this fast because people wanted it, and i want to get back
+to more coding. Thanks! 
+- Now when you cook your raw ribes on the fire, you get cooked ribs, NOW YOU CAN EAT THEM! Cooking skill also!
+- Some of my cooking is in here also! Finishing the rest! Alot of Ingreds! 
+- Also when you make a bag of flour it is openable and closable! Also added some items usable in here
+by dbl clicking on it. Just a sample! 
+Well this is all for now! Like I said I have been down with the Flu, and feel like crap, so i put
+this in fast, and trying to fig out the Static maving effect from an onject, if you can help me, I would be very happy! 
+Thanks!
+
+TANiS (tanis@mediacom.it) - 0.68.025.016a
+- It's exactly the same as 016 in functionality. I just modified debug.cpp and debug.h to
+  compile it under Linux with no troubles.
+
+
+Vagrant (vagrant@ctel.net - 0.68.025.017
+
+Tailoring Fixes!:
+- Spinning wool now makes yarn, and not thread.
+- Spinning cotton now makes thread and not yarn.
+- Sewing kit is now used for both cloth and hides.
+- Hides and cloth are now consumed properly.
+- You can now use all types of folded cloth for material, not just one. 
+- New create.scp included (one from UOXScript20a was messed up for versions other than the TeamUOX build)
+- A few redundant functions related to tailoring were merged.
+- Removed void cut() because nothing uses it and it was not even defined.
+- Fixed various typos and misspellings, and probably added some.  :)
+
+ Also:
+- Added McCleod's titles fix from 0.68.025.009b (which was omitted in recent versions).
+- Modified defines in debug.h to help mingw32 compile correctly.
+- Brought back the other Makefile, let's keep it that way.  :)
+
+=============================================================================================================================================
+
+UOX3 v0.68.025.018 by Sir Joseph (sirjoseph@dzonline.com) - 9/26/98
+
+Fixes:
+ - Doors-autoclose fix (by SpaceDog, spacedos@mail1.stofanet.dk)
+ - Horse sound for Lizardman fix (by Vagrant, vagrant@ctel.net)
+ - Campfire light-type fix (by Vagrant)
+ - Mining bug fix(ore stack problem fix, by Anthracks, fred1117@tiac.net)
+ - Fixed "living" time for summoned creatures (by Friend)
+ - Fixed status window update for /fullstats
+ - Re-implemented fix for /setspattack (sigh)
+ - "Ultima Offline ExperimMiner" fixed
+ - You can no longer die if you are allready dead :)
+ - Fixes for combat:
+   - NPCs not fighting anymore after fighting (killing) one creature fixed
+   - NPCs will now automatically attack anyone who is hitting them (fixes NPCs standing there doing nothing while they are getting killed)
+
+Modified stuff:
+ - GM Title is obtained at 1000 skill(100.0), not 980(98.0)
+ - Tweaks/Changes to Blade Spirits and Energy Vortex (damage, BS was making more damage than EV, added poison and changed stats)
+ - Changed "You feel yourself resisting magical energy." to "You feel yourself resisting magical energy!" ;)
+ - You now need to shove NPCs in order to walk thru them. Also, when shoving
+   something invisible, you now don't get the creature's name
+ - Snooping Karma loss is now capped(if snooping would be enabled..:)
+ - Message for when "(petname) transfer" is done
+ - "VALUE 0" lines at the world file are no longer saved. This should drastically reduce the world file size
+ - SPATTACK now uses caster mana
+ - Summoned creatures now dissapear when you release them
+ - Much better(almost completely rewrote it ;) NPC 0x40 type Guards:
+   - Teleport effect added, and they now also yell "Thou shalt regret thine actions, swine!" :)
+   - Guard now goes after attacker, not defender
+   - Various guards are now allowed. With the old code only 1 guard would appear for the whole shard
+   - Guards will no longer attack invulnerable players
+   - If a Guard is attacked by someone else other than his target, he will retain his original target
+   - If a Guard's target runs away the guard will teleport close to his target and yell "Halt, scoundrel!", unless the target is out of guard region
+   - Guards will now attack evil NPCs
+   - Guards can now be both male or female :)
+   - spawnguards() is now called from attack, not combat, and int spawnedguards is gone
+   - After killing their target, and before dissapearing, Guards walk around a bit and turn their AI to attack-evil(4).
+   Please keep in mind that guards may be better now but they are still NOT PERFECT.
+
+New features:
+ - Advancement Objects. Player can walk thru one of this objects (only once per character)
+   and gain skills/stats (defined at advance.scp). /TYPE 80 and MOREX is script section.
+   Script allows to use all skills and stats.
+ - Poison creatures. New line for NPC scripts, "POISON x" (x = poison level). There is a %33 chance (1 out of 3)
+   that the creature will poison his target when it hits. 4 Levels of poison, lesser poison, poison,
+   greater poison and deadly poison.
+ - /setpoisoned, /setpoison, /setadvobj and /setspdelay commands
+   (/setpoisoned 0 will cure the target, /setadvobj was made for advancement objects testing purposes)
+ - Nightsight, Cure and Poison potions are now working
+   Chances to cure poison with cure potions:
+    -Lesser cure: %80 chance lesser poison, %40 poison, %20 greater poison, %5 deadly
+    -Cure: %100 chance lesser poison, %80 poison, %40 greater poison, %20 deadly
+    -Greater Cure: %100 chance lesser/normal poison, %80 greater poison, %60 deadly
+ - GMs now can also handle the Counselor queue (by Anthracks)
+   The new commands are /CQ, /CNEXT, and /CCLEAR the same as the ones a GM
+   normally uses except preceeded by a C to show they are for the counselor
+   pages.
+ - Cotton picking.  Just double click a cotton plant to get cotton. (by Vagrant)
+ - Mining regions.  Sections 253 and 254 of regions.scp are RESERVED FOR MINING. (by Vagrant)
+   Please don't change the section numbers.  Section 253 is intended for out of town mining areas.
+   Section 254 is intended for in town mining areas.  To add other area's to mine, simply add the 
+   coordinates to the end of the section.  
+ - Added command '/minecheck i' to change the minecheck setting in game. (by Vagrant)
+
+Scripts stuff:
+ - Added new specification in server.scp:  "MINECHECK i".  Where 'i' is the type of check to perform.
+   0 = no check (you can mine anywhere), 1 = you can only mine off cave floors, 2 = you can only 
+   mine in specified regions. (by Vagrant)
+NPC.SCP:
+ - (new, NPC 691) Lesser Fire Elemental, pretty weak, only uses fireball
+ - Fire Elemental now haves different stats, and only uses only fireball, explosion and flamestrike
+ - (new, NPC 692) Fire Lord, tough, uses fireball, flamestrike and %20 source health physical fireball
+   (I just wanted to change FE..:)
+ - Snake, Giant Spider, Giant Scorpion, Giant Serpent and Poison Elemental now use poison
+
+=============================================================================================================================================
+
+UOX3 v0.68.025.019 by Sir Joseph (sirjoseph@dzonline.com) - 10/3/98
+
+Fixes:
+ - Fix for Gates (hehe check your code after merging it, Vagrant :)
+ - Fix for getting the wrong message by drinking a cure potion if you were not poisoned
+ - "Vendor Sell" client lock-ups should no longer happen
+   * Feedback needed on this one :)
+ - Fix for Inscription, Alchemy (by Bud)
+ - Put the right sound on the Lizardman with spear, (it was supposed to be fixed in version 025018 but I forgot there was 2 switch(id2) in void playmonstersound .... sorry Sir_Joseph, by SpaceDog)
+ - Added minecheck fix (by Vagrant)
+ - Fix for Newbie items not being stackble (by Vagrant)
+ - Mining regions can now be placed within other regions (by Vagrant)
+ - Fix for the miner paperdoll crash (by Anthracks)
+
+Modified stuff:
+ - Magery tweaked, changed: Harm, Fireball, Lightning, Energy bolt, Explosion and Flamestrike damage, better # of HPs healed
+   calculation for Greater Heal
+   * I need some feedback on this one too :P
+ - Commented out the "UOX3: Sendbpitem bug. Item not in container." message as it was very annoying :)
+ - "Townstone" now uses type 35 instead of an ID
+ - Defender no longer learns attacker's combat skill. I commented out this as it was a "kinda ugly learn-from watching wannabe feature" IMHO ;)
+ - Changed the ingots HEX from 1B EF to 1B F2 looks nicer when they pile (by SpaceDog)
+ - Changed poison text, sow that it now shows with red text when you have been poisoned (by SpaceDog)
+
+New stuff:
+ - New Fame/Karma gain system, more like OSIs. This way it should be much harder to raise your reputation to high levels.
+   (no more Glorious Lords from killing rats :P)
+   * SCRIPT WRITERS NEED TO UPDATE NPC.SCP. A Lich Lord, for example, should have around 12000 Karma/fame
+   * And more feedback needed here! :)
+ - Damage Objects (type 85), every time a character walks over one of this (includes changing direction for now), it will
+   make "item[x]+a random number between item[y] and item[z] damage". Example, place a flamestrike animation object on ground,
+   /settype 85 on it and /setmorexyz 10 10 25. This will make 20-35 damage every time a character walks thru it.
+ - Added "poisontxt" timer, so the poison message won't spam
+ - Added some basic teleport check, you now cannot teleport to static blocking tiles (ie walls) unless you are a GM
+ - Item use timer (delay, "You must wait to perform another action.", does not apply for GMs)
+ - "Combat Hit Message" (ie: "Stunning blow to your Head!") can now be turned off
+   (defined on server.scp, COMBAT_HIT_MESSAGE 0 is off, 1 is on)
+ - Added new Tailoring function (by Vagrant)
+ - Added goldmining back in code, this was left out since version 025.007 (made by Hunter, added by SpaceDog)
+ - Changed gold ore a gold color insted of ordinary iron ore color :) (by SpaceDog)
+ - You can now mine cave walls too :) (by SpaceDog)
+ - Made more items created from code decay "I actually think we are lucky if the code doesn't decay now :)" (by SpaceDog & Bud)
+ - Alchemy now creates an empty bottle :) (by Bud)
+
+Script stuff:
+NPC.SCP
+ - Changed the City Guards to use SECTION NPC 1000 & 1001, so if you use another script then The Script Teams you don't have to alter it, just add NPC 1000 & 1001 and set npcai to 4 (by SpaceDog)
+
+=============================================================================================================================================
+
+UOX3 v0.68.025.020 by Tauriel (karl@mwcyber.com) - 10/3/98
+I got tired of scrolling down to see the latest fixes... 
+This is based off of v0.68.025.019
+Routines effected:
+ - uox3.h
+ - globals.cpp
+ - magic.cpp
+ - skills.cpp
+
+Modified stuff:
+ - rewrote the whole void castspell function... fixed all the bugs that I knew about so if anything is broken its new.
+ 
+
+Script stuff:
+SPELLS.SCP
+ - Contains all spell information except damage.
+
+=============================================================================================================================================
+
+UOX3 v0.68.025.020a by Tauriel (karl@mwcyber.com) - 10/4/98
+Routines effected:
+ - combat.ccp
+ - uox3.cpp
+ - magic.cpp
+ - skills.cpp
+
+Fixed:
+ - reagent use and mana use problem with castspell re-write
+ - Piles of scrolls no longer disappear when you double click to use one
+ - Same with all food items
+ - mana gets used in one spot instead of 65 (deleted 320 lines of code!)
+ - Fixed teleporting guard code. Thanks Dupois!
+ - Added a fix for teleporting guards AI (TANiS)
+ - Added a fix for checktempeffect() for trying to apply the effect to dead people and corrupting memory (TANiS)
+ - Fixed 'You have cooked your meat,and it smeels' to be 'smells' (CyberCrusher)
+ - Added ability to cook an lots of different things, ovens, fires, etc... (CyberCrusher)
+ 
+ 
+Modified stuff:  (sorry I don't know who all the credit goes to for these)
+ - Added in the console 'Q' and 'T' commands snippet
+ - Added in the arrow stacking during combat snippet
+ - Added in the shutdown message in minutes snippet
+ 
+Thanks to Swords for helping test out guards...this is what we found:
+*** Teleporting guards will attack the aggressor.*** Period end of story. Regardless of if you attack a monster or not,in town of course.
+Also when monsters are chasing into town guards will not teleport in to save you unless the monster "re-aquires" you
+Guards don't seem to teleport out of town anymore.
+
+That about does it so far....
+
+=============================================================================================================================================
+UOX3 v0.68.025.021 by Cironian
+Routines affected:
+ - uox3.cpp
+ - uox3.h
+
+Done:
+ - Fixed updatechar not to break the walk counter anymore
+ - Changed wear_item to fix paperdoll items vanishing on equip
+ - Small changes to teleport for a similiar reason (New client "feature")
+ - Same for startchar...
+ - Added another advancement object type (81) which ALWAYS allows usage
+   (Dont place this one in public areas, its for shard personel only! :)
+
+=============================================================================================================================================
+
+UOX3 v0.68.025.022 by TANiS (tanis@mediacom.it)
+
+Files modified:
+ - list.h is NO LONGER NEEDED! It's been so for months but it's still getting around. Please
+   don't add it back.
+
+Fixed:
+ - Backpack bug. When dropping items with a serial number >=0x41000000 the server would crash.
+   I modified the check on the item serial number and now it works ok.
+ - dump_item() function now handles wrong serial numbers the right way and doesn't corrupt the
+   items database.
+ - Doors are now auto-closing again.
+ - setspeechtarget() function now works correctly and allows you to set a speech to basic npcs
+   in orded to let them work as vendors (vendors aren't working if you don't set a speech for
+   them)
+ - "stamina" is misspelled into "stanima" in some server functions. Corrected.
+ - I had to comment out a section in npcMovement() because it was forcing NPCs to have
+   NPCWANDER set to 2.
+
+Added:
+ - You can now define in SERVER.SCP if monsters should attack animals. To let them attack
+   animals define MONSTERS_VS_ANIMALS to 1
+   This way there's a chance that monsters will attack animals. This chance can be defined
+   in SERVER.SCP as ANIMALS_ATTACK_CHANCE. By default it's set to 15% chance to attack an
+   animal.
+   By default MONSTERS_VS_ANIMALS is set to 0 and this means monsters won't attack animals
+   at all.
+   Actually monsters won't attack vendors and the like because the check is made on the npcai
+   and since npcai is set to 0x00 for both animals and vendors/npcs monsters won't attack them.
+   I'm still trying to find a way to identify animals from other npcs. If anybody has got an
+   idea please let me know.
+   Thanks to Kolours and Spacedog for hints.
+
+To do by Script Writers:
+ - Add all the missing menus in CREATE.SCP
+
+=============================================================================================================================================
+
+UOX3 v0.68.025.023 by Moongraven <moongraven@hotmail.com>
+
+Engraving Changes:
+-on single click it displays item name, spell name, and charge
+-now engrave use reagents and mana
+-you can engrave offensive spells like fireball and in combat if you hit an opponent it will discharge the spell on the enemy 
+-max charges you can put on an item:
+ circle 1, 16 charges
+ circle 2, 14 charges
+ .......(etc).......
+ circle 8, 2 charges
+
+=============================================================================================================================================
+
+UOX3 v0.68.025.024 released by Sir Joseph <sirjoseph@dzonline.com> - 10/11/98
+Fixes/New Features/Modifications done by Sir Joseph, Gerry, Dupois, Vagrant, Anthracks and Jim Wright.
+
+Fixes:
+  - "SKILLx 1" lines are no longer saved(WSC). This should save up some space :)
+  - Summoned pets should no longer "live forever" if the server goes down and back up
+  - Fix for Res Robes not decaying
+  - Some fix for Guards :)
+  - Correct light type for Gates
+  - Fix for incorrect characters getting food messages
+  - Fixed one level of hunger not giving out correct message
+  - You will now un-freeze if you get injured with either magic or direct attack
+  - Death "backpack/robe" fix (by Dupois)
+  - Alchemy fix (by SpaceDog/Gerry)
+  - Fix for Fish decay (by Bud)
+  - Fix for Combat Message (by Bud)
+  - Fixed problem with cloth not being used when making bandages (by Vagrant)
+  - Fixed tailoring finally. It now uses the correct amount of cloth or hides (by Vagrant)
+
+Modified Stuff:
+  - Re-activated house deeds. They are *STILL* Buggy. If you don't like em, just don't use em :)
+  - "combat target clean" is now done at deathstuff()
+  - Better "combat attack" AI, fixes, etc (modified various combat internal stuff, like attacker not following target, etc :)
+    (new function used, npcsimpleattacktarget)
+  - Commented out the "Bad Char Number" debug message :)
+  - Physical fireball now makes less damage, instead of %20-%40-%60 source health it makes %10-%20-%40
+  - Rewrote Fletching (by Vagrant):
+    You can now use feather on shafts, or shafts on feathers. It now deletes the correct amount of feathers and shafts.
+  - Merged walking() and npcwalking(): Just added a check to see whether it was an npc or not, got rid of 531 lines of unnecissary code (By Vagrant)
+
+New Features:
+  - You can no longer cast spells while frozen
+  - NPCs will now flee if they are about to die, and reload old wander mode if they regenerate some health
+    This uses 2 new script commands for npc.scp: FLEEAT and REATTACKAT, for example, you can set FLEEAT at 30 and that NPC would flee from target 
+    when it reaches %30 health, and REATTACKAT 60 to make it re-attack("reload" old wander mode) when it reaches %60 health. If you want to make a
+    char never flee, set FLEEAT -1 and REATTACKAT 0. If nothing is set then default values are used (defined at server.scp), check Script file modifications.
+    Thanks a lot to Moongraven and Vagrant for helping me fix a problem I had with this :)
+  - New command: /SETHEXMOREXYZ
+  - Sound Objects(type 86). When a player walks into one of this, there is a chance of [item morez]% that the sound
+    [item morex] [item morey] will be played. Example: Item type 86, MoreXYZ: 01 9c 80, there is a chance of %80 that the sound
+    of a lich laughing will be played when the player walks over this item. (Use /SETHEXMOREXYZ to set the sound ID and then
+    use /SETMOREZ for the chance)
+  - New item limit of 32768
+  - Karma/Fame gain is now capped at 1000 per kill
+  - New door sounds (by Dupois)
+  - Sound for createpotion() (by Dupois)
+  - New item SFXs, for example, gold dropping, moving objects, etc (by Dupois)
+  - NPC Animals should no longer open doors :) (by Dupois)
+  - Global teleporters (such as dungeon entrances) are no longer hard-coded, but located at teleport.scp (by Jim Wright, wrightja@gte.net)
+  - Implemented shaft carving and bowcraft (by Vagrant)
+  - New Advancement Object script features(lines): DYEHAIR, DYEBEARD, KILLHAIR, KILLBEARD, KILLPACK, ITEM, SKIN, POLY, ADVOBJ (by Anthracks)
+
+Script Files:
+  - New teleport.scp file
+  - Lots of work done on npc.scp, "rich, almost-invulnerable" wisps, drakes/dragons firing every 50 seconds, reapers using magery every 100..
+    eles casting 3 magic arrows and running out of mana, almost all magery-using monsters casting every 10 seconds,
+    hyper-weak monsters like bone knights..etc etc, all fixed/changed :)
+  - Added fletching/bowcraft stuff to create.scp and items.scp, it's all outlined in DOCS\scp_changes_UOX3_068_025_024.txt (by Vagrant)
+  - Added SpellBook and All-Spells scroll to Master Mage section in advance.scp (just an example of ITEM)
+  - Added NPC_BASE_FLEEAT and NPC_BASE_REATTACKAT to server.scp
+
+=============================================================================================================================================
+UOX3 v0.68.025.025 released by Cironian <cironian@stratics.com> - ?????
+
+New Features:
+  - /INVUL and /NOINVUL commands (Simplify flag setting, as its often used)
+  - People with GM or Counselor flag NEVER have to shove things
+  - Trash container at type 87 (Removes all items put into it)
+  - /GUARDSON and /GUARDSOFF to globally disable guards (For combat events)
+
+Fixes:
+  - Doors *really* only autoclose now if they were not yet closed by a player
+  - Small '==' to '=' fix in void itemspell
+
+=============================================================================================================================================
+
+UOX3 v0.68.025.026 released by Gerry & Sir Joseph <gerry@nycap.rr.com/sirjoseph@dzonline.como> - 10/11/98
+Fixes, Modifications and New Features in this release were done by:
+Gerry, SpaceDog, Anthracks, Bud, Ash, Dupois, Sir Joseph and Lord Slayer.
+
+Fixes:
+  - Fixed Alchemy again (it should work now..)
+  - Fixed the sound for gold when purchasing and buying items from vendors/moving item
+  - Added in a few different type codes for Anthracks
+  - Fixed the speech bug where no one could hear you (by Anthracks)
+  - Fixed the GM paging bug where it misdisplayed pages in que (by Anthracks)
+  - Fixed getting SPD settings on weapons (by Bud)
+
+Modified Stuff
+  - Dropping items should now haves the correct sound
+
+New Features:
+  - Added Spellsounds to potions ie: heal, cure etc (by Spacedog)
+  - Added Message You have poisoned yourself, when you drink a poison potion (by Spacedog)
+  - Added Training Dummies (cap per skill 30)(by Ash)
+  - You now lose logs if you fail in Carpentry (by Spacedog)
+  - Added Basic Tinkering (by SpaceDog)
+  - Random NPC background sounds (by Lord Slayer)
+
+Notes:
+  - A partial section of Ash's stat modifiers code was left in, you should *NOT*
+  - use the script commands for this as it's not finished, it was left in so
+  - developers can continue the work on it. To Devs: Add stat modifier removal
+  - in get_item and combat item destroy. Thanks, Sir Joseph.
+=============================================================================================================================================
+
+UOX3 v0.68.025.027 released by Gerry <gerry@nycap.rr.com> - 10/26/98
+
+This release would not be possible without of course CIRONIAN and everyone else that has helped with uox3 in any way :)
+
+Fixes, Modifications and New Features in this release were done by:
+Gerry, Sir Joseph, Friend, SpaceDog, Bud, Vagrant, Moongraven, Max Wulf, Dupois, Lord Slayer, Tauriel, Anthracks and Zadius.
+
+
+Bug Fixes : 
+
+-Fix for NPCs walking through some stuff.	
+-Fix to get item sounds when combining in pack.	
+-Annoying and incorrect message fix for fletching.	
+-Fix for /add breaking for your character if you failed a skill that uses makemenutarget 	
+-Fix for Armor display update.	
+-Fix for auto closing doors.	
+-Fix for money SFX.	
+-Fix for Poision Field not doing anything. Poision Field now works!	
+-Fix for Energy Vortex and Spirit Blades they both attack nearest target now	
+-Fix for Monster Sounds	
+-Fix for Mining ( now you cant mine trees )	
+-Great deal of item optimization 	
+-Fixed the message getting broadcast to eveyone when you drank poison :)	
+-Fix for AR update in Status Window.	
+-Great deal of NPC optimization	
+-Fixed spell's not wearing off
+-Fixed Counselor commands (wasnt working)
+-Fixed GM commands	
+
+Modified Stuff : 
+
+-All memory functions that slide, now copy last item in memory to empty spot.(Bud)
+-Characters created by pc's are moved to top of memory and save file(needed function so pc's dont get memcpy'd).(Bud)
+-Character struct targ and attacker are now pointers to dynamic npc structs in memory.(Bud)
+-Cleaned up some non terminating loops in void doubleclick(Bud&Tauriel)
+-In void checkauto, getclock() all set to currenttime variable(Bud&Zadius)
+-More Trees added to lumberjack.	
+-More Tinkering added
+-More Armslore message	
+-Added new variable in addmenutarget() now spell name and offensive spell work when you /add
+-Rewrite all engraveaction() now it work with spell.scp
+-Rewrite of void restock to reduce a great deal of lag
+-Added code to make older .wsc files (.26 and below compatible with .27)
+
+New Features : 
+
+-Archery Butte's (max 35 skill).	
+-Hitpoints regenerate depending on the healing skill of a monster or character. set the regen rate of HP and MANA in the server.scp	
+-Autostacking of items made with void makemenutarget.	
+-Can now tame all animals also based on skill	
+-Cure spell works	
+-Poision spell works	
+-New spell added "summon hero"	
+-Npc Background SFX is now configurable in the server.scp file from 0-10 (0 being off, 1 being frequent, 10 being almost never)
+-Rate of mana, health regeneration is now configurable in the server.scp file.
+-Weight system implemented 
+-new army's enlist item
+
+****There is a updated inscribe.txt file in the docs folder****
+
+**also packaged this release with sensible scripts 1.05, due to tons of requests**
+=============================================================================================================================================
+
+UOX3 v0.68.025.027a released by Genesis <kccarter@uswest.net> - 11/05/98
+
+Fixes, Modifications and New Features in this release were done by:
+	Genesis
+
+Fixes:
+
+- Addmenutarget prototype in uox3.h had only two variables added the third variale int Addmitem.
+
+modified:
+
+- cleaned up some dirty code to prevent some compile warnings.
+- changed mining(int s) to check for grave sights.
+- changed mining(int s) to use a new spawnitembackpack() function.
+- adjusted the messageing for mining to ask "Where do you want to dig?".
+
+new features:
+
+- Grave digging is in, My first part in implementing my ideas for Necromancy.
+	Use a shovel or pickaxe on a grave sight. It's not fully complete but it will spawn undead.
+- new functions:
+	SpawnItemBackpack(int s, int nAmount, char* cName, int nStackable, char cItemId1, char cItemId2, char cColorId1, char cColorId2)
+	SpawnItemBackpack(int s, int nItem) -> Needs a lot of work it creates a world item but, doesn't draw it put it where i want it yet.
+
+**also packaged this release with sensible scripts 1.07, due to tons of requests**
+=============================================================================================================================================
+
+UOX3 v0.68.025.027b released by Genesis <kccarter@uswest.net> - 11/06/98
+
+Fixes:
+
+- finally made the other spawnitembackpack() function work.
+
+new Features:
+
+- when items are dug up like a viking sword it's HP value is randomly selected from the script
+ 	as well as the value.
+	
+=============================================================================================================================================
+UOX3 v0.68.025.028 released by Gerry <gerry@nycap.rr.com> - 11/7/98
+
+This release would not be possible without of course CIRONIAN and everyone else that has helped with uox3 in any way :)
+
+Fixes, Modifications and New Features in this release were done by:
+Gerry, Tauriel, SpaceDog, Myca, Bud, Armageddon, Cironian, Dupois
+
+Bug Fixes : 
+-Fix from SpaceDog, rem'd out, it caused problems with Tweak(and possible other code as well, if compiled under mingw32),
+  rem'd lines are all of type bpitem[20]=items[i].decaytime=0;  (Bud)
+-Fix for endmessage() showing wrong amount of time til shutdown
+-Fix for no bottle being left when drinking a potion (thanks to Armageddon for the code)
+-Fix for meat not getting destroyed when failing cooking, It will now remove a random amount up to the full stack.
+-Fix for Decaying not getting reset when items are moved to the backpack
+-Fix for newbie items getting deleted when trying to pile them(they will now stack)
+-Fix for walking through stuff (by Cironian)
+-Fix for the time returned when minutes are between 45-60 that was incorrect
+-Fix to delete death robes that were generated for npc's in deathstuff(Bud)
+-Fix for HP Regeneration Bug. (Mana Regeneration is based on armour mage is wearing, more armour slower regen)
+-Fix for TACTICS not increasing when using training dummys (increases now, but only by a fraction of the normal rate - due to the fact 
+ that 4 skills can raise TACTICS fencing,wrestling,swordsmanship,mace fighting).
+-Fix for teleporting guards.  Wouldn't be summoned on spawned npc's that never moved after being placed such as SSCP's vendors or a newly
+ placed NPC (reason being that chars[x].region was never updated until after the NPC moved - modified addrespawnnpc()).  
+ NOTE - If you've used SSCP, all existing vendors will have to be removed and respawned in order to work 
+ (or set their NPCWANDER = 4 to make them move).
+
+Modified Stuff:
+-Added timed checking for gatedestruct and respawn in main loop to help with performance.
+-Fix checkweight() in walking code to not check if an NPC, GM or counselor makes it run a LOT faster.
+-Training dummies now use tempeffect2 (removed from main loop to only check if their hit)
+-Mining, lumberjacking, and fishing now possible on GM created tiles
+-Moved newbie code from uox3.cpp to newbie.cpp
+-All item and char structs in memory are now static..no more memcpy's on items or npc's..instead there is a new free tag, 
+ did this so pointers can easily be used..also char serial numbers of deleted chars are now recycled when new ones are 
+ created.(Bud, thanks to Armageddon and Tauriel for ideas we discussed)
+
+New Features:
+-Added Cironians monster gates(type 82, set morex to npc number)(Bud)
+-Added flag for not showing death animations (server.scp SHOWDEATHANIM 1 or 0)
+-Buffer system for creating new items and chars, in deleted memory spots is inplace.(Bud)
+-Message saying when people enter and leave a server.
+-Ability to set an archive directory for the uox3.wsc file.  Just before the world is saved, the old UOX3.WSC files is renamed and placed 
+ into the directory specified by a parameter in the SERVER.SCP file.  To create the entry in the SERVER.SCP file, start UOX3 and then shut
+ down UOX3 and look at SERVER.SCP.  There should be an entry called ARCHIVEPATH.  If ARCHIVEPATH is blank then no archiving will take place.
+ To specify a location to archive the wsc file, enter a path such as ARCHIVEPATH C:\ARCHIVE\ (notice the ending backslash, it is required). 
+ The file name will be in the form: uox3-yyyydddhhmmss.wsc  yyyy=4 digit year, ddd=3 digit day of year, etc...  Default is NO archiving.
+-Added ANIMALS_GUARDED to SERVER.SCP.  If set to 1, and animals are attacked in a guarded region, well... then guards will be summoned.  
+ If set to 0, then guards will not be summoned (like OSI-UO).  Default is NOT guarded. 
+
+=============================================================================================================================================
+
+UOX3 v.68.025.028b released by Genesis <genesispro@uswest.net> - 11/08/98
+
+Bugs:
+- In beggingtarget() the line for(i=0;i<charcount-1;i++) would not select npc with id 3.
+	changed for(i=0;i<charcount;i++) 
+
+modified:
+- merged the code of .27b with .28a.
+
+new feature:
+- void Karma(int s, int nPierLimit, int nEffect)
+	this function will modify the karma value of any character
+	(int s) - current character.
+	(int nPierLimit) - The karma pier a value between -10000 and 10000.
+	(int nEffect) - 	value of 0 is used for a negative action.
+				value of 1 is used for a positive action.
+=============================================================================================================================================
+
+UOX3 v.68.025.028c released by Tauriel <karl@mwcyber.com> - 11/08/98
+
+Bugs:
+- Fixed gravedigging code to compile under Mingw32. C'mon guys, make your stuff standard! 
+
+modified:
+- Commented out some calcweight() stuff (it was taking 10 minutes just to sign on a character)
+  I know this probably causes some weight problems, but the looping within looping within looping
+  checking for weight for all items was making it impossible to do anything.
+- Anthracks added a lot of stuff to this release, his changes are in the \docs directory
+  in the file Anthracks28c.txt
+
+Note:
+   This will be my last update for UOX3 for awhile.  It has become extremly obvious that without
+the re-write of the way items arrays are handled, that uox3 will never become anything more than a toy.
+That is why I will be starting with this version and trying to isolate all the item stuff and put it into
+a single place.  This will allow easy creation and maintenance of pointer arrays for items.  I will be 
+merging in features from other releases as I work on this. And I will release it when I get done. :)
+
+=============================================================================================================================================
+
+UOX3 v0.68.026.00 released by Cironian <cironian@stratics.com> - 11/09/98
+
+Fixes:
+- /NEXT command now sets the call you arrive to as handled
+- Range checking for archery buttes is now more generous
+- Stopped UOX from halting if no UOX3.WSC was found, blank world used instead
+- Another walking fix; non-GMs wont be able to run through everything anymore
+- Small fix to house deed targetting, someone must have broken it recently
+- Fix to default UOX3.INI (Read the note below)
+- Fix for backpacks still displaying deleted items (From the new delete code)
+
+Changes:
+- MoreX/Y/Z now added to /istats output
+- Made /POINT a public command as it is often used to fix small problems
+- Same for /WHERE; cant do any harm having it available to players
+- items.txt removed from distribution as it made the archives too big
+
+New features:
+- Nothing really new, unless you count the finally working houses as such :)
+
+Other:
+- Sensible Scripts 1.08 included
+
+NOTES:
+The old default copy of UOX3.INI had the entries for MULTI.MUL and MULTI.IDX
+in the wrong order, which might have accounted for a great amount of stability
+issues when dealing with houses. The right order is to have MULTI.MUL as the
+first of the two, followed then by MULTI.IDX (I spent 2 hours searching for
+a bug in the code until I found that *grr*)
+
+For the new house code, only small houses are working for now. Well, the
+other deeds "work" but they dont automatically add doors and the sign yet.
+I will add more tomorrow and just release new house.cpp files as that will
+make the changes easy to implement for everyone else. (I just hope no one
+else decides to suddenly start on house.cpp too after all this time)
+
+=============================================================================================================================================
+
+
+UOX3 v0.68.026.01 released by Cironian <cironian@stratics.com> - 11/10/98
+
+Fixes:
+- Implemented Bud's buffer fix (Should fix crashes when saving)
+
+New Features:
+- Tents and large brick houses work now (More types coming soon)
+- Accounts are now stored outside UOX3.INI in ACCOUNTS.ADM
+
+=============================================================================================================================================
+
+UOX3 v0.68.026.02 released by Bud <jeff001@megsinet.net> - 11/10/98
+
+Fixes:
+- pc creation optimization fix (McCleod)
+- newbie.scp parrying problem fixed (McCleod)
+- npc corruption and server stability fixs (Tauriel&Bud)
+- fix to reset decay timer when stuff is put in backpack (Spacedog)
+
+Modified stuff: 
+-gcollect rewritten by Tauriel
+-ftarg1-4 now moved to an ftarg pointer(Bud)
+
+New Features:
+
+=============================================================================================================================================
+
+UOX3 v0.68.026.03 released by Genesis<genesispro@uswest.net> - 11/13/98
+
+Fixes:
+- Random NPC error fix (Bud)
+
+Modified:
+- Karma was revamped to work with less code.
+- Grave digging was made scriptable for monsters, weapons, and armor.
+	Along with this is a new necro.scp file and a new necro.cpp file.
+New Feature:
+- When Fighting monsters fame and karma can go up or down.
+
+=============================================================================================================================================
+
+UOX3 v0.68.026.03a released by Nattsorgh <nattsorgh@usa.net> - 11/13/98
+
+Fixes:
+- Fix for Player death problems (Bud)
+
+New Features:
+- /xtele for objects (Okaria Dragon)
+
+This release also includes the fixed newbie.scp as it wasn't included in the original
+0.68.026.03 version Genesis released. (Fix by McCleod)
+
+=============================================================================================================================================
+
+UOX3 v0.68.026.03b released by redbaron <vader101@ica.net> - 11/13/98
+
+Fixes:
+-Minning on a horse now displays right animation
+-Fix for server status to display correct animation(Bud)
+-Fix for player deleted character to display correctly(Bud)
+
+New:
+-You will now loose ore when you fail to smelt it
+
+=============================================================================================================================================
+
+UOX3 v0.68.026.03c released by Genesis <genesispro@uswest.net> - 11/13/98
+
+Fixes:
+- corrected some code in switch(nRandnum)in gravedig().
+- in smelting corrected it so it won't destroy the whole stack if fail.
+- newbie items not useable before move.(Thunderstorm)
+- Fame() will not display loss of fame if the victim has less fame.
+- SpawnItemBacpack dupe bug found by (Myth)
+- Fixes Karma and Fame messageing should get to the right sockets.
+	Can now tell if the char that fame and karma is calced for is a npc.
+
+
+modified
+- Removed some unecesary code from addrandom(item,loot, and npc) 1 line.
+- made SpawnRandom(Monster & Item) more flexible to handle different scripts.
+- Set Karma() function to check for 10000 or -10000 limits.
+- Deathstuff moved stuff with deathcount to fame function.
+  Moved Karma calc to karma function.
+  Moved killcount to a line just in front of deathstuff() in combat.cpp.
+
+=============================================================================================================================================
+
+UOX3 v0.68.026.03d released by Genesis <genesispro@uswest.net> - 11/14/98
+
+Fixes:
+- Karma now checks if killed player karma was less than 0
+- reversed changes to SpawnRandomMonster and Item they didn't work as what i expected
+
+=============================================================================================================================================
+
+UOX3 v0.68.026.03e released by Nattsorgh <nattsorgh@usa.net> - 11/16/98
+
+Fixes:
+ - Changed NECRO.SCP to necro.scp at all places in skills.cpp so that it works
+   correctly on a Linux compile.
+ - Gravedigging now recognises all character ID's. (Genesis)
+ - Townstones now displays correct message when voting for mayor. (Thunderstorm)
+ - Fixed problems with "xxx has left the realm." messages. (Thunderstorm)
+ - Fixed some problems with character memory that should fix some weird behavior
+   and some crashes. (Thunderstorm)
+=============================================================================================================================================
+
+UOX3 v0.68.026.05 released by Genesis <genesispro@uswest.net> - 11/17/98
+
+Fixes:
+- Walking into caves. (SpaceDog)
+- ridable t2a creatures (SpaceDog)
+- You can carve all t2a monsters (SpaceDog)
+- Shield Message Fix (Thunderstorm)
+
+modified:
+- Mining and Smeltore have been updated and redundant code cleaned up. (Genesis/Myth)
+
+New Features:
+- You can now use mortar & pestle to grind bone into powder.
+- You can now use a empty vial on a corpse,NPC, or PC.
+
+Documentation:
+- Updated Readme.txt  (Ripper)
+- Trigger.html (Zadius)
+- Splitreadme.txt (McCleod)
+
+Pre-Testing:
+- Ripper did a tremendous job of pre-testing and finding MAJOR bugs. Thanks to him the
+  Pre-Release Testers had much less of a headache.  Thanks Ripper for all your time!
+  
+=============================================================================================================================================
+
+UOX3 v0.68.026.06 released by Tauriel <karl@mwcyber.com> - 11/30/98
+
+Known Bugs:
+- Wandering healers will attack each other if close enough.
+
+Fixes: (By the entire Dev Team - does it matter who fixed it?)
+- Fixed a crash occasionally happening when using doors (Myth)
+- Fixed wrong skill values being used (Myth)
+- Items disappearing in Backpacks/Bank Boxes (Moongraven)
+- Character delete message was only reading 38 out of 39 characters (Tauriel)
+- Character deletion problem with characters switching places (Thunderstorm)
+- Archery butte code not initializing some variables  (Anthracks)
+- Some minor speed enhancements and code cleanup (Zadius)
+
+modified:
+- Added linux signal handling. (Thunderstorm)
+- Blacksmithing now uses triggers... there could be some problems here, but seems to work ok.
+- Script Teams 21a was updated to 22 by Genesis and Ripper. (Beware the slimes!)
+- Almost all Item creation and deletion functions are now in items.cpp.
+- Allow you to put privilidge settings in your npc.scp file by using PRIV1 X and PRIV2 X.
+   (usefull for frozen corpsers , or magic reflecting Ancient Dragons. Make those guards invunrable) (Algaran)
+- Shields have a chance to block 0 damage, thus no more insured zero-damage from small (Algaran)
+   creatures while wearing shield.
+- Armour no longer deducts a set number of points from damage done, it now reduces the total damage
+   done by a percentage instead of by a set number 30AC recievs about 1/3 damage. This actually makes
+   lower damage weapons/wretling usefull again (they did no damage before), and low level creatures
+   will cause damage against armoured opponents (no more "invunrability)  (Algaran)
+- A character with 0 dexterity will not become unfrozen when attacked. (usefull for corpsers, so they
+   dont start moving in the middle of combat)  (Algaran)
+- Gravedigging/mining Gem fixes, must use the new necro.scp  (Genesis)
+- Made characters chars[].packitem = their packitem and int packitem(int p) now returns that. Should speed things up a bit.
+
+New Features:
+- Support for unicode speech!  Thanks Anthracks!
+- Trigger system.  Makes almost anything possible now without adding code. See the trigger.html file.
+    Thanks to SpaceDog and Zadius for working on this. :)
+- Monsters can now be set to split when hit in combat (like slimes) see the splitreadme.txt for more info.
+
+Documentation:
+- Added the UOX Construction Yards command pages and updated them to be current. (Tauriel)
+- An updated readme file. Thanks Ripper!
+- Trigger.html Instructions for using the new triggers (by Zadius)
+- Splitreadme.txt  for makeing monsters split. (by McCleod)
+
+Pre-Testing:
+- A special thanks goes to Ripper who found many major bugs and allowed us to fix them before
+  26.06 went into "final" testing.  
+
+=============================================================================================================================================
+UOX3 v0.68.026.06a released by Tauriel <karl@mwcyber.com> - 11/30/98
+
+NOTE: Use the envoke.scp and wtrigrs.scp provided with this or blacksmithing and lumberjacking will NOT work.
+
+Fixes: 
+- Fixed NPC.SCP  NPC 5 (wandering healer female) so they don't attack each other (Tauriel)
+- Fix for lumberjacking without triggers crashing (Tauriel)
+- Fix for IADD to use 3rd number for random amount instead of 2nd which was ID (Tauriel)
+- Added some trees to the wtrigrs.scp file (Tauriel)
+- ReArranged the envoke.scp and commented out the dagger for now so you could get kindling (Tauriel)
+- Fixed Blacksmithing trigger per Zadius.
+- Fixed item's triggers not being reset when item was deleted. Same with characters/npcs
+
+I personally apologize that these weren't caught earlier...but they are fixed now.
+=============================================================================================================================================
+
+UOX3 v0.68.026.06b released by Tauriel <karl@mwcyber.com> - 11/30/98
+
+Fixes: 
+- Fixed a Major crash bug, thanks to Homey for helping track it down. (Tauriel)
+=============================================================================================================================================
+
+UOX3 v0.68.026.06c released by Tauriel <karl@mwcyber.com> - 11/30/98
+
+Fixes: 
+- Sorry for yet another LETTER release, but it now works with the .36 client
+  Thanks to Beosil for cracking it and Ignatius for send it to me.
+  Only files changed were uox3.h and uox3.cpp (Tauriel)
+=============================================================================================================================================
+
+UOX3 v0.68.026.07
+-------------------------------------------
+*FIXED* RANGE token not working (Zadius)
+*FIXED* Trigger vals not getting loaded when adding a item or NPC from the script file (Zadius)
+*FIXED* Fix the SETOWNER token for NPCs and items. (Zadius)
+*FIXED* NADD on NPC trigger is crashing (Zadius)
+*FIXED* Fix IDFX token (Zadius)
+*FIXED* RAND token crashing server (Zadius)
+*FIXED* Fix mounting more than one creature. (Zadius)
+*FIXED* Fix ACT and NPCACT passing wrong values grrr (Zadius)
+*FIXED* DISABLE token not working (Zadius)
+
+*ADDED* Add token for checking if skill is above certain amount "IFSKL" (Zadius)
+*ADDED* Set the triggerx to the character number in addrespawnnpc() (Zadius)
+*ADDED* Add a token for a targeter to fire a trigger. "TARG" (Zadius)
+*ADDED* Add ability to specify new guard types for different regions (Zippy/Drax)
+*ADDED* Added display of users IP address when they log on. (Zippy)
+*ADDED* Add token for seting owner on new item or NPC. "NEWOWNER" (Zadius)
+*ADDED* Add token for setting the name of new item/NPC "NEWNAME" (Zadius)
+*ADDED* Command for making item WorldForge compatible "/WF" (Tauriel)
+*ADDED* Command for making items non decayable "/NODECAY" (Tauriel)
+*ADDED* Make a token for giving a trigger assignment to new item and NPC "NEWTRIG" (Zadius)
+*ADDED* Make a token for setting a new trigger word on NPC "NEWWORD" (Zadius)
+*ADDED* Add a token for doing misc functions like 'bank' "MISC BANK" (Zadius)
+*ADDED* Add new console command to reload accounts.adm file 'A' (Zadius)
+*ADDED* Rays Triggers.  Some pretty cool triggers here. :)  (Ray)
+*ADDED* 15 new spells. (Moongraven)
+		-mana drain
+		-mana vampire
+		-meteor swarm
+		-chain lightning
+		-arch protection
+		-arch cure
+		-mass curse
+		-mass dispel
+		-magic lock
+		-magic trap
+		-magic trap
+		-magic untrap
+		-summon monster
+		-reactive armor
+		-box spell
+
+*CHANGED* ITEMTYPE token is now SETTYPE and NEWTYPE (Zadius)
+
+Updated Documentation
+-------------------------------------------
+trigger.html - Trigger Documentation
+readme.txt - Server main help file
+commands.html - Command listing
+
+Scripts Updated
+-------------------------------------------
+triggers.scp - Dynamic Triggers
+wtrigrs.scp - Static Triggers
+ntrigrs.scp - NPC Triggers
+items.scp - Item scripts
+create.scp - Item creation menus
+
+
+=============================================================================================================================================
+
+UOX3 v69.00
+
+   The entire way that items are looked up has been re-written. There are now several pointer arrays to items
+   based on serial #, owner, container, spawner, etc...  Programmers should familarize themselves with the 
+   pointer.cpp file.
+   
+New Files added:
+   pointer.cpp, WorldMain.cpp, WorldMain.h
+   
+New Commands:
+   /announceon  -turns on broadcast of world save messages
+   /announceoff -turns off broadcast of world save messages
+   
+New features:
+   Color coded messages (thanks Ripper)
+   World saves seperated getting ready for binary saves (Thanks EviLDeD)
+   Cutting bolts of cloth now leave cut cloth (Thanks EviLDeD)
+   
+Fixed:
+   /guardson & /guardsoff  - now work properly
+   To much more to list... after 2 weeks of coding and debugging, it should work whatever it was.
+
+Broken:
+   Background sounds for some critters (like sewer rats) would crash the server if you were
+   not the first character on the first account.  Maybe one of the other programmers could
+   figure this out.  I commented out the xsend(s, sfx, 12, 0);  for now... and it stopped the
+   random crashes.
+
+Script Stuff:
+   Check the uoxscriptupdate.txt file.  There were some fixes that Ripper made to items, npc, and speech.
+   
+This should be the fastest that UOX has ever ran (except walking that still is slow), I hope you all 
+enjoy it.  And walking lag will be fixed sometime in the near future...
+
+=============================================================================================================================================
+
+UOX3 v69.01 - Tauriel and the UOX Dev Team
+
+   This release is mostly bug fixes, and speed improvements. There were numerous memory corruption errors
+   and other crash type bugs that were fixed.
+   
+New Files added:
+   none
+   
+New Commands:
+/tile
+
+	/tile xx yy	   , and clicking two points on a map, fills the box
+			formed by the coordinates with the item specified by
+			"xx yy".  The height of all the items will be the
+			height of the *second* point clicked.  Note that this
+			is *not* the item number that appears in the items.scp
+			file, but rather the ID number (as seen in InsideUO).
+
+/wipe
+
+	The /wipe command has been altered from versions previous to 69.01.
+
+	/wipe		   , and clicking two points on a map, allows the
+			removal of all items within the box formed by the two
+			coordinates.  This does not count items on characters
+			inside the box.
+
+	/wipe ALL	   clears ALL items from the game.  This is equivalent
+			to the original /wipe command.  Note that 'ALL' must be
+			in uppercase.  This does not count items on characters.
+
+	/wipe x1 y1 x2 y2  wipes out all the items within the specified corners
+			of (x1,y1) and (x2,y2).  Again, this does not count
+			items on characters.
+
+/iwipe
+
+	/iwipe		   , and clicking two points on a map, allows the
+			removal of all items **NOT** within the box formed by
+			the two coordinates (this is an INVERTED wipe).  This
+			does not count items on characters outside the box.
+
+	/iwipe x1 y1 x2 y2  wipes out all the items **NOT** within the
+			corners of (x1,y1) and (x2,y2) does not count items on characters.
+			   
+New features:
+   
+Fixed:
+   /guardsoff  - now means exactly that, guards won't come no matter what, evil creatures, PvP, PvNPC, etc.
+   Reveal was modified to use your magery skill when determining how far to reveal,
+   and also takes into account z position (thanks Pellinore Dragon)
+   Background sound crashing has been fixed.
+   A lot of warnings were cleaned up (about 600 so far) about 400 to go...
+   Vendors not responding to players sometimes.
+   Vendor inventories getting messed up. (I hope this is fixed, it worked on test system).
+   Another speed boost.
+   Too much more other stuff to mention...
+   
+
+Broken:
+	Monster gates are broken... not sure why yet, just found out about it. They should be fixed in 69.02.
+	Some third party software (we won't name which one) wreaks havok on the shards. We are working on a
+	fix for this.
+
+Script Stuff: v. 24
+   Check the uoxscriptupdate.txt file.  There were some fixes that Ripper made to items, npc, and speech.
+   
+This again should be the fastest that UOX has ever ran (except walking that still is slow), I hope you all 
+enjoy it.  And walking lag is being worked on as well as Line of Sight and other things...
+=============================================================================================================================================
+
+UOX3 v69.02 - Tauriel and the UOX Dev Team
+
+   This release is mostly bug fixes, and features.  The next release will be
+   solely file format changes and bug fixes.  Then the long awaited SPEED boost
+   will be in 69.04.  EviLDeD is in charge of the 69.03 release, and Crwth the 69.04.
+   
+New Files added:
+   house.scp
+   
+New Commands:
+/wholist  (by Homey)
+
+	/wholist is a GM tool. It lists the players on-line and
+			allows you to perform certain GM options on them, like
+			teleport to them, bring them to you, jail, release, kick.
+			It works very well, try it out.
+			   
+New/Fixed features:
+	 Explosion potions now work you have 3 seconds to get rid of it.
+	 
+	Explosion potions were re-written. (Tauriel)
+	sleep(20) was added back in to return some system resources for
+	   NT systems.  (Tauriel)
+
+	Stealing and Snooping fixes by (Crwth)
+	Random and Area spawn fixes by (Tauriel)
+	Line of Sight fixes by (McCleod)
+
+	New /wholist command by (Homey)
+
+		This is an awesome command... Try it out.
+
+	More trigger fixes (Tauriel)
+
+		Triggers will now give skill and stat gains properly.
+		Well.... as defined in skills.scp.  Also added trees
+		to lumberjacking in wtrigrs.scp
+
+	Line of Sight (McCleod)
+
+		No more arrows through walls!  No more fireballs from nowhere!
+		This has been a greatly-needed addition, and thanks to
+		McCleod, is now available!
+
+	Healing Skill (Phantom and Wolfgang)
+
+		Players with high-enough Healing skill can now cure and even
+		resurrect other players!  This implementation does not require
+		the Anatomy skill as on OSI shards.
+
+	Unlockable Spawn containers (Phantom)
+
+		A variant on the item spawning containers, these ones can't be
+		locked by mean thieves for their own plundering.  This has
+		been implemented as type 65.
+
+	Guest Accounts (Zippy)
+
+		For people running test shards, deathmatches or just open,
+		public shards, this allows users to add a "GUEST 20" line in
+		the accounts.adm file, which acts like entries for guest1
+		through guest20, with the same password.
+
+	House Placement (Zippy)
+
+		Placing a house now checks for a valid position, taking away
+		the ability to have pine trees sticking through the floor.
+		Also, signs and doors and chests and things are now added
+		automatically to your house, much better than before.
+
+	Keyless door entry (Zippy)
+
+		As long as the key exists in the user's backpack,
+		double-clicking on a door will unlock, open, and relock the
+		door.
+
+	Explosion potions (Zippy)
+
+		Double-click this, throw it somewhere, and boom!  There's no
+		timer on it yet, so it explodes immediately;  strength and
+		range-of-damage is determined by the skill of the alchemist
+		that created it.
+
+	Area spawners (Zippy)
+
+		Type 69 allows NPCs to be spawned within a range of the
+		spawner, and not just on it.  The range is settable with the
+		more3 and more4 values:  more3=3, more4=5 means that the NPCs
+		will spawn in a range of (-3,-5) to (3,5) around the spawner
+		(where the spawner is (0,0) ).  It checks to make sure that it
+		doesn't spawn them onto a tree or anything, too.
+
+	Snooping/Stealing (Zippy)
+
+		Snooping and stealing are back!  These should be working as
+		you'd expect.  I don't know how guards would react, though...
+
+	Trigger fixes and additions (Tauriel)
+
+		Added tokens: RANDOM_ITEM, RANDOM_NPC, CMSG, END_TRIGGER  (see
+		triggers.html for more info on them) Fixed HEA not checking
+		invulnerable flag, Modified IDADD to be able to add a range of
+		amounts. See gravedigging trigger for example of the new tokens,
+		and wood chopping for new IDADD.
+
+Script Stuff: v. 26a
+   Adds a lot of fixes and changes. see the UOXScript readme
+   
+=============================================================================================================================================
+
+UOX3 v0.69.03 - Tauriel
+
+New Features:
+	-Added working message boards (by Dupois)
+	-Added new poison type (by Revana)
+	-Added New .ini and .adm formats (by EviLDeD)
+	-Added Copper smithing (altho need script 29 to work which isn't out yet)
+	-Added Auto-correct code for items and characters in invalid x,y positions
+	-Added Rippers new summon spells
+	-Added Cork's colored armor and ore
+	-Added Brendan's LASTON character feature
+	-Added Ison's weight changes
+	-Added Tauriels speed code improvements
+
+Fixes:	
+	-Fix for the client version 37
+	-Fixed server crash when casting spells
+	-Fixed Gates not working and not disappearing
+	-Fixed deleted items not being removed from mapRegions
+	-Fixed items not getting placed into mapRegions from /add and /addx
+	-Fixed weight problems. May still need tweaking for small items like arrows, reagents, and such
+	-Fixed LASTON causing .wsc corruption and sending characters to around 0,0 on next server startup
+	-Fixed minor bugs with items not being placed in the mapRegions.
+	-Fixed other minor bugs
+
+=============================================================================================================================================
+
+From 69.03 -> UOX3 v0.70.01.07t  by the UOX Dev Team
+
+New Features:
+	-Added: New command: /SETMURDER #   to set murder counts on a person. (Abaddon)
+	-Added: New Command: /ZEROKILLS   to blank out murder counts on a person.
+	-Added: Lockdown/Release for housing   (Abaddon)
+	-Added: /SetRace command will change the GM who executes it (Abaddon)
+	-Added: /wstats command for testing walking code (fur)
+	-Added: Command table made scriptable, added commands.scp (Abaddon)
+	-Added: Fireworks wands (Zippy)
+	-Added: House redeeding done	(Eagle)
+	-Added: Player Races (by Abaddon)	
+	-Added: Weather System (by Abaddon)	
+	-Added: New command: /glow   (Makes an item glow)	
+	-Added: New command: /unglow  (Turns off the glowing item)	
+	-Added: Setting ITEMSDECAY 1 in house.scp allows items to decay there	
+	-Added: New Item Types: -35 Town Stones
+					-88 Sound Objects that make sound when you come near.
+						/SETMOREX #(soundeffect#),
+						/SETMOREY #(radius within it is hearable),
+						/SETMOREZ %(probability)
+					-185 Smoking (use /setmorex # for duration. Each 5 seconds = smoke animation)
+					-202 Guild Stone deed			      
+					-217 Player Vendor Deed
+	-Added: Pet Guarding for owner (Abaddon)
+	-Added: Running NPCs, Scriptable   (Abaddon courtesy of Ripper)
+	-Added: Pet attack stuff(Ripper)
+	-Added: Burning meat makes burnt meat (Abaddon)
+	-Added: Early playTileSound function (Abaddon)
+	-Added: Fire and Ice arrows (Abaddon)
+	-Added: Spells are cacheable(optional) (Krazyglue's team)
+	-Added: Missing iron gate (0x0824) to doortypes		      (fur) 
+	-Added: cItem/CharacterHandle classes for handling item/char memory	(Zippy)
+	-Added: try{}catch(...){} to main for crash protection	(Zippy) 
+			(Note, this slows things down, and now it won't crash to the correct line in the debugger, it's nice and shuts down (with crash protection of 0.  Try/catch takes a 5-10% performance hit in C++, because of extra stuff it needs to track, you may want to not actually release a switch based version, but a #ifdef one, because even with a switch turned off, you will find that it still takes the performance hit because of what it needs to track... Abaddon)
+			CRASH_PROTECTION added to server.scp SECTION SERVER:
+				0 - Off, on an unhandled exception server will shutdown
+				1 - Save only, on an unhandled exception server will save and shutdown
+				2+  Save & Restart, server will save and restart on an unhandled exception, after
+					10 restarts, server will shutdown.		(Zippy)
+
+
+Fixes:
+	-Fixed: Crashfix in targ::ownertarget 
+	-Fixed: Singleclicking a murderer will show their name in red    (Abaddon)
+	-Fixed: Impowncreate now highlights murderers correctly          (Abaddon)
+	-Fixed: /possess command						     (??)
+	-NPC display walk fix                                            (Homey)
+	-Wallmounted torch problems fixed                                (Quippl)
+	-Magic anim on horse properly fixed up                           (Abaddon)
+	-Shouldn't be able to steal from a vendor's buy or sell layer    (Abaddon)
+	-Murderer's should highlight correctly now                       (Abaddon)
+	-Skill management fixups                                         (Abaddon)
+	-Removed the not dead message when being resurrected as ghost    (Abaddon)
+	-Keytable overrun fix                                            (fur)
+	-NPC highlighting fix and speedups                          (Abaddon)
+	-Memory leak fix                                            (Eagle)
+	-Mining fix                                                 (Mithos)
+	-Lag fix                                                    (Eagle)
+	-Fixed: Alchemy bug (no more access denied message when grinding)  (Abaddon)
+	-Fixed: Paperdoll bug								(Abaddon)
+	-Fixed: Combat crash fix, archery butte fix, mantra say fix		(Abaddon)
+	-Fixed: bugs & improved the Map0 caching to search smarter	(fur)
+	-Fixed: Keeping monsters from spawning into black areas (fur)
+	-Fixed: Reading in multi's				(fur)
+	-Fixed: /npccircle command				(fur)
+	-Fix to NULL vendor items				(fur & Quipple)
+	-Fixes for item/region spawning and npcwander bounding areas when created (fur)
+	-Fixed: Memory corruption bug in MemCharFree()!!(fur)
+	-Fixed: Bug in newbieitems()  			(fur)
+	-Fixed several crash bugs with closescript()	(fur)
+	-Fixes for sending socket = -1 to SpawnItem() by adding extra argument to it	(fur)
+	-Fixed Bugs that would blow up when deleting spells[] (fur)
+	-Fixed: crash bugs including SpawnItem() changes(fur)
+	-Fixed: Newbie gold bugs				(Eagle)
+	-Fixed: Z change errors, doors opening, some triggers(LB)
+	-Fixed: NPC/Item save in wind and some dungeons (Abaddon)
+	-Fixed: Region spawning/NLIST bug		      (fur)
+	-Fixed: Items made with /tile disappearing      (fur)
+	-Fixed: Static caching (CACHE_MUL 1)		(fur)
+	-Fixed: /npccircle not getting saved      	(fur)
+	-Fixed: Lots and lots of Bugs 			(byAbaddon,Zippy,Revana,JustMichael)
+	-Fixed: Some Magic bugs 				(Abaddon)
+	-Fixed: Some walking bugs 				(JustMichael)
+	-Fixed: Some Linux bugs 				(Tseramed)
+	-Fixed: Pets that guard now follow you 		(Abaddon)
+	-Fixed: Chaos/Order gates fixed 			(Abaddon & Kashyyyk)
+	-Fixed: Pets highlight same colour as owner 	(Zippy)
+	-Fixed: STR, DEX and INT cap only applies to PCs(includes GMs)(Abaddon)
+	-Fixed: Some Dead and commented code removed 	(Abaddon)
+	-Item decay fixes (item in container no decay) 	(JustMichael)
+	-NPC dyeing fixes (DyeItem and DyeTarget) 	(Abaddon)
+	-Fix for spawn type 62/69.  still needs some work for wander areas (fur)
+	-Fixes for spawning, map stuff, and walking		(fur)
+	-Fixed call to memset() to pass a pointer			(fur)
+	-Fix for monsters falling thru the floor in dungeons	(fur)
+	-Metal box gump fix                             (Daemar)
+	-Skill use exploit fix                          (Mike)
+	-Stealing crash fixes                           (Abaddon)
+	-Fixed: Items/characters that are hidden will only be sent to GM clients(Zippy)
+
+Modifications:
+	-AddNPCxyz rewrite to use switch (Guards fixed)                  (Abaddon,Homey)
+	-Renamed several cMapStuff functions to help keep them straight	(fur)
+	-Created an AverageMapHeight() function in the cMapStuff class	(fur)
+	-Moved the const record lengths into .h file so could be used in other .cpp's	(fur)
+	-Made the cMapStuff caching methods private			(fur)
+	-Removed redundant references, changed sprintf()s to strcpy()s  (Abaddon)
+	-Rewrites of map and map caching (fur)
+	-Rewrites/fixes to walking (fur)
+	-Major speedups to item and npc script loading(Krazyglue)
+	-Speedups to InitItem  (Krazyglue)
+	-malloc and realloc completely replaced with new (Krazyglue)
+	-Better memory and file cleanup (Krazyglue)
+	-GMs no longer need reagants to cast spells                 (Abaddon)
+	-GMs no longer can cast spells in jail (we want to jail em!)(Abaddon)
+	-newSelectSpell2Cast streamlined a touch (Abaddon)
+	-Many sprintfs turned to strcpys 	(Krazyglue)
+	-Borland fixes merged in        	(Krazyglue)
+	-Moved most #defines to typedefs.h  (Abaddon)
+	-Moved structures to uoxstruct.h    (Abaddon)
+	-Borland, makefile and Visual C project information put in  (Abaddon)
+
+==========================================================================================================================================
+
+Ver 0.70.02 - by the UOX Dev Team
+New Features:
+	-Added: Moongates work just like OSI (you wind up in the gate after teleporting not offset by +1) (Dupois)
+	-Added: Door Macro (Zippy/Dupois)
+	-Added: Sound effects added when other player in a trade window adds or removes an item (Dupois)
+	-Added: Message boards now have a few more features (see msgboard.txt in DOCS dir and msgboard.scp in SCRIPTS dir) (Dupois)
+	-Added: Escort quests added / integrated with message board enhancements (Dupois)
+	-Added: /SHOWDETAIL command (Abaddon) 
+	-Added: /GETLIGHT command added for aiding in debugging (Abaddon)
+
+Fixes:
+    	-Fixed: Cancelling axle with gear creation no longer deletes item (Abaddon)
+	-cItem::CreateRandomItem crashfix (AntiChrist)
+	-Fixed: Empty shelves gump correction (JM/Abaddon)
+	-Fixed: If fail spell, saids words of power (Abaddon)
+	-Fixed: Using an axe on logs works correctly (Abaddon)
+	-Fixed: Adding scroll to spellbook will no longer spam (JustMichael)
+	-Fixed: ALL BY DUPOIS 
+		-NPC's (monster/vendors) walking over blocking static objects (ie display cases) 
+		-Vendor training 
+		-Vendor selling, they now look through your entire backpack for items they will buy. 
+	-Fixed: Multis set correctly in walking (CheckForHouseBan()) (Zippy)
+	-Fixed: Endtrade possession fix (Dupois)
+	-Fixed: No name player made items & items added from addmenu (JustMichael)
+	-Fixed: name2 initialized in inititem (Abaddon)
+	-Fixed: Horses dying no longer die on dismount (JustMichael)
+	-Fixed: Weight being way too high on trade window fix (JustMichael)
+	-Fixed: HTML Code fix (Zippy)
+	-Fixed: Gender bender bug fix (Dupois)
+	-Fixed: Few script/item load fixes (Abaddon)
+	-Fixed: Racial effect save on item (Abaddon)
+	-Fixed: /zerokills now flags properly (AntiChrist)
+	-Fixed: /setmurder updates flag quickly (Abaddon)
+	-Fixed: /tilew crash catch (AntiChrist)
+	-Fixed: cCommands::MakeShop spawnitem crash prevention (AntiChrist)
+	-Fixed: cCommands::AddHere crash prevention (AntiChrist)
+	-Fixed: cCommands::DupeItem requires a pack (AntiChrist)
+	-Fixed: Guildstone placement crash avoidances (AntiChrist)
+	-Fixed: Deedhouse crash prevention (AntiChrist)
+	-Fixed: addthere with a crash prevention, and RefreshItemusage (AntiChrist)
+	-Fixed: Item -1 checks in necro (AntiChrist)
+	-Fixed: TreeTarget fixes (AntiChrist)
+	-Fixed: Enticement fixes (AntiChrist)
+	-Fixed: CreatePotion crash fix (AntiChrist)
+	-Fixed: AdvanceStats fix (AntiChrist)
+	-Fixed: Buying from a player vendor now requires a backpack (AntiChrist)
+	-Fixed: NPCs will trigger in case 24 of targ::multitarg (Magius)
+	-Fixed: Crashfix in targ::ownertarget 
+	-Fixed: Day/Night cycling partially works (Abaddon)
+
+Modifications:
+	-Sound effects being sent to everyone on screen when your moving items in your own backpack 
+	 (removed, should only send sfx to player who owns the pack) (Dupois)
+	-Can no longer combine 2 axles or 2 gears to get axle with gear (Abaddon)
+	-Can no longer combine axle with self, or gear with self (Abaddon)
+	-Added ifdef for crash protection and took out realmain() (Zippy)
+	-all_items_all() added to /wanim (AntiChrist)
+	-|1 changed to &1 in cGump::input (AntiChrist)
+	-House release code slight textual change (Abaddon)
+	-closescript() added into cItem::CreateScriptItem (AntiChrist)
+	-closescript() added into cItem::CreateRandomItem (AntiChrist)
+	-closescript() added into cItem::CreateScriptRandomItem (AntiChrist)
+	-closescript() added into cItem::SpawnItemBackpack2 (AntiChrist)
+	-closescript() added into cItem::AddRandomItem (AntiChrist)
+	-Numerous more closescript() added (AntiChrist)
+	-Healing speech revision (AntiChrist)
+	-House list code revised and debugged (AntiChrist)
+	-When in combat, with a target, if you run, you get a 2 sec attack delay (Abaddon)
+	-Removed some old commented out code (Abaddon)
+	-cGuilds::Read changed from ifs to if/elseif (Abaddon)
+	-cItem::CreateScriptItem changed ifs to switch (Abaddon)
+	-cItem::GetScriptItemSetting changed ifs to switch (Abaddon)
+	-cGump::Button changed to have some switch statements (Abaddon)
+
+

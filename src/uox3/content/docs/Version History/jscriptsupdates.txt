@@ -1,0 +1,86 @@
+-==========================-
+-= 29/01/2006 - UOX3 0.98-3.2 =-
+-=========================-
+	Duplicate itemmenu 5022 in npcmenu.bulk.dfn containing champion-NPCs changed to 5023 (longshot)
+	Changed DEF values of all NPCs to an average of 10 (some a little weaker, some a little stronger) (Xuri)
+	Boneaxeman-stats lowered to that of a skeleton, has been moved to weakundeadlist (Xuri)
+	Mummy has been moved to strongundeadlist (Xuri)
+	Removed gazer and wisp from strongundeadlist (Xuri)
+	Moved common tags in malevendors.dfn and femalevendors.dfn to new NPC; basevendor (Xuri)
+	Moved common tags in malehuman.dfn and femalehuman.dfn to new NPC; basehuman (Xuri)
+	Fixed several teleport locations (Xuri)
+	Fixed missing = in locations.dfn (Fish)
+	Included an example script that takes the old 1->9 keys and implements them through the new JS routines (Maarc)
+	Included an example script that takes the old shutdown keys and implements them through the JS routines (Maarc)
+
+-=========================-
+-= 22/10/2005 - JScripts 0.98-3.1 =-
+-=========================-
+	Added InitWanderArea to ADD NPC command so the FX1, FY1, FX2, FY2 and FZ1 values from DFNs are used for
+	 manually spawned NPCs.
+	New files added: item/sword.js, item/axe.js (giwo), sheepshearing.js (Xuri)
+	Sheepshearing functionality merged from scissors.js and sword.js to server/resource/sheepshearing.js
+
+-=========================-
+-= 14/08/2005 - JScripts 0.98-3.0g =-
+-=========================-
+	Added two more cloth-ids as valid tailoring resources in tailoring.js, though this in reality has no effect yet
+	since the actual crafting code only accepts one id as valid resource (as specified in crafting DFNs).
+
+-=========================-
+-= 05/08/2005 - JScripts 0.98-3.0e =-
+-=========================-
+	teleport.scp has received a facelift, no functional changes.
+	jse_typeassociations.scp now includes 234=5008, to enable using kindling by it's type.
+	Logs are no longer an invalid carpentry resource.
+	Removed debug-code & redundant lines from combatanims.js.
+	Counselors can no longer use the areacommand, only GMs with commandlevel 2 or above.
+	Minor fixes to pitchers.js to avoid potential crashes with the spidermonkey dll.
+	Minor fixes to repeatingcmds.js to avoid potential crashes with the spidermonkey dll.
+
+-=========================-
+-= 15/07/2005 - JScripts 0.98-3.0c =-
+-=========================-
+	Added 'XSAY command for remote speech.
+	Fixed 'SET SPAWNSECTION in set.js
+
+-=========================-
+-= 14/06/2005 - JScripts 0.98-3.0a =-
+-=========================-
+	Changed kindling script to allow igniting kindling on the ground.
+	Added missing triggers for kindling to jse_objectassociations.scp
+	Fixed skill\cooking\dough.js, now possible to make bread-dough from sacks of flour and pitchers of water.
+
+-=========================-
+-= 12/06/2005 - JScripts 0.98-3.0 =-
+-=========================-
+	Added DECAY and NODECAY commands (misc-cmd.js)
+	Added NPCACTION command, changed ACTION to target self (effects.js)
+	Added Training Dummy-script (5005=item/trainingdummy.js)
+	Added Pickpocket Dip(dummy)-script (5006=item/pickpocketdip.js)
+	Added Archery Butte-script, complete with scoring system (5007=item/archerybutte.js)
+	Added generic script for determining weapon-type (2500=server/data/weapontypes.js)
+	Added generic script for determining combat-anim (2501=server/data/combatanims.js)
+	Updated jse_fileassociations.scp, jse_objectassociations.scp and jse_typeassociations.scp
+
+-=========================-
+-= 21/05/2005 - JScripts 0.98-2.8h =-
+-=========================-
+	Fixed a minor issue with SET commands.
+	Added SET command MOREXYZ.
+
+-=========================-
+-= 16/04/2005 - JScripts 0.98-2.8g =-
+-=========================-
+	(potion.js) Fixed an issue causing exploding potions to not function properly.
+
+-=========================-
+-= 15/04/2005 - JScripts 0.98-2.8f =-
+-=========================-
+	(set.js) SET OWNER command no longer requires additional arguments. Target owner, target object to be owned.
+	(set.js) Fixed a spelling error which caused SET NPCWANDER to have no effect.
+	(healing.js) Added 0x0192 and 0x0193 (ghosts) as valid targets for healing with bandages.
+	(travel.js) Added a new command, 'TRAVEL, as a shortcut to itemmenu 6000 - which is the GM Travel-menu.
+	(jse_fileassociations.scp) Added 400=commands/custom/travel.js
+	(jse_objectassociations.scp) Added 0xf6b=509 to make the second unlit torch work.
+	(server/light/*.js) Fixed sound-effects for lighting various lightsources.

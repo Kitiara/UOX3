@@ -1,0 +1,15 @@
+IF(CMAKE_SIZEOF_VOID_P MATCHES 8)
+    MESSAGE(STATUS "Detected 64 bit platform")
+    SET(PLATFORM 64)
+ELSE()
+    MESSAGE(STATUS "Detected 32 bit platform")
+    SET(PLATFORM 32)
+ENDIF()
+
+INCLUDE("${CMAKE_SOURCE_DIR}/cmake/platform/settings.cmake")
+
+IF(WIN32)
+  INCLUDE("${CMAKE_SOURCE_DIR}/cmake/platform/win/settings.cmake")
+ELSEIF(UNIX)
+  INCLUDE("${CMAKE_SOURCE_DIR}/cmake/platform/unix/settings.cmake")
+ENDIF()

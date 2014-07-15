@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?><?xml-stylesheet type='text/xsl' href='_UpgradeReport_Files/UpgradeReport.xslt'?><UpgradeLog>
+<Properties><Property Name="Solution" Value="js">
+</Property><Property Name="Solution File" Value="C:\Users\Aybars\Desktop\uox3-master\uox3-master\spidermonkey\js.sln">
+</Property><Property Name="Date" Value="19 Haziran 2014 Perşembe">
+</Property><Property Name="Time" Value="07:05:07">
+</Property></Properties><Event ErrorLevel="0" Project="js" Source="js.mdp" Description="Converting project file 'C:\Users\Aybars\Desktop\uox3-master\uox3-master\spidermonkey\js.mdp'.">
+</Event><Event ErrorLevel="2" Project="C:\Users\Aybars\Desktop\uox3-master\uox3-master\spidermonkey\js.mdp" Source="" Description="The following error has occurred during XML parsing:&#xA;&#xA;File: C:\Users\Aybars\Desktop\uox3-master\uox3-master\spidermonkey\js.mdp&#xA;Line: 1&#xA;Column: 1&#xA;Error Message:&#xA;Geçersiz belge sözdizimi.&#xA;&#xA;The file 'C:\Users\Aybars\Desktop\uox3-master\uox3-master\spidermonkey\js.mdp' has failed to load.">
+</Event><Event ErrorLevel="2" Project="js" Source="js.mdp" Description="'xs:choice' bitiş etiketi, 'xs:sequence' başlangıç etiketiyle eşleşmiyor.&#xA;">
+</Event><Event ErrorLevel="2" Project="js" Source="js.mdp" Description="Project upgrade failed.">
+</Event><Event ErrorLevel="3" Project="js" Source="js.mdp" Description="Not Converted">
+</Event><Event ErrorLevel="2" Project="" Source="js.mdp" Description="Project upgrade failed.">
+</Event></UpgradeLog>
