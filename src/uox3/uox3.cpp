@@ -48,7 +48,6 @@
 #include "speech.h"
 #include "cVersionClass.h"
 #include "ssection.h"
-#include "cHTMLSystem.h"
 #include "gump.h"
 #include "CJSMapping.h"
 #include "cScript.h"
@@ -64,10 +63,7 @@
 #include "ObjectFactory.h"
 #include "PartySystem.h"
 #include "CJSEngine.h"
-
-#if ACT_SQL == 1
 #include "SQLManager.h"
-#endif
 
 namespace UOX
 {
@@ -86,10 +82,7 @@ timeval current;
 
 ObjectFactory *	objFactory;
 PartyFactory *	partySys;
-#if ACT_SQL == 1
 SQLManager *	sqlmMan;
-#endif
-
 
 //o---------------------------------------------------------------------------o
 // FileIO Pre-Declarations
@@ -190,8 +183,6 @@ void DoMessageLoop( void )
 								Console.PrintDone(); 	
 								Commands->Load();
 								Skills->Load();								break;	// Reload JS
-					case '8':	HTMLTemplates->Unload();
-								HTMLTemplates->Load();						break;	// Reload HTML
 					}
 					cwmWorldState->SetReloadingScripts( false );
 				}
@@ -1248,8 +1239,6 @@ void CWorldMain::CheckAutoTimers( void )
 		}
 		nextCheckSpawnRegions = BuildTimeValue( (R32)ServerData()->CheckSpawnRegionSpeed() );//Don't check them TOO often (Keep down the lag)
 	}
-	
-	HTMLTemplates->Poll( ETT_ALLTEMPLATES );
 
 	const UI32 saveinterval = ServerData()->ServerSavesTimerStatus();
 	if( saveinterval != 0 )
@@ -1509,7 +1498,6 @@ void InitClasses( void )
 	Dictionary		= NULL;	Accounts	= NULL;
 	MapRegion		= NULL;	SpeechSys	= NULL;
 	CounselorQueue	= NULL;
-	HTMLTemplates	= NULL;
 	FileLookup		= NULL;
 	objFactory		= NULL; partySys	= NULL;
 
@@ -1542,8 +1530,7 @@ void InitClasses( void )
 	JSMapping->GetEnvokeByType()->Parse();
 	if(( MapRegion		= new CMapHandler )						== NULL ) Shutdown( FATAL_UOX3_ALLOC_MAPREGION );
 	if(( Effects		= new cEffects )						== NULL ) Shutdown( FATAL_UOX3_ALLOC_EFFECTS );
-	if(( HTMLTemplates	= new cHTMLTemplates )					== NULL ) Shutdown( FATAL_UOX3_ALLOC_HTMLTEMPLATES );
-	if(( Accounts		= new cAccountClass( cwmWorldState->ServerData()->Directory( CSDDP_ACCOUNTS ) ) ) == NULL ) Shutdown( FATAL_UOX3_ALLOC_ACCOUNTS );
+	if(( Accounts		= new cAccountClass() )					== NULL ) Shutdown( FATAL_UOX3_ALLOC_ACCOUNTS );
 	if(( SpeechSys		= new CSpeechQueue()	)				== NULL ) Shutdown( FATAL_UOX3_ALLOC_SPEECHSYS );
 	if(( GuildSys		= new CGuildCollection() )				== NULL ) Shutdown( FATAL_UOX3_ALLOC_GUILDS );
 	if(( JailSys		= new JailSystem() )					== NULL ) Shutdown( FATAL_UOX3_ALLOC_JAILSYS );
@@ -1565,11 +1552,7 @@ void ParseArgs( int argc, char *argv[] )
 			++i;
 		}
 		else if( !strcmp( argv[i], "-dumptags" ) )
-		{
-			cwmWorldState->ServerData()->dumpLookup( 0 );
-			cwmWorldState->ServerData()->save( "./uox.tst.ini" );
 			Shutdown( FATAL_UOX3_SUCCESS );
-		}
 		else if( !strcmp( argv[i], "-cluox100" ) )
 		{
 			++i;
@@ -1709,14 +1692,6 @@ void Shutdown( SI32 retCode )
 
 	if( cwmWorldState->ClassesInitialized() )
 	{
-		if( HTMLTemplates )
-		{
-			Console << "HTMLTemplates object detected. Writing Offline HTML Now..." << myendl;
-			HTMLTemplates->Poll( ETT_OFFLINE );
-		}
-		else
-			Console << "HTMLTemplates object not found." << myendl;
-
 		Console << "Cleaning up item and character memory... ";
 		ObjectFactory::getSingleton().GarbageCollect();
 		Console.PrintDone();
@@ -1747,7 +1722,6 @@ void Shutdown( SI32 retCode )
 		delete OffList;
 		delete Books;
 		delete GMQueue;
-		delete HTMLTemplates;
 		delete CounselorQueue;
 		delete Dictionary;
 		delete Accounts;
@@ -1787,10 +1761,9 @@ void Shutdown( SI32 retCode )
 
 	delete partySys;
 	delete objFactory;
-#if ACT_SQL == 1
+
 	SQLManager::getSingleton().Disconnect();
 	delete sqlmMan;
-#endif
 
 	Console << "Server shutdown complete!" << myendl;
 	Console << "Thank you for supporting " << CVersionClass::GetName() << myendl;
@@ -2664,10 +2637,10 @@ int main( int argc, char *argv[] )
 
 		if(( cwmWorldState = new CWorldMain ) == NULL ) 
 			Shutdown( FATAL_UOX3_ALLOC_WORLDSTATE );
-#if ACT_SQL == 1
+
 		sqlmMan			= NULL;
 		sqlmMan			= new SQLManager();
-#endif
+
 		cwmWorldState->ServerData()->Load();
 		
 		Console << "Initializing and creating class pointers... " << myendl;
@@ -2756,10 +2729,6 @@ int main( int argc, char *argv[] )
 		Console << "Initializing Jail system       ";	
 		JailSys->ReadSetup();
 		JailSys->ReadData();
-		Console.PrintDone();
-		
-		Console << "Initializing Status system     ";	
-		HTMLTemplates->Load();
 		Console.PrintDone();
 
 		Console << "Loading custom titles          ";
@@ -2908,8 +2877,6 @@ int main( int argc, char *argv[] )
 				cwmWorldState->SaveNewWorld( true );
 			} while( cwmWorldState->GetWorldSaveProgress() == SS_SAVING );
 		}
-		
-		cwmWorldState->ServerData()->save();
 
 		Console.Log( "Server Shutdown!\n=======================================================================\n" , "server.log" );
 

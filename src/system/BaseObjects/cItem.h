@@ -67,9 +67,7 @@ protected:
 	virtual void	AddSelfToOwner( void );
 
 	void			CheckItemIntegrity( void );
-#if ACT_SQL == 0
-	virtual bool	DumpHeader( std::ofstream &outStream ) const;
-#endif
+
 	virtual bool	LoadRemnants( void );
 
 	UI16			entryMadeFrom;
@@ -261,15 +259,10 @@ public:
 	void			SendPackItemToSocket( CSocket *mSock );
 	virtual void	RemoveFromSight( CSocket *mSock = NULL );
 
-#if ACT_SQL == 1
 	virtual UString	Save(void);
 	virtual std::stringstream	DumpBody() const;
 	virtual void	HandleLine(std::vector<UString> dataList);
-#else
-	virtual bool	Save( std::ofstream &outStream );
-	virtual bool	DumpBody( std::ofstream &outStream ) const;
-	virtual bool	HandleLine( UString &UTag, UString &data );
-#endif
+
 	virtual void	PostLoadProcessing( void );
 	virtual void	Cleanup( void );
 	virtual void	Delete( void );
@@ -302,15 +295,8 @@ public:
 	bool				IsSectionAList( void ) const;
 	void				IsSectionAList( bool newVal );
 
-#if ACT_SQL == 1
 	virtual std::stringstream		DumpBody() const;
 	virtual void		HandleLine(std::vector<UString> dataList);
-#else
-	virtual bool		DumpHeader( std::ofstream &outStream ) const;
-	virtual bool		DumpBody( std::ofstream &outStream ) const;
-
-	virtual bool		HandleLine( UString &UTag, UString &data );
-#endif
 
 	bool				DoRespawn( void );	// Will replace RespawnItem() eventually
 	bool				HandleItemSpawner( void );

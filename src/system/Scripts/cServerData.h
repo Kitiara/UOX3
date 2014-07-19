@@ -86,13 +86,9 @@ enum CSDDirectoryPaths
 	CSDDP_ROOT = 0,
 	CSDDP_DATA,
 	CSDDP_DEFS,
-	CSDDP_ACCESS,
-	CSDDP_ACCOUNTS,
 	CSDDP_SCRIPTS,
 	CSDDP_BACKUP,
 	CSDDP_MSGBOARD,
-	CSDDP_SHARED,
-	CSDDP_HTML,
 	CSDDP_LOGS,
 	CSDDP_DICTIONARIES,
 	CSDDP_BOOKS,
@@ -121,6 +117,7 @@ private:
 class CServerData 
 {
 private:
+	std::vector<std::pair<UString, UString> > settings;
 
 	std::bitset< CF_BIT_COUNT > clientFeatures;
 	std::bitset< SF_BIT_COUNT > serverFeatures;
@@ -136,7 +133,6 @@ private:
 	SI16		backupRatio;					//	Number of saves before a backup occurs
 	UI32		serversavestimer;				//	Number of seconds between world saves
 	UI32		netRcvTimeout;					// 04/03/2004 - Used to be hardcoded as 2 seconds (2 * 1000ms) for some raly laggy nets this would drop alot of packets, and disconnect people.
-	UI32		netSndTimeout;					// 04/03/2004 - Not used at this time.
 	UI32		netRetryCount;					// 04/03/2004 - Used to set the number of times a network recieve will be attempted before it throws an error
 	bool		uogEnabled;						// 04/03/2004 - Added to support the UOG Info Request Service
 
@@ -170,7 +166,6 @@ private:
 
 	// Settings
 	SI16		ambientsounds;					//	Ambient sounds - values from 1->10 - higher values indicate sounds occur less often
-	SI16		htmlstatusenabled;				//	If > 0 then it's enabled - only used at PC char creation - use elsewhere? (was # of seconds between updates)
 	SI16		sellmaxitems;					//	Maximum number of items that can be sold to a vendor
 	R32			weightPerSTR;					//	How much weight per point of STR a character can hold.
 	UI16		petOfflineTimeout;				//	Offline time after a player looses all pets
@@ -261,8 +256,6 @@ private:
 	UI32		taxPeriod;						//	Time (in seconds) between periods of taxes for PCs 
 	UI32		guardPayment;					//	Time (in seconds) between payments for guards
 
-	void	PostLoadDefaults( void );
-
 public:
 	void		SetServerFeature( ServerFeatures, bool );
 	void		SetServerFeatures( size_t );
@@ -290,11 +283,10 @@ public:
 	void		ServerStartPrivs( UI16 value );
 	void		ServerStartGold( SI16 value );
 	bool		ParseINI( const std::string& filename );
-	bool		HandleLine( const UString& tag, const UString& value );
+	template<typename T>
+	UString		GetDefaultValue(UString name, T def);
 
 	void		Load( void );
-	bool		save( void );
-	bool		save( std::string filename );
 
 	void		ResetDefaults( void );
 
@@ -302,15 +294,9 @@ public:
 
 				CServerData( void );
 				~CServerData();
-	void		ServerName( std::string setname );
-	void		ServerDomain( std::string setdomain );
-	void		ServerIP( std::string setip );
-	std::string ServerName( void ) const;
-	std::string ServerDomain( void ) const;
-	std::string ServerIP( void ) const;
-	
-	void		ServerPort( UI16 setport );
-	UI16		ServerPort( void ) const;
+	void		AddServer(UString data);
+	std::string ServerName(int id) const;
+	UI16		ServerPort(int id) const;
 	void		ServerConsoleLog( UI08 setting );
 	UI08		ServerConsoleLogStatus( void ) const;
 	void		ServerCommandPrefix( char cmdvalue );
@@ -319,8 +305,6 @@ public:
 	bool		ServerAnnounceSavesStatus( void ) const;
 	void		ServerJoinPartAnnouncements( bool setting );
 	bool		ServerJoinPartAnnouncementsStatus( void ) const;
-	void		ServerMulCaching( bool setting );
-	bool		ServerMulCachingStatus( void ) const;
 	void		ServerBackups( bool setting );
 	bool		ServerBackupStatus( void ) const;
 	void		ServerSavesTimer( UI32 timer );
@@ -349,8 +333,6 @@ public:
 	void		ServerNetRetryCount(UI32 retryValue) { netRetryCount = retryValue; }
 	UI32		ServerNetRcvTimeout(void) const { return netRcvTimeout; }
 	void		ServerNetRcvTimeout(UI32 timeoutValue) { netRcvTimeout = timeoutValue; }
-	UI32		ServerNetSndTimeout(void) const { return netSndTimeout; }
-	void		ServerNetSndTimeout(UI32 timeoutValue) { netSndTimeout = timeoutValue; }
 
 	// ClientSupport used to determine login-restrictions
 	bool		ClientSupport4000(void) const { return Clients4000Enabled; }
@@ -646,7 +628,6 @@ public:
 	void		LootingIsCrime( bool value );
 	bool		LootingIsCrime( void ) const;
 
-	void		dumpLookup( int lookupid );
 	void		dumpPaths( void );
 
 	void			ServerLocation( std::string toSet );
@@ -671,9 +652,8 @@ public:
 
 	void			SaveTime( void );
 	void			LoadTime( void );
-#if ACT_SQL == 1
+
 	void			LoadTimeTags( std::ifstream &input );
-#endif
 
 	// These functions return TRUE if it's a new day
 	bool			incSecond( void );

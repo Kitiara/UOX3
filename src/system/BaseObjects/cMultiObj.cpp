@@ -265,24 +265,6 @@ void CMultiObj::RemoveLockDown( CItem *toRemove )
 //|	Purpose			-	Saves a multi out to disk
 //|						outStream is the file to write to
 //o--------------------------------------------------------------------------o
-#if ACT_SQL == 0
-bool CMultiObj::Save( std::ofstream &outStream )
-{
-	bool rvalue = false;
-	if( !isFree() )
-	{
-		rvalue = true;
-		MapData_st& mMap = Map->GetMapData( worldNumber );
-		if( GetCont() != NULL || ( GetX() > 0 && GetX() < mMap.xBlock && GetY() < mMap.yBlock ) )
-		{
-			DumpHeader( outStream );
-			DumpBody( outStream );
-			DumpFooter( outStream );
-		}
-	}
-	return rvalue;
-}
-#else
 UString CMultiObj::Save(void)
 {
 	UString uStr;
@@ -294,7 +276,6 @@ UString CMultiObj::Save(void)
 	}
 	return uStr;
 }
-#endif
 
 //o--------------------------------------------------------------------------o
 //|	Function		-	bool LoadRemnants( UI32 arrayOffset )
@@ -327,21 +308,6 @@ void CMultiObj::SetMaxLockDowns( UI16 newValue )
 	maxLockedDown = newValue;
 }
 
-#if ACT_SQL == 0
-//o--------------------------------------------------------------------------o
-//|	Function		-	bool DumpHeader( ofstream &outStream )
-//|	Date			-	Unknown
-//|	Programmer		-	Abaddon
-//|	Modified		-
-//o--------------------------------------------------------------------------o
-//|	Purpose			-	Dumps out the header for the CMultiObj
-//o--------------------------------------------------------------------------o
-bool CMultiObj::DumpHeader( std::ofstream &outStream ) const
-{
-	outStream << "[HOUSE]" << '\n';
-	return true;
-}
-#endif
 //o--------------------------------------------------------------------------o
 //|	Function		-	bool DumpBody( ofstream &outStream )
 //|	Date			-	Unknown
@@ -351,43 +317,6 @@ bool CMultiObj::DumpHeader( std::ofstream &outStream ) const
 //|	Purpose			-	Writes out all CMultiObj specific information to a world
 //|						file.  Also prints out the Item and BaseObject portions
 //o--------------------------------------------------------------------------o
-#if ACT_SQL == 0
-bool CMultiObj::DumpBody( std::ofstream &outStream ) const
-{
-	CItem::DumpBody( outStream );
-
-	// Hexadecimal Values
-	outStream << std::hex;
-
-	// Decimal / String Values
-	outStream << std::dec;
-	for( std::map< CChar *, UI08 >::const_iterator oIter = housePrivList.begin(); oIter != housePrivList.end(); ++oIter )
-	{
-		if( ValidateObject( oIter->first ) )
-		{
-			if( oIter->second == HOUSEPRIV_OWNER )
-				outStream << "CoOwner=";
-			else if( oIter->second == HOUSEPRIV_BANNED )
-				outStream << "Banned=";
-			else
-				continue;
-			outStream << oIter->first->GetSerial() << '\n';
-		}
-	}
-
-	ITEMLIST_CITERATOR lIter;
-	for( lIter = lockedList.begin(); lIter != lockedList.end(); ++lIter )
-	{
-		if( ValidateObject( (*lIter) ) )
-			outStream << "LockedItem=" << (*lIter)->GetSerial() << '\n';
-	}
-
-	outStream << "MaxLockedDown=" << maxLockedDown << '\n';
-	// Add deedname= to the save :) We need a way to preserve the name of the item
-	outStream << "DeedName=" << deed << '\n';
-	return true;
-}
-#else
 std::stringstream CMultiObj::DumpBody() const
 {
 	std::stringstream Str = CItem::DumpBody();
@@ -429,7 +358,6 @@ std::stringstream CMultiObj::DumpBody() const
 	Str << "'" << maxLockedDown << "','" << deed << "')\n";
 	return Str;
 }
-#endif
 
 //o--------------------------------------------------------------------------o
 //|	Function		-	bool HandleLine( UString &UTag, UString &data )
@@ -440,60 +368,6 @@ std::stringstream CMultiObj::DumpBody() const
 //|	Purpose			-	Processes a tag/data pair if it can.  If it can, returns
 //|						true.  Otherwise, returns false.
 //o--------------------------------------------------------------------------o
-#if ACT_SQL == 0
-bool CMultiObj::HandleLine( UString &UTag, UString &data )
-{
-	bool rvalue = CItem::HandleLine( UTag, data );
-	if( !rvalue )
-	{
-		switch( (UTag.data()[0]) )
-		{
-			case 'B':
-				if( UTag == "BANNED" )
-				{
-					CChar *bList = calcCharObjFromSer( data.toULong() );
-					if( ValidateObject( bList ) )
-						AddToBanList( bList );
-					rvalue = true;
-				}
-				break;
-			case 'C':
-				if( UTag == "COOWNER" )
-				{
-					CChar *cList = calcCharObjFromSer( data.toULong() );
-					if( ValidateObject( cList ) )
-						AddAsOwner( cList );
-					rvalue = true;
-				}
-				break;
-			case 'D':
-				if( UTag == "DEEDNAME" )
-				{
-					SetDeed( data );
-					rvalue = true;
-				}
-				break;
-			case 'L':
-				if( UTag == "LOCKEDITEM" )
-				{
-					CItem *iList = calcItemObjFromSer( data.toULong() );
-					if( ValidateObject( iList ) )
-						LockDownItem( iList );
-					rvalue = true;
-				}
-				break;
-			case 'M':
-				if( UTag == "MAXLOCKEDDOWN" )
-				{
-					maxLockedDown = data.toUShort();
-					rvalue = true;
-				}
-				break;
-		}
-	}
-	return rvalue;
-}
-#else
 void CMultiObj::HandleLine(std::vector<UString> dataList)
 {
 	CItem::HandleLine(dataList);
@@ -567,7 +441,6 @@ void CMultiObj::HandleLine(std::vector<UString> dataList)
 		}
 	}
 }
-#endif
 //o--------------------------------------------------------------------------o
 //|	Function		-	SetOwner( CChar *newOwner )
 //|	Date			-	Unknown
@@ -703,21 +576,6 @@ CBoatObj::~CBoatObj()
 }
 
 //o--------------------------------------------------------------------------o
-//|	Function		-	bool DumpHeader( ofstream &outStream )
-//|	Date			-	Unknown
-//|	Programmer		-	Abaddon
-//|	Modified		-
-//o--------------------------------------------------------------------------o
-//|	Purpose			-	Dumps out the header for the CMultiObj
-//o--------------------------------------------------------------------------o
-#if ACT_SQL == 0
-bool CBoatObj::DumpHeader( std::ofstream &outStream ) const
-{
-	outStream << "[BOAT]" << '\n';
-	return true;
-}
-#endif
-//o--------------------------------------------------------------------------o
 //|	Function		-	bool DumpBody( ofstream &outStream )
 //|	Date			-	Unknown
 //|	Programmer		-	Abaddon
@@ -726,22 +584,6 @@ bool CBoatObj::DumpHeader( std::ofstream &outStream ) const
 //|	Purpose			-	Writes out all CMultiObj specific information to a world
 //|						file.  Also prints out the Item and BaseObject portions
 //o--------------------------------------------------------------------------o
-#if ACT_SQL == 0
-bool CBoatObj::DumpBody( std::ofstream &outStream ) const
-{
-	CMultiObj::DumpBody( outStream );
-
-	// Hexadecimal Values
-	outStream << std::hex;
-	outStream << "Hold=" << "0x" << hold << '\n';
-	outStream << "Planks=" << "0x" << planks[0] << ",0x" << planks[1] << '\n';
-	outStream << "Tiller=" << "0x" << tiller << std::dec << '\n';
-
-	// Decimal / String Values
-	outStream << std::dec;
-	return true;
-}
-#else
 std::stringstream CBoatObj::DumpBody() const
 {
 	std::stringstream Str = CMultiObj::DumpBody();
@@ -752,8 +594,6 @@ std::stringstream CBoatObj::DumpBody() const
 	Str << "'" << tiller << "')\n ";
 	return Str;
 }
-#endif
-
 
 //o--------------------------------------------------------------------------o
 //|	Function		-	bool HandleLine( UString &UTag, UString &data )
@@ -764,46 +604,6 @@ std::stringstream CBoatObj::DumpBody() const
 //|	Purpose			-	Processes a tag/data pair if it can.  If it can, returns
 //|						true.  Otherwise, returns false.
 //o--------------------------------------------------------------------------o
-#if ACT_SQL == 0
-bool CBoatObj::HandleLine( UString &UTag, UString &data )
-{
-	bool rvalue = CMultiObj::HandleLine( UTag, data );
-	if( !rvalue )
-	{
-		switch( (UTag.data()[0]) )
-		{
-			case 'M':
-				if( UTag == "MOVETYPE" )
-				{
-					rvalue = true;
-				}
-			case 'H':
-				if( UTag == "HOLD" )
-				{
-					SetHold( data.toULong() );
-					rvalue = true;
-				}
-				break;
-			case 'P':
-				if( UTag == "PLANKS" )
-				{
-					SetPlank( 0, data.section( ",", 0, 0 ).stripWhiteSpace().toULong() );
-					SetPlank( 1, data.section( ",", 1, 1 ).stripWhiteSpace().toULong() );
-					rvalue = true;
-				}
-				break;
-			case 'T':
-				if( UTag == "TILLER" )
-				{
-					SetTiller( data.toULong() );
-					rvalue = true;
-				}
-				break;
-		}
-	}
-	return rvalue;
-}
-#else
 void CBoatObj::HandleLine(std::vector<UString> dataList)
 {
 	CMultiObj::HandleLine(dataList);
@@ -829,7 +629,6 @@ void CBoatObj::HandleLine(std::vector<UString> dataList)
 		}
 	}
 }
-#endif
 //o--------------------------------------------------------------------------o
 //|	Function		-	SERIAL Tiller()
 //|	Date			-	September 25, 2003

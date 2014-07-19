@@ -15,10 +15,7 @@
 #include "skills.h"
 #include "PartySystem.h"
 #include "cGuild.h"
-
-#if ACT_SQL == 1
 #include "SQLManager.h"
-#endif
 #include <openssl\sha.h>
 
 namespace UOX
@@ -182,7 +179,6 @@ bool CPIFirstLogin::Handle( void )
 	}
 
 	char sha1hash[SHA_DIGEST_LENGTH*2+1];
-#if ACT_SQL == 1
     unsigned char digest[SHA_DIGEST_LENGTH];
     SHA_CTX ctx;
     SHA1_Init(&ctx);
@@ -191,13 +187,12 @@ bool CPIFirstLogin::Handle( void )
  
     for (int i = 0; i < SHA_DIGEST_LENGTH; i++)
         sprintf(&sha1hash[i*2], "%02x", (unsigned int)digest[i]);
-#endif
 
 	if( tSock->AcctNo() != AB_INVALID_ID )
 	{
 		if( actbTemp->wFlags.test( AB_FLAGS_BANNED ) )
 			t = LDR_ACCOUNTDISABLED;
-		else if( actbTemp->sPassword != (ACT_SQL == 1 ? sha1hash : pass1))
+		else if( actbTemp->sPassword != sha1hash)
 			t = LDR_BADPASSWORD;
 		else
 		{
@@ -490,7 +485,6 @@ bool CPISecondLogin::Handle( void )
 	pSplit( pass0, pass1, pass2 );
 
 	char sha1hash[SHA_DIGEST_LENGTH*2+1];
-#if ACT_SQL == 1
     unsigned char digest[SHA_DIGEST_LENGTH];
     SHA_CTX ctx;
     SHA1_Init(&ctx);
@@ -499,13 +493,12 @@ bool CPISecondLogin::Handle( void )
  
     for (int i = 0; i < SHA_DIGEST_LENGTH; i++)
         sprintf(&sha1hash[i*2], "%02x", (unsigned int)digest[i]);
-#endif
 
 	if( tSock->AcctNo() != AB_INVALID_ID )
 	{
 		if( actbTemp.wFlags.test( AB_FLAGS_BANNED ) )
 			t = LDR_ACCOUNTDISABLED;
-		else if( (ACT_SQL == 1 ? sha1hash : pass1) != actbTemp.sPassword )
+		else if( sha1hash != actbTemp.sPassword )
 			t = LDR_BADPASSWORD;
 	}
 	else

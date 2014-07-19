@@ -450,6 +450,17 @@ double UString::toDouble(bool * ok)  const
 	return ( data );
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+bool UString::toBoolean(bool * ok)  const  
+{
+	bool data ;
+	std::stringstream input ;
+	input << *this ;
+	input >> data ;
+	if( ok != NULL )
+		(*ok) = !input.bad() ;
+	return ( data );
+}
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 char UString::toByte( bool *ok, int base ) const
 {
 	return static_cast< char >( toShort( ok, base ) );

@@ -11,10 +11,8 @@
 #include "regions.h"
 #include "combat.h"
 #include "CJSMapping.h"
-
-#if ACT_SQL == 1
 #include "SQLManager.h"
-#endif
+
 namespace UOX
 {
 
@@ -958,31 +956,6 @@ void cEffects::SaveEffects( void )
 	Console << "Saving Effects...   ";
 	Console.TurnYellow();
 
-#if ACT_SQL == 0
-	std::ofstream writeDestination, effectDestination; //writeDestination seems to be unused
-	const char blockDiscriminator[] = "\n\n---EFFECT---\n\n";
-
-	std::string filename = cwmWorldState->ServerData()->Directory( CSDDP_SHARED ) + "effects.wsc";
-	effectDestination.open( filename.c_str() );
-	if( !effectDestination )
-	{
-		Console.Error( "Failed to open %s for writing", filename.c_str() );
-		return;
-	}
-
-	cwmWorldState->tempEffects.Push();
-	for( CTEffect *currEffect = cwmWorldState->tempEffects.First(); !cwmWorldState->tempEffects.Finished(); currEffect = cwmWorldState->tempEffects.Next() )
-	{
-		if( currEffect == NULL )
-			continue;
-		currEffect->Save( effectDestination );
-		effectDestination << blockDiscriminator;
-	}
-	effectDestination.close();
-	cwmWorldState->tempEffects.Pop();
-
-	Console << "\b\b\b\b";
-#else
 	std::string str = "DELETE FROM effects";
 	bool Started = false;
 	cwmWorldState->tempEffects.Push();
@@ -1006,7 +979,7 @@ void cEffects::SaveEffects( void )
 	str.clear();
 	while (std::getline(iss, str))
 		SQLManager::getSingleton().ExecuteQuery(str);
-#endif
+
 	Console.PrintDone();
 	Console.Print("Effects saved in %.02fsec\n", ((float)(getclock()-StartTime))/1000.0f);
 }
@@ -1022,111 +995,6 @@ void cEffects::SaveEffects( void )
 void ReadWorldTagData( std::ifstream &inStream, UString &tag, UString &data );
 void cEffects::LoadEffects( void )
 {
-#if ACT_SQL == 0
-	std::ifstream input;
-	std::string filename = cwmWorldState->ServerData()->Directory( CSDDP_SHARED ) + "effects.wsc";
-
-	input.open( filename.c_str(), std::ios_base::in );
-	input.seekg( 0, std::ios::beg );
-
-	UString tag, data, UTag;
-
-	if( input.is_open() )
-	{
-		CTEffect *toLoad;
-		char line[1024];
-
-		while( !input.eof() && !input.fail() )
-		{
-			input.getline( line, 1024 );
-			UString sLine( line );
-			sLine = sLine.removeComment().stripWhiteSpace();
-			if( !sLine.empty() )
-			{
-				if( sLine.upper() == "[EFFECT]" )
-				{
-					toLoad = new CTEffect;
-					while( tag != "o---o" )
-					{
-						ReadWorldTagData( input, tag, data );
-						if( tag != "o---o" )
-						{
-							UTag = tag.upper();
-							switch( (UTag.data()[0]) )
-							{
-								case 'A':
-									if( UTag == "ASSOCSCRIPT" )
-										toLoad->AssocScript( data.toUShort() );
-									break;
-								case 'D':
-									if( UTag == "DEST" )
-										toLoad->Destination( data.toULong() );
-									if( UTag == "DISPEL" )
-										toLoad->Dispellable( ( (data.toULong() == 0) ? false : true ) );
-									break;
-								case 'E':
-									if( UTag == "EXPIRE" )
-										toLoad->ExpireTime( static_cast<UI32>(data.toULong() + cwmWorldState->GetUICurrentTime()) );
-									break;
-								case 'I':
-									if( UTag == "ITEMPTR" )
-									{
-										SERIAL objSer = data.toULong();
-										if( objSer != INVALIDSERIAL )
-										{
-											if( objSer < BASEITEMSERIAL )
-												toLoad->ObjPtr( calcCharObjFromSer( objSer ) );
-											else
-												toLoad->ObjPtr( calcItemObjFromSer( objSer ) );
-										}
-										else
-											toLoad->ObjPtr( NULL );
-									}
-									break;
-								case 'M':
-									if( UTag == "MORE1" )
-										toLoad->More1( data.toUShort() );
-									if( UTag == "MORE2" )
-										toLoad->More2( data.toUShort() );
-									if( UTag == "MORE3" )
-										toLoad->More3( data.toUShort() );
-									break;
-								case 'N':
-									if( UTag == "NUMBER" )
-										toLoad->Number( data.toUByte() );
-									break;
-								case 'O':
-									if( UTag == "OBJPTR" )
-									{
-										SERIAL objSer = data.toULong();
-										if( objSer != INVALIDSERIAL )
-										{
-											if( objSer < BASEITEMSERIAL )
-												toLoad->ObjPtr( calcCharObjFromSer( objSer ) );
-											else
-												toLoad->ObjPtr( calcItemObjFromSer( objSer ) );
-										}
-										else
-											toLoad->ObjPtr( NULL );
-									}
-								case 'S':
-									if( UTag == "SOURCE" )
-										toLoad->Source( data.toULong() );
-									break;
-								default:
-									Console.Error( "Unknown effects tag %s with contents of %s", tag.c_str(), data.c_str() );
-									break;
-							}
-						}
-					}
-					cwmWorldState->tempEffects.Add( toLoad );
-					tag = "";
-				}
-			}
-		}
-		input.close();
-	}
-#else
 	int index;
 	if (SQLManager::getSingleton().ExecuteQuery("SELECT * FROM effects", &index, false))
 	{
@@ -1187,7 +1055,6 @@ void cEffects::LoadEffects( void )
 		}
 		SQLManager::getSingleton().QueryRelease(false);
 	}
-#endif
 }
 
 //o-----------------------------------------------------------------------o
@@ -1197,38 +1064,6 @@ void cEffects::LoadEffects( void )
 //o-----------------------------------------------------------------------o
 //|	Returns			-	true/false indicating the success of the write operation
 //o-----------------------------------------------------------------------o
-#if ACT_SQL == 0
-bool CTEffect::Save( std::ofstream &effectDestination ) const
-{
-	CBaseObject *getPtr = NULL;
-
-	effectDestination << "[EFFECT]" << '\n';
-
-	// Hexadecimal Values
-	effectDestination << std::hex;
-	effectDestination << "Source=" << "0x" << Source() << '\n';
-	effectDestination << "Dest=" << "0x" << Destination() << '\n';
-
-	getPtr = ObjPtr();
-	effectDestination << "ObjPtr=" << "0x";
-	if( ValidateObject( getPtr ) )
-		effectDestination << getPtr->GetSerial() << '\n';
-	else
-		effectDestination << INVALIDSERIAL << '\n';
-
-	// Decimal / String Values
-	effectDestination << std::dec;
-	effectDestination << "Expire=" << ( ExpireTime() - cwmWorldState->GetUICurrentTime() ) << '\n';
-	effectDestination << "Number=" << static_cast<UI16>(Number()) << '\n';
-	effectDestination << "More1=" << More1() << '\n';
-	effectDestination << "More2=" << More2() << '\n';
-	effectDestination << "More3=" << More3() << '\n';
-	effectDestination << "Dispel=" << Dispellable() << '\n';
-	effectDestination << "AssocScript=" << AssocScript() << '\n';
-	effectDestination << '\n' << "o---o" << '\n' << '\n';
-	return true;
-}
-#else
 UString CTEffect::Save(void) const
 {
 	std::stringstream Str;
@@ -1255,6 +1090,5 @@ UString CTEffect::Save(void) const
 	Str << ")";
 	return Str.str();
 }
-#endif
 
 }

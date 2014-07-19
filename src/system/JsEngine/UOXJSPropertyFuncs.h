@@ -68,12 +68,8 @@ JSPropertyFunc CPartyProps_getProperty;
 JSPropertyFunc CPartyProps_setProperty;
 JSBool CParty_equality( JSContext *cx, JSObject *obj, jsval v, JSBool *bp );
 
-#if ACT_SQL == 1
-
 JSPropertyFunc CSQLMProps_getProperty;
 JSPropertyFunc CSQLMProps_setProperty;
-
-#endif
 
 }
 

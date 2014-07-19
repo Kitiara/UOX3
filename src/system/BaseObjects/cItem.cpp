@@ -883,27 +883,6 @@ void CItem::LockDown( void )
 	movable = 3;
 }
 
-#if ACT_SQL == 0
-bool CItem::Save( std::ofstream &outStream )
-{
-	if( isFree() )
-		return false;
-	MapData_st& mMap = Map->GetMapData( worldNumber );
-	if( GetCont() != NULL || ( GetX() > 0 && GetX() < mMap.xBlock && GetY() < mMap.yBlock ) )
-	{
-		DumpHeader( outStream );
-		DumpBody( outStream );
-		DumpFooter( outStream );
-
-		for( CItem *toSave = Contains.First(); !Contains.Finished(); toSave = Contains.Next() )
-		{
-			if( ValidateObject( toSave ) && toSave->ShouldSave() )
-				toSave->Save( outStream );
-		}
-	}
-	return true;
-}
-#else
 UString CItem::Save(void)
 {
 	UString uStr;
@@ -921,7 +900,6 @@ UString CItem::Save(void)
 	}
 	return uStr;
 }
-#endif
 
 void CItem::RemoveSelfFromOwner( void )
 {
@@ -1069,60 +1047,7 @@ void CItem::SetWeatherDamage( WeatherType effectNum, bool value )
 {
 	weatherBools.set( effectNum, value );
 }
-#if ACT_SQL == 0
-bool CItem::DumpHeader( std::ofstream &outStream ) const
-{
-	outStream << "[ITEM]" << '\n';
-	return true;
-}
 
-
-bool CItem::DumpBody( std::ofstream &outStream ) const
-{
-	CBaseObject::DumpBody( outStream );
-
-	// Hexadecimal Values
-	outStream << std::hex;
-	outStream << "GridLoc=" << "0x" << (SI16)GetGridLocation() << '\n';
-	outStream << "Layer=" << "0x" << (SI16)GetLayer() << '\n';
-	outStream << "Cont=" << "0x" << GetContSerial() << '\n';
-	outStream << "More=" << "0x" << GetTempVar( CITV_MORE ) << '\n';
-	outStream << "Creator=" << "0x" << GetCreator() << '\n';
-	outStream << "MoreXYZ=" << "0x" << GetTempVar( CITV_MOREX ) << ",0x" << GetTempVar( CITV_MOREY ) << ",0x" << GetTempVar( CITV_MOREZ ) << '\n';
-	outStream << "Glow=" << "0x" << GetGlow() << '\n';
-	outStream << "GlowBC=" << "0x" << GetGlowColour() << '\n';
-	outStream << "Ammo=" << "0x" << GetAmmoID() << ",0x" << GetAmmoHue() << '\n';
-	outStream << "AmmoFX=" << "0x" << GetAmmoFX() << ",0x" << GetAmmoFXHue() << ",0x" << GetAmmoFXRender() << '\n';
-	outStream << "Spells=" << "0x" << GetSpell( 0 ) << ",0x" << GetSpell( 1 ) << ",0x" << GetSpell( 2 ) << '\n';
-
-	// Decimal / String Values
-	outStream << std::dec;
-	outStream << "Name2=" << GetName2() << '\n';
-	outStream << "Desc=" << GetDesc() << '\n';
-	outStream << "Type=" << static_cast<SI16>(GetType()) << '\n';
-	outStream << "Offspell=" << (SI16)GetOffSpell() << '\n';
-	outStream << "Amount=" << GetAmount() << '\n';
-	outStream << "WeightMax=" << GetWeightMax() << '\n';
-	outStream << "BaseWeight=" << GetBaseWeight() << '\n';
-	outStream << "MaxHP=" << GetMaxHP() << '\n';
-	outStream << "Speed=" << (SI16)GetSpeed() << '\n';
-	outStream << "Movable=" << (SI16)GetMovable() << '\n';
-	outStream << "Priv=" << (SI16)GetPriv() << '\n';
-	outStream << "Value=" << GetBuyValue() << "," << GetSellValue() << '\n';
-	outStream << "Restock=" << GetRestock() << '\n';
-	outStream << "AC=" << (SI16)GetArmourClass() << '\n';
-	outStream << "Rank=" << (SI16)GetRank() << '\n';
-	outStream << "Sk_Made=" << (SI16)GetMadeWith() << '\n';
-	outStream << "Bools=" << (SI16)(bools.to_ulong()) << '\n';
-	outStream << "Good=" << GetGood() << '\n';
-	outStream << "GlowType=" << (SI16)GetGlowEffect() << '\n';
-	outStream << "RaceDamage=" << (SI16)(GetWeatherDamage( LIGHT ) ? 1 : 0) << "," << (SI16)(GetWeatherDamage( RAIN ) ? 1 : 0) << ","
-	<< (SI16)(GetWeatherDamage( HEAT ) ? 1 : 0) << "," << (SI16)(GetWeatherDamage( COLD ) ? 1 : 0) << ","
-	<< (SI16)(GetWeatherDamage( SNOW ) ? 1 : 0) << "," << (SI16)(GetWeatherDamage( LIGHTNING ) ? 1 : 0) << '\n';
-	outStream << "EntryMadeFrom=" << EntryMadeFrom() << '\n';
-	return true;
-}
-#else
 std::stringstream CItem::DumpBody() const
 {
 	std::stringstream Str = CBaseObject::DumpBody();
@@ -1192,327 +1117,7 @@ std::stringstream CItem::DumpBody() const
 	Str << "'" << EntryMadeFrom() << "')\n";
 	return Str;
 }
-#endif
 
-#if ACT_SQL == 0
-bool CItem::HandleLine( UString &UTag, UString &data )
-{
-	bool rvalue = CBaseObject::HandleLine( UTag, data );
-	if( !rvalue )
-	{
-		switch( (UTag.data()[0]) )
-		{
-			case 'A':
-				if( UTag == "AMMO" )
-				{
-					if( data.sectionCount( "," ) != 0 )
-					{
-						SetAmmoID( data.section( ",", 0, 0 ).stripWhiteSpace().toUShort() );
-						SetAmmoHue( data.section( ",", 1, 1 ).stripWhiteSpace().toUShort() );
-					}
-					else
-					{
-						SetAmmoID( data.toULong() );
-						SetAmmoHue( ( 0 ) );
-					}
-					rvalue = true;
-				}
-				else if( UTag == "AMMOFX" )
-				{
-					if( data.sectionCount( "," ) != 0 )
-					{
-						SetAmmoFX( data.section( ",", 0, 0 ).stripWhiteSpace().toUShort() );
-						SetAmmoFXHue( data.section( ",", 1, 1 ).stripWhiteSpace().toUShort() );
-						SetAmmoFXRender( data.section( ",", 2, 2 ).stripWhiteSpace().toUShort() );
-					}
-					else
-					{
-						SetAmmoFX( data.toULong() );
-						SetAmmoFXHue( ( 0 ) );
-						SetAmmoFXRender( ( 0 ) );
-					}
-					rvalue = true;
-				}
-				else if( UTag == "AMOUNT" )
-				{
-					amount = data.toUShort();
-					rvalue = true;
-				}
-				else if( UTag == "AC" )
-				{
-					SetArmourClass( data.toUByte() );
-					rvalue = true;
-				}
-				break;
-			case 'B':
-				if( UTag == "BOOLS" )
-				{
-					bools = data.toUByte();
-					rvalue = true;
-				}
-				break;
-			case 'C':
-				if( UTag == "CONT" )
-				{
-					contObj = (CBaseObject *)data.toULong();
-					rvalue = true;
-				}
-				else if( UTag == "CREATOR" || UTag == "CREATER" )
-				{
-					SetCreator( data.toULong() );
-					rvalue = true;
-				}
-				else if( UTag == "CORPSE" )
-				{
-					SetCorpse( data.toUByte() == 1 );
-					rvalue = true;
-				}
-				else if( UTag == "COLD" )
-				{
-					SetWeatherDamage( COLD, data.toUByte() == 1 );
-					rvalue = true;
-				}
-				break;
-			case 'D':
-				if( UTag == "DESC" )
-				{
-					SetDesc( data.c_str() );
-					rvalue = true;
-				}
-				if( UTag == "DIR" )
-				{
-					SetDir( data.toByte() );
-					rvalue = true;
-				}
-				else if( UTag == "DYEABLE" )
-				{
-					SetDye( data.toUByte() == 1 );
-					rvalue = true;
-				}
-				break;
-			case 'E':
-				if( UTag == "ENTRYMADEFROM" )
-				{
-					EntryMadeFrom( data.toUShort() );
-					rvalue = true;
-				}
-				break;
-			case 'G':
-				if( UTag == "GRIDLOC" )
-				{
-					SetGridLocation( data.toByte() );
-					rvalue = true;
-				}
-				else if( UTag == "GLOWTYPE" )
-				{
-					SetGlowEffect( data.toUByte() );
-					rvalue = true;
-				}
-				else if( UTag == "GLOWBC" )
-				{
-					SetGlowColour( data.toUShort() );
-					rvalue = true;
-				}
-				else if( UTag == "GLOW" )
-				{
-					SetGlow( data.toULong() );
-					rvalue = true;
-				}
-				else if( UTag == "GOOD" )
-				{
-					SetGood( data.toShort() );
-					rvalue = true;
-				}
-				break;
-			case 'H':
-				if( UTag == "HEAT" )
-				{
-					SetWeatherDamage( HEAT, data.toUByte() == 1 );
-					rvalue = true;
-				}
-				break;
-			case 'L':
-				if( UTag == "LAYER" )
-				{
-					layer = static_cast<ItemLayers>(data.toUByte());
-					rvalue = true;
-				}
-				else if( UTag == "LIGHT" )
-				{
-					SetWeatherDamage( LIGHT, data.toUShort() == 1 );
-					rvalue = true;
-				}
-				else if( UTag == "LIGHTNING" )
-				{
-					SetWeatherDamage( LIGHTNING, data.toUShort() == 1 );
-					rvalue = true;
-				}
-				break;
-			case 'M':
-				if( UTag == "MORE" )
-				{
-					if( data.sectionCount( "," ) != 0 )
-						SetTempVar( CITV_MORE, data.section( ",", 0, 0 ).stripWhiteSpace().toULong() );
-					else
-						SetTempVar( CITV_MORE, data.toULong() );
-					rvalue = true;
-				}
-				else if( UTag == "MORE2" )	// Depreciated
-					rvalue = true;
-				else if( UTag == "MURDERER" )
-					rvalue = true;
-				else if( UTag == "MOREXYZ" )
-				{
-					SetTempVar( CITV_MOREX, data.section( ",", 0, 0 ).stripWhiteSpace().toULong() );
-					SetTempVar( CITV_MOREY, data.section( ",", 1, 1 ).stripWhiteSpace().toULong() );
-					SetTempVar( CITV_MOREZ, data.section( ",", 2, 2 ).stripWhiteSpace().toULong() );
-					rvalue = true;
-				}
-				else if( UTag == "MOREX" )
-				{
-					SetTempVar( CITV_MOREX, data.toULong() );
-					rvalue = true;
-				}
-				else if( UTag == "MOREY" )
-				{
-					SetTempVar( CITV_MOREY, data.toULong() );
-					rvalue = true;
-				}
-				else if( UTag == "MOREZ" )
-				{
-					SetTempVar( CITV_MOREZ, data.toULong() );
-					rvalue = true;
-				}
-				else if( UTag == "MOVABLE" )
-				{
-					SetMovable( data.toByte() );
-					rvalue = true;
-				}
-				else if( UTag == "MAXHP" )
-				{
-					SetMaxHP( data.toUShort() );
-					rvalue = true;
-				}
-				break;
-			case 'N':
-				if( UTag == "NAME2" )
-				{
-					SetName2( data.c_str() );
-					rvalue = true;
-				}
-				break;
-			case 'O':
-				if( UTag == "OFFSPELL" )
-				{
-					SetOffSpell( data.toByte() );
-					rvalue = true;
-				}
-				break;
-			case 'P':
-				if( UTag == "PRIV" )
-				{
-					SetPriv( data.toUByte() );
-					rvalue = true;
-				}
-				else if( UTag == "PILEABLE" )
-				{
-					SetPileable( data.toUByte() == 1 );
-					rvalue = true;
-				}
-				break;
-			case 'R':
-				if( UTag == "RESTOCK" )
-				{
-					SetRestock( data.toUShort() );
-					rvalue = true;
-				}
-				else if( UTag == "RACEDAMAGE" )
-				{
-					SetWeatherDamage( LIGHT, data.section( ",", 0, 0 ).stripWhiteSpace().toUByte() == 1 );
-					SetWeatherDamage( RAIN, data.section( ",", 1, 1 ).stripWhiteSpace().toUByte() == 1 );
-					SetWeatherDamage( HEAT, data.section( ",", 2, 2 ).stripWhiteSpace().toUByte() == 1 );
-					SetWeatherDamage( COLD, data.section( ",", 3, 3 ).stripWhiteSpace().toUByte() == 1 );
-					SetWeatherDamage( SNOW, data.section( ",", 4, 4 ).stripWhiteSpace().toUByte() == 1 );
-					SetWeatherDamage( LIGHTNING, data.section( ",", 5, 5 ).stripWhiteSpace().toUByte() == 1 );
-					rvalue = true;	
-				}
-				else if( UTag == "RANK" )
-				{
-					SetRank( data.toByte() );
-					rvalue = true;
-				}
-				else if( UTag == "RAIN" )
-				{
-					SetWeatherDamage( RAIN, data.toUByte() == 1 );
-					rvalue = true;
-				}
-				else if( UTag == "REPUTATION" )
-					rvalue = true;
-				break;
-			case 'S':
-				if( UTag == "SPEED" )
-				{
-					SetSpeed( data.toUByte() );
-					rvalue = true;
-				}
-				else if( UTag == "SK_MADE" )
-				{
-					SetMadeWith( data.toByte() );
-					rvalue = true;
-				}
-				else if( UTag == "SNOW" )
-				{
-					SetWeatherDamage( SNOW, data.toUByte() == 1 );
-					rvalue = true;
-				}
-				else if( UTag == "SPELLS" )
-				{
-					SetSpell( 0, data.section( ",", 0, 0 ).stripWhiteSpace().toULong() );
-					SetSpell( 1, data.section( ",", 1, 1 ).stripWhiteSpace().toULong() );
-					SetSpell( 2, data.section( ",", 2, 2 ).stripWhiteSpace().toULong() );
-					rvalue = true;
-				}
-				break;
-			case 'T':
-				if( UTag == "TYPE" )
-				{
-					if( data.sectionCount( "," ) != 0 )
-						SetType( static_cast<ItemTypes>(data.section( ",", 0, 0 ).stripWhiteSpace().toUByte()) );
-					else
-						SetType( static_cast<ItemTypes>(data.toUByte()) );
-					rvalue = true;
-				}
-				else if( UTag == "TYPE2" )
-					rvalue = true;
-				break;
-			case 'V':
-				if( UTag == "VALUE" )
-				{
-					if( data.sectionCount( "," ) != 0 )
-					{
-						SetBuyValue( data.section( ",", 0, 0 ).stripWhiteSpace().toULong() );
-						SetSellValue( data.section( ",", 1, 1 ).stripWhiteSpace().toULong() );
-					}
-					else
-					{
-						SetBuyValue( data.toULong() );
-						SetSellValue( (data.toULong() / 2) );
-					}
-					rvalue = true;
-				}
-				break;
-			case 'W':
-				if( UTag == "WEIGHTMAX" )
-				{
-					SetWeightMax( data.toLong() );
-					rvalue = true;
-				}
-				break;
-		}
-	}
-	return rvalue;
-}
-#else
 void CItem::HandleLine(std::vector<UString> dataList)
 {
 	CBaseObject::HandleLine(dataList);
@@ -1717,7 +1322,6 @@ void CItem::HandleLine(std::vector<UString> dataList)
 		}
 	}
 }
-#endif
 //o--------------------------------------------------------------------------
 //|	Function		-	bool LoadRemnants( UI32 arrayOffset )
 //|	Date			-	21st January, 2002
@@ -2445,19 +2049,6 @@ void CSpawnItem::IsSectionAList( bool newVal )
 {
 	isSectionAList = newVal;
 }
-#if ACT_SQL == 0
-//o---------------------------------------------------------------------------o
-//|   Function    -  bool DumpHeader( std::ofstream &outStream )
-//|   Date        -  6/29/2004
-//|   Programmer  -  giwo
-//o---------------------------------------------------------------------------o
-//|   Purpose     -  Dumps Header to Worldfile
-//o---------------------------------------------------------------------------o
-bool CSpawnItem::DumpHeader( std::ofstream &outStream ) const
-{
-	outStream << "[SPAWNITEM]" << '\n';
-	return true;
-}
 
 //o---------------------------------------------------------------------------o
 //|   Function    -  bool DumpBody( std::ofstream &outStream )
@@ -2466,15 +2057,7 @@ bool CSpawnItem::DumpHeader( std::ofstream &outStream ) const
 //o---------------------------------------------------------------------------o
 //|   Purpose     -  Dumps Spawn Item to Worldfile
 //o---------------------------------------------------------------------------o
-bool CSpawnItem::DumpBody( std::ofstream &outStream ) const
-{
-	CItem::DumpBody( outStream );
-	outStream << "Interval=" << (UI16)GetInterval( 0 ) << "," << (UI16)GetInterval( 1 ) << '\n';
-	outStream << "SpawnSection=" << GetSpawnSection() << '\n';
-	outStream << "IsSectionAList=" << (UI16)(IsSectionAList()?1:0) << '\n';
-	return true;
-}
-#else
+
 std::stringstream CSpawnItem::DumpBody() const
 {
 	std::stringstream Str = CItem::DumpBody();
@@ -2489,7 +2072,6 @@ std::stringstream CSpawnItem::DumpBody() const
 	Str << "'" << (UI16)(IsSectionAList() ? 1 : 0) << "')\n";
 	return Str;
 }
-#endif
 //o---------------------------------------------------------------------------o
 //|   Function    -  bool HandleLine( UString &UTag, UString &data )
 //|   Date        -  6/29/2004
@@ -2497,39 +2079,6 @@ std::stringstream CSpawnItem::DumpBody() const
 //o---------------------------------------------------------------------------o
 //|   Purpose     -  Reads data from Worldfile into the class
 //o---------------------------------------------------------------------------o
-#if ACT_SQL == 0
-bool CSpawnItem::HandleLine( UString &UTag, UString &data )
-{
-	bool rvalue = CItem::HandleLine( UTag, data );
-	if( !rvalue )
-	{
-		switch( (UTag.data()[0]) )
-		{
-			case 'I':
-				if( UTag == "INTERVAL" )
-				{
-					SetInterval( 0, data.section( ",", 0, 0 ).stripWhiteSpace().toUByte() );
-					SetInterval( 1, data.section( ",", 1, 1 ).stripWhiteSpace().toUByte() );
-					rvalue = true;
-				}
-				else if( UTag == "ISSECTIONALIST" )
-				{
-					IsSectionAList( (data.toUByte() == 1) );
-					rvalue = true;
-				}
-				break;
-			case 'S':
-				if( UTag == "SPAWNSECTION" )
-				{
-					SetSpawnSection( data );
-					rvalue = true;
-				}
-				break;
-		}
-	}
-	return rvalue;
-}
-#else
 void CSpawnItem::HandleLine(std::vector<UString> dataList)
 {
 	CItem::HandleLine(dataList);
@@ -2561,7 +2110,6 @@ void CSpawnItem::HandleLine(std::vector<UString> dataList)
 		}
 	}
 }
-#endif
 
 //o---------------------------------------------------------------------------o
 //|   Function    -  DoRespawn()

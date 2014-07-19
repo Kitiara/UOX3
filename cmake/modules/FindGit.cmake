@@ -1,7 +1,4 @@
 ################################################################################
-#
-#  Program: 3D Slicer
-#
 #  Copyright (c) Kitware Inc.
 #
 #  See COPYRIGHT.txt

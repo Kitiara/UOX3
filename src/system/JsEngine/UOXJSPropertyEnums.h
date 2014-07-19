@@ -419,15 +419,11 @@ enum CPartyProperties
 	CPARTYP_COUNT
 };
 
-#if ACT_SQL == 1
-
 enum CSQLMProperties
 {
 	CSQLMP_LASTSUCCEEDED = 0,
 	CSQLMP_COUNT
 };
-
-#endif
 
 }
 

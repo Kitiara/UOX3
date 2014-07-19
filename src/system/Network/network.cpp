@@ -16,6 +16,7 @@
 #include "mapstuff.h"
 
 #include "ObjectFactory.h"
+#include "SQLManager.h"
 
 #if UOX_PLATFORM != PLATFORM_WIN32
 	#include <sys/ioctl.h>
@@ -23,10 +24,6 @@
 
 #undef DBGFILE
 #define DBGFILE "Network.cpp"
-
-#if ACT_SQL == 1
-#include "SQLManager.h"
-#endif
 
 namespace UOX
 {
@@ -251,7 +248,7 @@ void cNetworkStuff::sockInit( void )
 	memset( (char *) &connection, 0, len_connection_addr );
 	connection.sin_family = AF_INET;
 	connection.sin_addr.s_addr = htonl( INADDR_ANY );
-	connection.sin_port = htons( cwmWorldState->ServerData()->ServerPort() );
+	connection.sin_port = htons( cwmWorldState->ServerData()->ServerPort(0) );
 	bcode = bind( a_socket, (struct sockaddr *)&connection, len_connection_addr );
 	
 	if( bcode < 0 )
@@ -262,7 +259,6 @@ void cNetworkStuff::sockInit( void )
 		Shutdown( FATAL_UOX3_ALLOC_NETWORK );
 		return;
 	}
-    
 	
 	UI32 mode = 1;
 	// set the socket to nonblocking
@@ -958,7 +954,9 @@ void cNetworkStuff::GetLoginMsg( UOXSOCKET s )
 			total	-= mi * 60;
 			se		= total;
 			// April 5, 2004 - EviLDeD - Please leave the place holders incode. They are not read in from the ini as of yet but will be as I get time and solidify the exact values needed
-			sprintf( (char*)szTBuf, "UOX3:sn=%s,cs=0x%04X,st=[ut:%02i:%02i:%02i][cn:%i][ic:%i][cc:%i][me:0x%08X][ma:0x%04X,%s,%s,%s,%s]\x0", cwmWorldState->ServerData()->ServerName().c_str(), cwmWorldState->ServerData()->GetClientFeatures(), ho, mi, se, cwmWorldState->GetPlayersOnline()+1, ObjectFactory::getSingleton().CountOfObjects( OT_ITEM ), ObjectFactory::getSingleton().CountOfObjects( OT_CHAR ), 0xDEADFEED, 0x000D, "Felucia", "Trammel", "Ilshenar", "Malas" );
+			sprintf( (char*)szTBuf, "UOX3:sn=%s,cs=0x%04X,st=[ut:%02i:%02i:%02i][cn:%i][ic:%i][cc:%i][me:0x%08X][ma:0x%04X,%s,%s,%s,%s]\x0",
+				cwmWorldState->ServerData()->ServerName(0).c_str(), cwmWorldState->ServerData()->GetClientFeatures(), ho, mi, se, cwmWorldState->GetPlayersOnline()+1,
+				ObjectFactory::getSingleton().CountOfObjects( OT_ITEM ), ObjectFactory::getSingleton().CountOfObjects( OT_CHAR ), 0xDEADFEED, 0x000D, "Felucia", "Trammel", "Ilshenar", "Malas" );
 			mSock->Send( (char*)szTBuf,strlen((char*)szTBuf)+1);
 			mSock->NewClient( false );
 		}
@@ -1152,48 +1150,6 @@ void cNetworkStuff::LoadFirewallEntries( void )
 {
 	UString token;
 	SI16 p[4];
-#if ACT_SQL == 0
-	std::string fileToUse;
-	if( !FileExists( "banlist.ini" ) )
-	{
-		if( FileExists( "firewall.ini" ) )
-			fileToUse = "firewall.ini";
-	}
-	else
-		fileToUse = "banlist.ini";
-	if( !fileToUse.empty() ) 
-	{
-		Script *firewallData = new Script( fileToUse, NUM_DEFS, false );
-		if( firewallData != NULL )
-		{
-			ScriptSection *firewallSect = NULL;
-			UString tag, data;
-			for( firewallSect = firewallData->FirstEntry(); firewallSect != NULL; firewallSect = firewallData->NextEntry() )
-				if( firewallSect != NULL )
-					for( tag = firewallSect->First(); !firewallSect->AtEnd(); tag = firewallSect->Next() )
-						if( tag.upper() == "IP" )
-						{
-							data = firewallSect->GrabData();
-							if( !data.empty() )
-								if( data.sectionCount( "." ) == 3 )	// Wellformed IP address
-								{
-									for( UI08 i = 0; i < 4; ++i )
-									{
-										token = data.section( ".", i, i );
-										if( token == "*" )
-											p[i] = -1;
-										else
-											p[i] = token.toShort();
-									}
-									slEntries.push_back( FirewallEntry( p[0], p[1], p[2], p[3] ) );
-								}
-								else if( data != "\n" && data != "\r" )
-									Console.Error( "Malformed IP address in banlist.ini (line: %s)", data.c_str() );
-						}
-		}
-		delete firewallData;
-	}
-#else
 	int index;
 	if (SQLManager::getSingleton().ExecuteQuery("SELECT ip FROM ip_banned", &index, false))
 	{
@@ -1222,7 +1178,6 @@ void cNetworkStuff::LoadFirewallEntries( void )
 		}
 		SQLManager::getSingleton().QueryRelease(false);
 	}
-#endif
 }
 
 void cNetworkStuff::RegisterPacket( UI08 packet, UI08 subCmd, UI16 scriptID )

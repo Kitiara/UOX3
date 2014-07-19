@@ -1938,7 +1938,7 @@ Source Changes/Fixes:
 JScript Changes/Fixes:
 	Added feedback message for the dupe-command (Xuri)
 	Added feedback on whether or not an item/npc was successfully created (through add.js) (Xuri)
-	Added commands: reloadalljs, reloadregions, reloadspawnregions, reloadspells, reloadcommands, reloadhtml, reloadall (Xuri)
+	Added commands: reloadalljs, reloadregions, reloadspawnregions, reloadspells, reloadcommands, reloadall (Xuri)
 	Added commands to repeatedcmds.js: rtele - for repeated teleports, and raddnpc - for repeated npc adds (Xuri)
 	Fixed out-of-date radditem command. (Xuri)
 	Cleaned up misc-cmd.js and repeatingcmds.js (Xuri)

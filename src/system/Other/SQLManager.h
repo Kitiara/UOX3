@@ -32,7 +32,8 @@ namespace UOX
 		SQL_STATE state;
 		bool lastState;
 		bool inTransaction;
-		std::string address;
+		std::string ip;
+		unsigned int port;
 		std::string	database;
 		std::string	username;
 		std::string	password;
@@ -41,10 +42,7 @@ namespace UOX
 		SQLManager();
 		~SQLManager();
 
-		bool SetAddress( std::string newVal );
-		bool SetDatabase( std::string newVal );
-		bool SetUsername( std::string newVal );
-		bool SetPassword( std::string newVal );
+		void SetDatabaseInfo(UString dbinfo);
 
 		std::string GetDatabase() const { return database; }
 
@@ -58,7 +56,6 @@ namespace UOX
 		bool FinaliseTransaction( bool commit );
 		bool LastSucceeded( void );
 		std::vector<std::string> Simplify(UString uStr, bool execute = true, int* index = NULL, bool transaction = true);
-		bool SaveSettings( std::ofstream& target );
 
 		MYSQL_RES* GetMYSQLResult() { return res; }
 

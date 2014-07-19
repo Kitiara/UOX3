@@ -2,9 +2,7 @@
 #include "classes.h"
 #include "regions.h"
 #include "ObjectFactory.h"
-#if ACT_SQL == 1
 #include "SQLManager.h"
-#endif
 
 namespace UOX
 {
@@ -28,7 +26,6 @@ int FileSize( std::string filename )
 	return retVal;
 }
 
-#if ACT_SQL == 1
 void LoadChar(std::vector<UString> dataList)
 {
 	CChar *x = static_cast<CChar *>(ObjectFactory::getSingleton().CreateBlankObject(OT_CHAR));
@@ -80,59 +77,6 @@ void LoadSpawnItem(std::vector<UString> dataList)
 		ObjectFactory::getSingleton().DestroyObject(ourSpawner);
 	}
 }
-#else
-void LoadChar( std::ifstream& readDestination )
-{
-	CChar *x = static_cast< CChar * >(ObjectFactory::getSingleton().CreateBlankObject( OT_CHAR ));
-	if( x == NULL ) 
-		return;
-	if( !x->Load( readDestination ) )
-	{
-		x->Cleanup();
-		ObjectFactory::getSingleton().DestroyObject( x );
-	}
-}
-void LoadItem( std::ifstream& readDestination )
-{
-	CItem *x = static_cast< CItem * >(ObjectFactory::getSingleton().CreateBlankObject( OT_ITEM ));
-	if( x == NULL ) 
-		return;
-	if( !x->Load( readDestination ) )
-	{
-		x->Cleanup();
-		ObjectFactory::getSingleton().DestroyObject( x );
-	}
-}
-void LoadMulti( std::ifstream& readDestination )
-{
-	CMultiObj *ourHouse = static_cast< CMultiObj * >(ObjectFactory::getSingleton().CreateBlankObject( OT_MULTI ));
-	if( !ourHouse->Load( readDestination ) )	// if no load, DELETE
-	{
-		ourHouse->Cleanup();
-		ObjectFactory::getSingleton().DestroyObject( ourHouse );
-	}
-}
-
-void LoadBoat( std::ifstream& readDestination )
-{
-	CBoatObj *ourBoat = static_cast< CBoatObj * >(ObjectFactory::getSingleton().CreateBlankObject( OT_BOAT ));
-	if( !ourBoat->Load( readDestination ) ) // if no load, DELETE
-	{
-		ourBoat->Cleanup();
-		ObjectFactory::getSingleton().DestroyObject( ourBoat );
-	}
-}
-
-void LoadSpawnItem( std::ifstream& readDestination )
-{
-	CSpawnItem *ourSpawner = static_cast< CSpawnItem * >(ObjectFactory::getSingleton().CreateBlankObject( OT_SPAWNER ));
-	if( !ourSpawner->Load( readDestination ) ) // if no load, DELETE
-	{
-		ourSpawner->Cleanup();
-		ObjectFactory::getSingleton().DestroyObject( ourSpawner );
-	}
-}
-#endif
 
 //o--------------------------------------------------------------------------o
 //|	Function		-	void SaveToDisk( std::ofstream& writeDestination, std::ofstream &houseDestination )
@@ -144,58 +88,6 @@ void LoadSpawnItem( std::ifstream& readDestination )
 //|								reworked SaveChar from WorldMain to deal with pointer based stuff in region rather than index based stuff in array
 //|								Also saves out all data regardless (in preparation for a simple binary save)
 //o--------------------------------------------------------------------------o
-#if ACT_SQL == 0
-void CMapRegion::SaveToDisk(std::ofstream& writeDestination, std::ofstream &houseDestination)
-{
-	charData.Push();
-	for (CChar* charToWrite = charData.First(); !charData.Finished(); charToWrite = charData.Next())
-	{
-		if (!ValidateObject(charToWrite))
-		{
-			charData.Remove(charToWrite);
-			continue;
-		}
-#if defined( _MSC_VER )
-		#pragma todo( "PlayerHTML Dumping needs to be reimplemented" )
-#endif
-		if (charToWrite->ShouldSave()) 
-			charToWrite->Save(writeDestination);
-	}
-	charData.Pop();
-	itemData.Push();
-	for (CItem *itemToWrite = itemData.First(); !itemData.Finished(); itemToWrite = itemData.Next())
-	{
-		if (!ValidateObject(itemToWrite))
-		{
-			itemData.Remove(itemToWrite);
-			continue;
-		}
-
-		if (itemToWrite->ShouldSave())
-		{
-			switch (itemToWrite->GetObjType())
-			{
-			case OT_MULTI:
-				{
-					CMultiObj *iMulti = static_cast<CMultiObj *>(itemToWrite);
-					iMulti->Save(houseDestination);
-				}
-				break;
-			case OT_BOAT:
-				{
-					CBoatObj *iBoat = static_cast<CBoatObj *>(itemToWrite);
-					iBoat->Save(houseDestination);
-				}
-				break;
-			default:
-				itemToWrite->Save(writeDestination);
-				break;
-			}				
-		}
-	}
-	itemData.Pop();
-}
-#else
 void CMapRegion::SaveToDB()
 {
 	UString uStr;
@@ -254,7 +146,6 @@ void CMapRegion::SaveToDB()
 	for (auto itr = eachTable.begin(); itr != eachTable.end(); ++itr)
 		SQLManager::getSingleton().ExecuteQuery(*itr);
 }
-#endif
 //o--------------------------------------------------------------------------o
 //|	Function		-	CDataList< CItem * > * GetItemList( void )
 //|	Date			-	Unknown
@@ -365,7 +256,7 @@ MapResource_st& CMapWorld::GetResource( SI16 x, SI16 y )
 void CMapWorld::SaveResources( UI08 worldNum )
 {
 	char wBuffer[2];
-	const std::string resourceFile	= cwmWorldState->ServerData()->Directory( CSDDP_SHARED ) + "resource[" + UString::number( worldNum ) + "].bin";
+	const std::string resourceFile	= cwmWorldState->ServerData()->Directory( CSDDP_ROOT ) + "resource[" + UString::number( worldNum ) + "].bin";
 	std::ofstream toWrite( resourceFile.c_str(), std::ios::out | std::ios::trunc | std::ios::binary );
 
 	if( toWrite )
@@ -399,7 +290,7 @@ void CMapWorld::LoadResources( UI08 worldNum )
 	const SI16 resLog				= cwmWorldState->ServerData()->ResLogs();
 	const UI32 oreTime				= BuildTimeValue( static_cast<R32>(cwmWorldState->ServerData()->ResOreTime() ));
 	const UI32 logTime				= BuildTimeValue( static_cast<R32>(cwmWorldState->ServerData()->ResLogTime()) );
-	const std::string resourceFile	= cwmWorldState->ServerData()->Directory( CSDDP_SHARED ) + "resource[" + UString::number( worldNum ) + "].bin";
+	const std::string resourceFile	= cwmWorldState->ServerData()->Directory( CSDDP_ROOT ) + "resource[" + UString::number( worldNum ) + "].bin";
 
 	char rBuffer[2];
 	std::ifstream toRead ( resourceFile.c_str(), std::ios::in | std::ios::binary );
@@ -766,7 +657,6 @@ void CMapHandler::Save( void )
 	Console << "Saving Character and Item Map Region data...   ";
 	UI32 StartTime = getclock();
 	SI32 baseX, baseY;
-#if ACT_SQL == 1
 	for (SI16 counter1 = 0; counter1 < AreaX; ++counter1)   // move left->right
 	{ 
 		baseX = counter1 * 8;
@@ -782,87 +672,6 @@ void CMapHandler::Save( void )
 	}
 
 	overFlow.SaveToDB();
-#else
-	Console.TurnYellow();
-	std::ofstream writeDestination, houseDestination;
-	int onePercent = 0;
-	//const int onePercent			= (int)((float)(UpperX*UpperY*Map->MapCount())/100.0f);
-	for(UI08 i = 0; i < Map->MapCount(); ++i )
-	{
-		MapData_st& mMap = Map->GetMapData( i );
-		onePercent += (int)(mMap.xBlock / MapColSize) * (mMap.yBlock / MapRowSize);
-	}
-	onePercent /= 100.0f;
-
-	const char blockDiscriminator[] = "\n\n---REGION---\n\n";
-	UI32 count						= 0;
-
-	Console << "0%";
-
-	std::string basePath = cwmWorldState->ServerData()->Directory( CSDDP_SHARED );
-	std::string filename = basePath + "house.wsc";
-	
-	houseDestination.open( filename.c_str() );
-
-	for( SI16 counter1 = 0; counter1 < AreaX; ++counter1 )	// move left->right
-	{
-		const SI32 baseX = counter1 * 8;
-		for( SI16 counter2 = 0; counter2 < AreaY; ++counter2 )	// move up->down
-		{
-			const SI32 baseY	= counter2 * 8;								// calculate x grid offset
-			filename	= basePath + UString::number( counter1 ) + "." + UString::number( counter2 ) + ".wsc";	// let's name our file
-			writeDestination.open( filename.c_str() );
-
-			if( !writeDestination ) 
-			{
-				Console.Error( "Failed to open %s for writing", filename.c_str() );
-				continue;
-			}
-
-			for( UI08 xCnt = 0; xCnt < 8; ++xCnt )					// walk through each part of the 8x8 grid, left->right
-			{
-				for( UI08 yCnt = 0; yCnt < 8; ++yCnt )				// walk the row
-				{
-					for( WORLDLIST_ITERATOR mIter = mapWorlds.begin(); mIter != mapWorlds.end(); ++mIter )
-					{
-						++count;
-						if( count%onePercent == 0 )
-						{
-							if( count/onePercent <= 10 )
-								Console << "\b\b" << (UI32)(count/onePercent) << "%";
-							else if( count/onePercent <= 100 )
-								Console << "\b\b\b" << (UI32)(count/onePercent) << "%";
-						}
-						CMapRegion * mRegion = (*mIter)->GetMapRegion( (baseX+xCnt), (baseY+yCnt) );
-						if( mRegion != NULL )
-							mRegion->SaveToDisk( writeDestination, houseDestination );
-
-						writeDestination << blockDiscriminator;
-					}
-				}
-			}
-			writeDestination.close();
-		}
-	}
-	houseDestination.close();
-
-	filename = basePath + "overflow.wsc";
-	writeDestination.open( filename.c_str() );
-
-	if( writeDestination.is_open() )
-	{
-		overFlow.SaveToDisk( writeDestination, writeDestination );
-		writeDestination.close();
-	}
-	else
-	{
-		Console.Error( "Failed to open %s for writing", filename.c_str() );
-		return;
-	}
-	
-	Console << "\b\b\b\b";
-	Console.PrintDone();
-#endif
 
 	Console.Print("World saved in %.02fsec\n", ((float)(getclock()-StartTime))/1000.0f);
 
@@ -891,7 +700,6 @@ bool PostLoadFunctor( CBaseObject *a, UI32 &b, void *extraData )
 void CMapHandler::Load( void )
 {
 	UI32 StartTime = getclock();
-#if ACT_SQL == 1
 	std::string strsql = "SELECT baseobjects.*, %s %s %s FROM baseobjects %s %s %s WHERE baseobjects.type = %u";
 	std::string column[3] = {"", "", ""};
 	std::string table[3] = {"", "", ""}; // last is not like the others...
@@ -990,78 +798,7 @@ void CMapHandler::Load( void )
 		else
 			++objtype;
 	}
-#else
-	Console.TurnYellow();
-	const SI16 AreaX		= UpperX / 8;	// we're storing 8x8 grid arrays together
-	const SI16 AreaY		= UpperY / 8;
-//	const int onePercent	= (int)((float)(AreaX*AreaY)/100.0f);
-	UI32 count				= 0;
-	std::ifstream readDestination;
-	Console << "0%";
-	std::string basePath	= cwmWorldState->ServerData()->Directory( CSDDP_SHARED );
-	std::string filename;
 
-	UI32 runningCount = 0;
-	int fileSizes[AreaX][AreaY];
-
-	for( SI16 cx = 0; cx < AreaX; ++cx )
-	{
-		for( SI16 cy = 0; cy < AreaY; ++cy )
-		{
-			filename			= basePath + UString::number( cx ) + "." + UString::number( cy ) + ".wsc";	// let's name our file
-			fileSizes[cx][cy]	= FileSize( filename );
-			runningCount		+= fileSizes[cx][cy];
-		}
-	}
-
-	if( runningCount == 0 )
-		runningCount = 1;
-
-	int runningDone			= 0;
-	for( SI16 counter1 = 0; counter1 < AreaX; ++counter1 )	// move left->right
-	{
-		for( SI16 counter2 = 0; counter2 < AreaY; ++counter2 )	// move up->down
-		{
-			filename	= basePath + UString::number( counter1 ) + "." + UString::number( counter2 ) + ".wsc";	// let's name our file
-			readDestination.open( filename.c_str());					// let's open it 
-			readDestination.seekg( 0, std::ios::beg );
-
-			if( readDestination.eof() || readDestination.fail() )
-			{
-				readDestination.close();
-				readDestination.clear();
-				continue;
-			}
-
-			++count;
-			LoadFromDisk( readDestination, runningDone, fileSizes[counter1][counter2], runningCount );
-
-			runningDone		+= fileSizes[counter1][counter2];
-			float tempVal	= (float)runningDone / (float)runningCount * 100.0f;
-			if( tempVal <= 10 )
-				Console << "\b\b" << (UI32)(tempVal) << "%";
-			else if( tempVal <= 100 )
-				Console << "\b\b\b" << (UI32)(tempVal) << "%";
-
-			readDestination.close();
-			readDestination.clear();
-		}
-	}
-
-	Console.TurnNormal();
-	Console << "\b\b\b";
-	Console.PrintDone();
-
-	filename	= basePath + "overflow.wsc";
-	std::ifstream flowDestination( filename.c_str() );
-	LoadFromDisk( flowDestination, -1, -1, -1 );
-	flowDestination.close();
-
-	filename	= basePath + "house.wsc";
-	std::ifstream houseDestination( filename.c_str() );
-	LoadFromDisk( houseDestination, -1, -1, -1 );
-	houseDestination.close();
-#endif
 	UI32 b = 0;
 	ObjectFactory::getSingleton().IterateOver(OT_MULTI, b, NULL, &PostLoadFunctor);
 	ObjectFactory::getSingleton().IterateOver(OT_ITEM, b, NULL, &PostLoadFunctor);
@@ -1077,56 +814,4 @@ void CMapHandler::Load( void )
 	}
 }
 
-//o--------------------------------------------------------------------------o
-//|	Function		-	LoadFromDisk( std::ifstream& readDestination )
-//|	Date			-	23 July, 2000
-//|	Programmer		-	Abaddon
-//|	Modified		-
-//o--------------------------------------------------------------------------o
-//|	Purpose			-	Loads in objects from specified file
-//o--------------------------------------------------------------------------o
-#if ACT_SQL == 0
-void CMapHandler::LoadFromDisk( std::ifstream& readDestination, int baseValue, int fileSize, int maxSize )
-{
-	char line[1024];
-	float basePercent	= (float)baseValue / (float)maxSize * 100.0f;
-	float targPercent	= (float)(baseValue + fileSize) / (float)maxSize * 100.0f;
-	float diffValue		= targPercent - basePercent;
-
-	int updateCount		= 0;
-	while( !readDestination.eof() && !readDestination.fail() )
-	{
-		readDestination.getline( line, 1024 );
-		UString sLine( line );
-		sLine = sLine.removeComment().stripWhiteSpace();
-		if( sLine.substr( 0, 1 ) == "[" )	// in a section
-		{
-			sLine = sLine.substr( 1, sLine.size() - 2 );
-			sLine = sLine.upper().stripWhiteSpace();
-			if( sLine == "CHARACTER" )
-				LoadChar( readDestination );
-			else if( sLine == "ITEM" )
-				LoadItem( readDestination );
-			else if( sLine == "HOUSE" )
-				LoadMulti( readDestination );
-			else if( sLine == "BOAT" )
-				LoadBoat( readDestination );
-			else if( sLine == "SPAWNITEM" )
-				LoadSpawnItem( readDestination );
-
-			if( fileSize != -1 && (++updateCount)%20 == 0 )
-			{
-				float curPos	= readDestination.tellg();
-				float tempVal	= basePercent + ( curPos / fileSize * diffValue );
-				if( tempVal <= 10 )
-					Console << "\b\b" << (UI32)(tempVal) << "%";
-				else
-					Console << "\b\b\b" << (UI32)(tempVal) << "%";
-			}
-		}
-		else if( sLine == "---REGION---" )	// end of region
-			continue;
-	}
-}
-#endif
 }

@@ -70,6 +70,8 @@ public:
 	float toFloat(bool * ok=0) const ;
 	double toDouble(bool * ok=0) const ;
 
+	bool toBoolean(bool * ok=0) const ;
+
 	UString  setNum ( short n, int base = 10 );
 	UString  setNum ( unsigned short n, int base = 10 );
 	UString  setNum ( int n, int base = 10 );

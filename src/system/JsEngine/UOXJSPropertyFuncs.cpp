@@ -39,10 +39,7 @@
 #include "jsutil.h"
 
 #include "PartySystem.h"
-
-#if ACT_SQL == 1
 #include "SQLManager.h"
-#endif
 
 namespace UOX
 {
@@ -1971,8 +1968,6 @@ namespace UOX
 		return JS_TRUE;
 	}
 
-#if ACT_SQL == 1
-
 	JSBool CSQLMProps_setProperty( JSContext *cx, JSObject *obj, jsval id, jsval *vp )
 	{
 		if( JSVAL_IS_INT( id ) ) 
@@ -1999,6 +1994,4 @@ namespace UOX
 		}
 		return JS_TRUE;
 	}
-
-#endif
 }

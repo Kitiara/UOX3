@@ -38,32 +38,25 @@ namespace UOX
 		Disconnect();
 	}
 
-	bool SQLManager::SetAddress( std::string newVal )
+	void SQLManager::SetDatabaseInfo(UString dbinfo)
 	{
-		address	= newVal;
-		lastState	= true;
-		return lastState;
-	}
+		int count = dbinfo.sectionCount(";");
+		if (count > 4)
+			count = 4;
 
-	bool SQLManager::SetDatabase( std::string newVal )
-	{
-		database	= newVal;
-		lastState	= true;
-		return lastState;
-	}
-
-	bool SQLManager::SetUsername( std::string newVal )
-	{
-		username	= newVal;
-		lastState	= true;
-		return lastState;
-	}
-
-	bool SQLManager::SetPassword( std::string newVal )
-	{
-		password	= newVal;
-		lastState	= true;
-		return lastState;
+		for (int i = 0; i < count+1; ++i)
+		{
+			if (i == 0)
+				ip = dbinfo.section(";", i, i).empty() ? "" : dbinfo.section(";", i, i).c_str();
+			else if (i == 1)
+				port = dbinfo.section(";", i, i).empty() ? 0 : dbinfo.section(";", i, i).toUInt();
+			else if (i == 2)
+				username = dbinfo.section(";", i, i).empty() ? "" : dbinfo.section(";", i, i).c_str();
+			else if (i == 3)
+				password = dbinfo.section(";", i, i).empty() ? "" : dbinfo.section(";", i, i).c_str();
+			else
+				database = dbinfo.section(";", i, i).empty() ? "" : dbinfo.section(";", i, i).c_str();
+		}
 	}
 
 	bool SQLManager::BeginTransaction(void)
@@ -113,7 +106,7 @@ namespace UOX
 
 		conn = mysql_init((MYSQL*) 0);
 		bool success = false;
-		if (mysql_real_connect(conn, address.c_str(), username.c_str(), password.c_str(), database.c_str(), 0, NULL, 0))
+		if (mysql_real_connect(conn, ip.c_str(), username.c_str(), password.c_str(), database.c_str(), port, NULL, 0))
 			success = true;
 
 		if (!success)
@@ -315,16 +308,6 @@ namespace UOX
 		}
 
 		return eachTable;
-	}
-
-	bool SQLManager::SaveSettings( std::ofstream& target )
-	{
-		target << std::endl << "[MySQL]" << std::endl << "{" << std::endl;
-		target << "MySQLDB=" << database << std::endl;
-		target << "MySQLUSER=" << username << std::endl;
-		target << "MySQLPASS=" << password << std::endl;
-		target << "}" << std::endl;
-		return true;
 	}
 
 	bool SQLManager::LastSucceeded( void )

@@ -5,15 +5,12 @@
 #include "cSpawnRegion.h"
 #include "scriptc.h"
 #include "townregion.h"
+#include "SQLManager.h"
+#include <unordered_map>
 
 #if UOX_PLATFORM != PLATFORM_WIN32
 #  include <fcntl.h>     // open
 #  include <sys/mman.h>  // mmap, mmunmap
-#endif
-
-#if ACT_SQL == 1
-#include "SQLManager.h"
-#include <unordered_map>
 #endif
 
 namespace UOX
@@ -339,58 +336,6 @@ void LoadSpawnRegions( void )
 //o---------------------------------------------------------------------------o
 void LoadRegions( void )
 {
-#if ACT_SQL == 0
-	cwmWorldState->townRegions.clear();
-	std::string regionsFile = cwmWorldState->ServerData()->Directory( CSDDP_SHARED ) + "regions.wsc";
-	bool performLoad		= false;
-	Script *ourRegions		= NULL;
-	if( FileExists( regionsFile ) )
-	{
-		performLoad = true;
-		ourRegions = new Script( regionsFile, NUM_DEFS, false );
-	}
-
-	UI16 i = 0;
-	UString regEntry;
-	for( Script *regScp = FileLookup->FirstScript( regions_def ); !FileLookup->FinishedScripts( regions_def ); regScp = FileLookup->NextScript( regions_def ) )
-	{
-		if( regScp == NULL )
-			continue;
-
-		for( ScriptSection *toScan = regScp->FirstEntry(); toScan != NULL; toScan = regScp->NextEntry() )
-		{
-			if( toScan == NULL )
-				continue;
-
-			regEntry = regScp->EntryName();
-			if( regEntry.section( " ", 0, 0 ) == "REGION" )
-			{
-				i = regEntry.section( " ", 1, 1 ).toUShort();
-				if( cwmWorldState->townRegions.find( i ) == cwmWorldState->townRegions.end() )
-				{
-					cwmWorldState->townRegions[i] = new CTownRegion( i );
-					cwmWorldState->townRegions[i]->InitFromScript( toScan );
-					if( performLoad )
-						cwmWorldState->townRegions[i]->Load( ourRegions );
-				}
-				else
-					Console.Warning( "regions.dfn has a duplicate REGION entry, Entry Number: %u", i );
-			}
-		}
-	}
-	if( regEntry == "" )
-	{
-		// No regions found? :O Shut down UOX3, or we'll run into trouble later.
-		Console.PrintFailed();
-		Shutdown( FATAL_UOX3_ALLOC_MAPREGIONS );
-	}
-
-	if( performLoad )
-	{
-		delete ourRegions;
-		ourRegions = NULL;
-	}
-#else
 	typedef std::tr1::unordered_map<UI16, std::vector<UString> > UNORDERED_MAP;
 	UNORDERED_MAP uMap;
 	std::string sql = "SELECT id, name, race, guardowner, mayor, priv, resourceamount, taxedid, taxedamount, guardspurchased, "
@@ -455,7 +400,7 @@ void LoadRegions( void )
 			}
 		}
 	}
-#endif
+
 	ScriptSection *InstaLog = FileLookup->FindEntry( "INSTALOG", regions_def );
 	if( InstaLog == NULL ) 
 		return;

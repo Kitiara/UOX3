@@ -392,8 +392,6 @@ static JSExtendedClass UOXParty_class =
 	JSCLASS_NO_RESERVED_MEMBERS
 }; 
 
-#if ACT_SQL == 1
-
 static JSClass UOXSQLM_class =
 {
 	"UOXSQLM",
@@ -407,8 +405,6 @@ static JSClass UOXSQLM_class =
 	JS_ConvertStub,
 	JS_FinalizeStub 
 };
-
-#endif
 
 }
 

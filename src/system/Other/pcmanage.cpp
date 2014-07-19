@@ -13,11 +13,8 @@
 #include "Dictionary.h"
 #include "cEffects.h"
 #include "ObjectFactory.h"
-
-#if ACT_SQL == 1
 #include "SQLManager.h"
 #include "regions.h"
-#endif
 
 namespace UOX
 {

@@ -254,8 +254,6 @@ JSMethodFunc CSocket_FirstTriggerWord;
 JSMethodFunc CSocket_NextTriggerWord;
 JSMethodFunc CSocket_FinishedTriggerWords;
 
-#if ACT_SQL == 1
-
 JSMethodFunc CSQLM_BeginTransaction;
 JSMethodFunc CSQLM_FinaliseTransaction;
 JSMethodFunc CSQLM_ExecuteQuery;
@@ -263,8 +261,6 @@ JSMethodFunc CSQLM_QueryRelease;
 JSMethodFunc CSQLM_FetchRow;
 JSMethodFunc CSQLM_GetColumn;
 JSMethodFunc CSQLM_LastOK;
-
-#endif
 
 static JSFunctionSpec CGump_Methods[] =  
 { 	
@@ -556,8 +552,6 @@ static JSFunctionSpec CParty_Methods[] =
 	{ NULL,				NULL,						0, 0, 0 }
 };
 
-#if ACT_SQL == 1
-
 static JSFunctionSpec CSQLM_Methods[] =  
 { 	
 	{ "BeginTransaction",		CSQLM_BeginTransaction,		0, 0, 0 },
@@ -569,8 +563,6 @@ static JSFunctionSpec CSQLM_Methods[] =
 	{ "LastOK",					CSQLM_LastOK,				0, 0, 0 },
 	{ NULL,						NULL,						0, 0, 0 }
 };
-
-#endif
 
 }
 

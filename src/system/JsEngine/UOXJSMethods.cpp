@@ -50,10 +50,7 @@
 #include "cThreadQueue.h"
 #include "combat.h"
 #include "PartySystem.h"
-
-#if ACT_SQL == 1
 #include "SQLManager.h"
-#endif
 
 namespace UOX
 {
@@ -6232,7 +6229,6 @@ JSBool CSocket_FinishedTriggerWords( JSContext *cx, JSObject *obj, uintN argc, j
 	return JS_TRUE;
 }
 
-#if ACT_SQL == 1
 JSBool CSQLM_BeginTransaction( JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval )
 {
 	if( argc != 0 )
@@ -6329,8 +6325,6 @@ JSBool CSQLM_LastOK( JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsva
 	*rval = BOOLEAN_TO_JSVAL( SQLManager::getSingleton().LastSucceeded() );
 	return JS_TRUE;
 }
-
-#endif
 
 }
 

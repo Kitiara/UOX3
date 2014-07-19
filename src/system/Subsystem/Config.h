@@ -15,10 +15,6 @@ This file has been adapted from OgreConfig.h, but customised to our purposes
 
 #define P_TIMESTAMP 1
 
-// Define this if you want the MySQL functionality
-
-#define ACT_SQL 1
-
 // configure options
 #ifdef HAVE_CONFIG_H
 #include "config.h"

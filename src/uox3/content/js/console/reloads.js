@@ -9,7 +9,6 @@ function ConsoleRegistration()
 	RegisterKey( '6', "reloadcommands" );
 	RegisterKey( '7', "reloaddfns" );
 	RegisterKey( '8', "reloadjs" );
-	RegisterKey( '9', "reloadhtml" );
 }
 
 /*function reloadall()
@@ -95,12 +94,5 @@ function reloadjs()
 {	
 	Console.Print( "CMD: Loading JS ..." );			
 	Console.Reload( 7 );	
-	Console.PrintDone( false );	
-}
-
-function reloadhtml() 		
-{	
-	Console.Print( "CMD: Loading HTML ..." );		
-	Console.Reload( 8 );	
 	Console.PrintDone( false );	
 }

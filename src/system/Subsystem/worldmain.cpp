@@ -32,10 +32,7 @@
 #include "jail.h"
 #include "Dictionary.h"
 #include "ObjectFactory.h"
-
-#if ACT_SQL == 1
 #include "SQLManager.h"
-#endif
 
 namespace UOX
 {
@@ -580,11 +577,10 @@ void CWorldMain::SaveNewWorld( bool x )
 			}
 		}
 		Console << "Saving Misc. data... ";
-		ServerData()->save();
+
 		Console.Log( "Server data save", "server.log" );
-#if ACT_SQL == 1
+
 		SQLManager::getSingleton().BeginTransaction();
-#endif
 		RegionSave();
 		Console.PrintDone();
 		MapRegion->Save(); 
@@ -592,23 +588,16 @@ void CWorldMain::SaveNewWorld( bool x )
 		JailSys->WriteData();
 		Effects->SaveEffects();
 		ServerData()->SaveTime();
-#if ACT_SQL == 1
 		SQLManager::getSingleton().FinaliseTransaction(true);
-#else
-		SaveStatistics(); // No need, we have sql functionalities when (ACT_SQL != 1)
-#endif
+
 		if( ServerData()->ServerAnnounceSavesStatus() )
 			sysBroadcast( "World Save Complete." );
 
 		//	If accounts are to be loaded then they should be loaded
 		//	all the time if using the web interface
 		Accounts->Save();
-#if ACT_SQL == 1
 		Accounts->Load();
-#else
-		// Make sure to import the new accounts so they have access too.
-		Console << "New accounts processed: " << Accounts->ImportAccounts() << myendl;
-#endif
+
 		SetWorldSaveProgress( SS_JUSTSAVED );
 		Console << "World save complete." << myendl;
 		Console.PrintSectionBegin();
@@ -627,21 +616,6 @@ void CWorldMain::SaveNewWorld( bool x )
 //o--------------------------------------------------------------------------o	
 void CWorldMain::RegionSave( void )
 {
-#if ACT_SQL == 0
-	std::string regionsFile	= cwmWorldState->ServerData()->Directory( CSDDP_SHARED ) + "regions.wsc";
-	std::ofstream regionsDestination( regionsFile.c_str() );
-	if( !regionsDestination ) 
-	{
-		Console.Error( "Failed to open %s for writing", regionsFile.c_str() );
-		return;
-	}
-
-	for(TOWNMAP_CITERATOR tIter = cwmWorldState->townRegions.begin(); tIter != cwmWorldState->townRegions.end(); ++tIter)
-		if( tIter->second != NULL )
-			tIter->second->Save( regionsDestination );
-
-	regionsDestination.close();
-#else
 	UString uStr = "DELETE FROM regions";
 	bool Started = false;
 	for (TOWNMAP_CITERATOR tIter = cwmWorldState->townRegions.begin(); tIter != cwmWorldState->townRegions.end(); ++tIter)
@@ -663,7 +637,6 @@ void CWorldMain::RegionSave( void )
 	uStr.clear();
 	while (std::getline(iss, uStr))
 		SQLManager::getSingleton().ExecuteQuery(uStr);
-#endif
 }
 
 CServerData *CWorldMain::ServerData( void )
@@ -674,33 +647,6 @@ CServerData *CWorldMain::ServerData( void )
 CServerProfile *CWorldMain::ServerProfile( void )
 {
 	return sProfile;
-}
-
-//o--------------------------------------------------------------------------o
-//|	Function/Class	-	void CWorldMain::SaveStatistics( void )
-//|	Date			-	February 5th, 2005
-//|	Developer(s)	-	Maarc
-//|	Company/Team	-	UOX3 DevTeam
-//o--------------------------------------------------------------------------o
-//|	Description		-	Saves out some useful statistics so that some tools
-//|						such as Xuri's WB can do some memory reserve shortcuts
-//o--------------------------------------------------------------------------o	
-void CWorldMain::SaveStatistics( void )
-{
-	std::string		statsFile = cwmWorldState->ServerData()->Directory( CSDDP_SHARED ) + "statistics.wsc";
-	std::ofstream	statsDestination( statsFile.c_str() );
-	if( !statsDestination ) 
-	{
-		Console.Error( "Failed to open %s for writing", statsFile.c_str() );
-		return;
-	}
-	statsDestination << "[STATISTICS]" << '\n' << "{" << '\n';
-	statsDestination << "PLAYERCOUNT=" << ObjectFactory::getSingleton().CountOfObjects( OT_CHAR ) << '\n';
-	statsDestination << "ITEMCOUNT=" << ObjectFactory::getSingleton().CountOfObjects( OT_ITEM ) << '\n';
-	statsDestination << "MULTICOUNT=" << ObjectFactory::getSingleton().CountOfObjects( OT_MULTI ) << '\n';
-	statsDestination << "}" << '\n' << '\n';
-
-	statsDestination.close();
 }
 
 //o--------------------------------------------------------------------------o

@@ -25,7 +25,6 @@
 #include "regions.h"
 #include "commands.h"
 #include "cServerDefinitions.h"
-#include "cHTMLSystem.h"
 #include "cRaces.h"
 #include "cGuild.h"
 #include "cScript.h"
@@ -1039,7 +1038,6 @@ void CConsole::Process( int c )
 					cwmWorldState->ServerData()->Load();
 					messageLoop << "CMD: Loading All";
 					messageLoop << "     Server INI... ";
-					// Reload accounts, and update Access.adm if new accounts available.
 					messageLoop << "     Loading Accounts... ";
 					Accounts->Load();
 					messageLoop << MSG_PRINTDONE;
@@ -1071,12 +1069,7 @@ void CConsole::Process( int c )
 					messageLoop << "     Loading spells... ";
 					Magic->LoadScript();
 					messageLoop << MSG_PRINTDONE;
-					// Reload the HTML output templates
-					messageLoop << "     Loading HTML Templates... ";
-					HTMLTemplates->Unload();
-					HTMLTemplates->Load();
 					cwmWorldState->SetReloadingScripts( false );
-					messageLoop << MSG_PRINTDONE;
 				}
 				else
 					messageLoop << "Server can only load one script at a time";
@@ -1190,7 +1183,7 @@ void CConsole::Process( int c )
 				messageLoop << "    3 - Regions             4 - Spawn Regions";
 				messageLoop << "    5 - Spells              6 - Commands";
 				messageLoop << "    7 - Dfn's               8 - JavaScript";
-				messageLoop << "    9 - HTML Templates      0 - ALL(1-9)";
+				messageLoop << "    9 - Unused              0 - ALL(1-9)";
 				messageLoop << " Save Commands:";
 				messageLoop << "    ! - Accounts            @ - World(w/AccountImport)";
 				messageLoop << "    # - Unused              $ - Unused";
@@ -1200,7 +1193,7 @@ void CConsole::Process( int c )
 				messageLoop << " Server Maintenence:";
 				messageLoop << "    P - Performance         W - Characters Online";
 				messageLoop << "    M - Memory Information  T - 10 Minute Shutdown";
-				messageLoop << "    V - Dump Lookups(Devs)  F - Display Priority Maps";
+				messageLoop << "    V - Unused              F - Display Priority Maps";
 				messageLoop << " Network Maintenence:";
 				messageLoop << "    D - Disconnect Acct0    K - Disconnect All";
 				messageLoop << "    Z - Socket Logging      ";
@@ -1208,11 +1201,6 @@ void CConsole::Process( int c )
 				break;
 			case 'v':
 			case 'V':
-				// Dump look up data to files so developers working with extending the ini will have a table to use
-				messageLoop << "| CMD: Creating Uox.ini Tag Lookup files(For Developers)....";
-				cwmWorldState->ServerData()->dumpLookup( 0 );
-				cwmWorldState->ServerData()->save( "./uox.tst.ini" );
-				messageLoop << MSG_PRINTDONE;
 				break;
 			case 'z':
 			case 'Z':
@@ -1315,12 +1303,10 @@ void CConsole::DisplaySettings( void )
 	(*this) << "   -Item count: " << ObjectFactory::getSingleton().CountOfObjects( OT_ITEM ) << myendl;
 	(*this) << "   -Num Accounts: " << Accounts->size() << myendl;
 	(*this) << "   Directories: " << myendl;
-	(*this) << "   -Shared:          " << cwmWorldState->ServerData()->Directory( CSDDP_SHARED ) << myendl;
 	(*this) << "   -Archive:         " << cwmWorldState->ServerData()->Directory( CSDDP_BACKUP ) << myendl;
 	(*this) << "   -Data:            " << cwmWorldState->ServerData()->Directory( CSDDP_DATA ) << myendl;
 	(*this) << "   -Defs:            " << cwmWorldState->ServerData()->Directory( CSDDP_DEFS ) << myendl;
 	(*this) << "   -Scripts:         " << cwmWorldState->ServerData()->Directory( CSDDP_SCRIPTS ) << myendl;
-	(*this) << "   -HTML:            " << cwmWorldState->ServerData()->Directory( CSDDP_HTML ) << myendl;
 	(*this) << "   -Books:           " << cwmWorldState->ServerData()->Directory( CSDDP_BOOKS ) << myendl;
 	(*this) << "   -MessageBoards:   " << cwmWorldState->ServerData()->Directory( CSDDP_MSGBOARD ) << myendl;
 }

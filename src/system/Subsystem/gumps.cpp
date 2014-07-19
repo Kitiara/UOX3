@@ -27,7 +27,28 @@ namespace UOX
 
 void CollectGarbage( void );
 void deedHouse( CSocket *s, CMultiObj *i );
-UString GetUptime( void );
+
+UString GetUptime( void )
+{
+	UI32 total	= (cwmWorldState->GetUICurrentTime() - cwmWorldState->GetStartTime() ) / 1000;
+	UI32 ho		= total / 3600;
+	total		-= ho * 3600;
+	UI32 mi		= total / 60;
+	total		-= mi * 60;
+	UI32 se		= total;
+	total		= 0;
+	UString builtString = "";
+	if( ho < 10 )
+		builtString += "0";
+	builtString += UString::number( ho ) + ":";
+	if( mi < 10 )
+		builtString += "0";
+	builtString += UString::number( mi ) + ":";
+	if( se < 10 )
+		builtString += "0";
+	builtString += UString::number( se );
+	return builtString;
+}
 
 //o---------------------------------------------------------------------------o
 //|   Function    :  void TextEntryGump( CSocket *s, SERIAL ser, char type, char index, SI16 maxlength, SI32 dictEntry )

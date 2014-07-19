@@ -19,7 +19,6 @@
 #include "magic.h"
 #include "ssection.h"
 #include "cThreadQueue.h"
-#include "cHTMLSystem.h"
 #include "cServerDefinitions.h"
 #include "Dictionary.h"
 #include "speech.h"
@@ -1522,14 +1521,10 @@ JSBool SE_Reload( JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *
 	case 5: // Reload JScripts
 			messageLoop << MSG_RELOADJS;
 			break;
-	case 6: // Reload HTMLTemplates
-			HTMLTemplates->Unload();
-			HTMLTemplates->Load();
-			break;
-	case 7:	// Reload INI
+	case 6:	// Reload INI
 			cwmWorldState->ServerData()->Load();
 			break;
-	case 8: // Reload Everything
+	case 7: // Reload Everything
 			FileLookup->Reload();
 			UnloadRegions();
 			LoadRegions();
@@ -1540,11 +1535,9 @@ JSBool SE_Reload( JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *
 			LoadSkills();
 			Skills->Load();
 			messageLoop << MSG_RELOADJS;
-			HTMLTemplates->Unload();
-			HTMLTemplates->Load();
 			cwmWorldState->ServerData()->Load();
 			break;
-	case 9: // Reload Accounts
+	case 8: // Reload Accounts
 			Accounts->Load();
 			break;
 	default:

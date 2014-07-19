@@ -3,9 +3,7 @@
 #include "cServerDefinitions.h"
 #include "ssection.h"
 #include "scriptc.h"
-#if ACT_SQL == 1
 #include "SQLManager.h"
-#endif
 
 namespace UOX
 {
@@ -117,28 +115,6 @@ void JailCell::PeriodicCheck( void )
 	}
 }
 
-#if ACT_SQL == 0
-void JailCell::WriteData( std::ofstream &outStream, size_t cellNumber )
-{
-	std::vector< JailOccupant * >::const_iterator jIter;
-	for( jIter = playersInJail.begin(); jIter != playersInJail.end(); ++jIter )
-	{
-		JailOccupant *mOccupant = (*jIter);
-		if( mOccupant != NULL )
-		{
-			outStream << "[PRISONER]" << '\n' << "{" << '\n';
-			outStream << "CELL=" << cellNumber << '\n';
-			outStream << "SERIAL=" << std::hex << mOccupant->pSerial << '\n';
-			outStream << "OLDX=" << std::dec << mOccupant->x << '\n';
-			outStream << "OLDY=" << mOccupant->y << '\n';
-			outStream << "OLDZ=" << (SI16)mOccupant->z << '\n';
-			outStream << "WORLD=" << (UI08)mOccupant->world << '\n';
-			outStream << "RELEASE=" << mOccupant->releaseTime << '\n';
-			outStream << "}" << '\n' << '\n';
-		}
-	}
-}
-#else
 UString JailCell::WriteData(size_t cellNumber)
 {
 	std::stringstream Str;
@@ -168,7 +144,6 @@ UString JailCell::WriteData(size_t cellNumber)
 		}
 	return Str.str();
 }
-#endif
 
 JailSystem::JailSystem()
 {
@@ -219,66 +194,6 @@ void JailSystem::ReadSetup( void )
 }
 void JailSystem::ReadData( void )
 {
-#if ACT_SQL == 0
-	if( jails.empty() )
-		return;
-	std::string temp	= cwmWorldState->ServerData()->Directory( CSDDP_SHARED ) + "jails.wsc";
-	if( FileExists( temp ) )
-	{
-		Script *jailData = new Script( temp, NUM_DEFS, false );
-		if( jailData != NULL )
-		{
-			ScriptSection *prisonerData = NULL;
-			for( prisonerData = jailData->FirstEntry(); prisonerData != NULL; prisonerData = jailData->NextEntry() )
-			{
-				if( prisonerData == NULL )
-					continue;
-				UString tag;
-				UString data;
-				UString UTag;
-				JailOccupant toPush;
-				UI08 cellNumber = 0;
-				for( tag = prisonerData->First(); !prisonerData->AtEnd(); tag = prisonerData->Next() )
-				{
-					if( tag.empty() )
-						continue;
-					UTag = tag.upper();
-					data = prisonerData->GrabData();
-					switch( (UTag.data()[0]) )
-					{
-						case 'C':
-							if( UTag == "CELL" )
-								cellNumber = data.toUByte();
-							break;
-						case 'O':
-							if( UTag == "OLDX" )
-								toPush.x = data.toShort();
-							else if( UTag == "OLDY" )
-								toPush.y = data.toShort();
-							else if( UTag == "OLDZ" )
-								toPush.z = data.toByte();
-							else if( UTag == "WORLD" )
-								toPush.world = data.toByte();
-							break;
-						case 'R':
-							if( UTag == "RELEASE" )
-								toPush.releaseTime = data.toLong();
-							break;
-						case 'S':
-							if( UTag == "SERIAL" )
-								toPush.pSerial = data.toULong();
-							break;
-					}
-				}
-				if( cellNumber < jails.size() )
-					jails[cellNumber].AddOccupant( &toPush );
-				else
-					jails[RandomNum( static_cast< size_t >(0), jails.size() - 1 )].AddOccupant( &toPush );
-			}
-		}
-		delete jailData;
-	}
-#else
 	int index;
 	if (SQLManager::getSingleton().ExecuteQuery("SELECT serial, cell, oldx, oldy, oldz, world, UNIX_TIMESTAMP(`release`) FROM jail", &index, false))
 	{
@@ -330,24 +245,9 @@ void JailSystem::ReadData( void )
 		}
 		SQLManager::getSingleton().QueryRelease(false);
 	}
-#endif
 }
 void JailSystem::WriteData( void )
 {
-#if ACT_SQL == 0
-	std::string jailsFile = cwmWorldState->ServerData()->Directory( CSDDP_SHARED ) + "jails.wsc";
-	std::ofstream jailsDestination( jailsFile.c_str() );
-	if( !jailsDestination )
-	{
-		Console.Error( "Failed to open %s for writing", jailsFile.c_str() );
-		return;
-	}
-
-	for( size_t jCtr = 0; jCtr < jails.size(); ++jCtr )
-		jails[jCtr].WriteData( jailsDestination, jCtr );
-
-	jailsDestination.close();
-#else
 	UString uStr = "DELETE FROM jail";
 	for (size_t jCtr = 0; jCtr < jails.size(); ++jCtr)
 		uStr += jails[jCtr].WriteData(jCtr);
@@ -357,7 +257,6 @@ void JailSystem::WriteData( void )
 	uStr.clear();
 	while (std::getline(iss, uStr))
 		SQLManager::getSingleton().ExecuteQuery(uStr);
-#endif
 }
 void JailSystem::PeriodicCheck( void )
 {

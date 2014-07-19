@@ -110,13 +110,9 @@ public:
 
 	void		SetGuildFaction( GuildType newFaction );
 	void		SetGuildRelation( GUILDID otherGuild, GUILDRELATION toSet );
-#if ACT_SQL == 1
+
 	UString Save(void);
 	void		Load(std::vector<UString> dataList);
-#else
-	void		Save( std::ofstream &toSave );
-	void		Load( ScriptSection *toRead );
-#endif
 
 	GUILDREL *	GuildRelationList( void );	// NOTE: This is aimed ONLY at menu stuff
 

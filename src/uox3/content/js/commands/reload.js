@@ -9,7 +9,6 @@ function CommandRegistration()
 	RegisterCommand( "reloadspawnregions", 3, true ); // reload spawnregions
 	RegisterCommand( "reloadspells", 3, true ); //reload spells
 	RegisterCommand( "reloadcommands", 3, true ); //reload commands
-	RegisterCommand( "reloadhtml", 3, true ); //reload HTML templates
 	RegisterCommand( "reloadall", 3, true ); //reload everything
 }
 
@@ -17,7 +16,7 @@ function command_RELOADACCOUNTS( socket, cmdString )
 {
 	var dictMessage = GetDictionaryEntry( 86, socket.Language );
 	socket.SysMessage( dictMessage );
-	Reload( 9 );
+	Reload( 8 );
 }
 
 function command_RELOADDEFS( socket, cmdString )
@@ -31,7 +30,7 @@ function command_RELOADINI( socket, cmdString )
 {
 	var dictMessage = GetDictionaryEntry( 45, socket.Language );
 	socket.SysMessage( dictMessage );
-	Reload( 7 );
+	Reload( 6 );
 }
 
 function command_RELOADJSFILE( socket, cmdString )
@@ -64,7 +63,7 @@ function command_RELOADALL( socket, cmdString )
 {
 	var dictMessage = GetDictionaryEntry( 1746, socket.Language );
 	BroadcastMessage( dictMessage );
-	Reload( 8 );
+	Reload( 7 );
 }
 
 function command_RELOADSPELLS( socket, cmdString )
@@ -77,10 +76,4 @@ function command_RELOADCOMMANDS( socket, cmdString )
 {
 	socket.SysMessage( "Reloading commands.." );
 	Reload( 3 );
-}
-
-function command_RELOADHTML( socket, cmdString )
-{
-	socket.SysMessage( "Reloading HTML Templates.." );
-	Reload( 6 );
 }

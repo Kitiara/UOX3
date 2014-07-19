@@ -610,100 +610,6 @@ void CBaseObject::SetSerial( SERIAL newSerial )
 //|	Purpose			-	Dumps out body information of the object
 //|						This is tag/data pairing information
 //o--------------------------------------------------------------------------
-#if ACT_SQL == 0
-bool CBaseObject::DumpBody(std::ofstream &outStream) const
-{
-	//static std::string destination; //static, construct only once
-	//static std::ostringstream objectDump( destination ); //static, construct only once
-	//objectDump.str(std::string()); // clear the stream
-	//destination = ""; // clear the string
-	// Hexadecimal Values
-	outStream << std::hex;
-	outStream << "Serial=" << "0x" << serial << '\n';
-	outStream << "ID=" << "0x" << id << '\n';
-	outStream << "Colour=" << "0x" << colour << '\n';
-	outStream << "Direction=" << "0x" << (SI16)dir << '\n';
-	if (ValidateObject(multis))
-	{
-		outStream << "MultiID=" << "0x";
-		try
-		{
-			outStream << multis->GetSerial() << '\n';
-		}
-		catch( ... )
-		{
-			outStream << "FFFFFFFF" << '\n';
-			Console << "EXCEPTION: CBaseObject::DumpBody(" << name << "[" << serial << "]) - 'MultiID' points to invalid memory." << myendl;
-		}
-	}
-	outStream << "SpawnerID=" << "0x" << spawnserial << '\n';
-	outStream << "OwnerID=" << "0x" << owner << '\n';
-
-	// Decimal / String Values
-	outStream << std::dec;
-	outStream << "Name=" << name << '\n';
-	outStream << "Location=" << x << "," << y << "," << (SI16)z << "," << (SI16)worldNumber << '\n';
-	outStream << "Title=" << title << '\n';
-
-	//=========== BUG (= For Characters the dex+str+int malis get saved and get rebuilt on next serverstartup = increasing malis)
-	SI16 temp_st2, temp_dx2, temp_in2;
-	temp_st2 = st2;
-	temp_dx2 = dx2;
-	temp_in2 = in2;
-	if (objType == OT_CHAR)
-	{
-		CChar *myChar = (CChar*)(this);
-
-		// For every equipped item 
-		// We need to reduce Str2+Dex2+Int2
-		for (CItem *myItem = myChar->FirstItem(); !myChar->FinishedItems(); myItem = myChar->NextItem())
-			if (ValidateObject(myItem))
-			{
-				temp_st2 -= myItem->GetStrength2();
-				temp_dx2 -= myItem->GetDexterity2();
-				temp_in2 -= myItem->GetIntelligence2();
-			}
-	}
-	//=========== BUGFIX END (by Dark-Storm)
-
-	outStream << "Weight="  << weight << '\n';
-	outStream << "Mana=" << mana << '\n';
-	outStream << "Stamina=" << stamina << '\n';
-	outStream << "Dexterity=" << dexterity << "," << temp_dx2 << '\n';
-	outStream << "Intelligence=" << intelligence << "," << temp_in2 << '\n';
-	outStream << "Strength=" << strength << "," << temp_st2 << '\n';
-	outStream << "HitPoints=" << hitpoints << '\n';
-	outStream << "Race=" << race << '\n';
-	outStream << "Visible=" << (SI16)visible << '\n';
-	outStream << "Disabled=" << (isDisabled()?"1":"0") << '\n';
-	outStream << "Damage=" << lodamage << "," << hidamage << '\n';
-	outStream << "Poisoned=" << (SI16)poisoned << '\n';
-	outStream << "Carve=" << GetCarve() << '\n';
-	outStream << "Defense=";
-	for (UI08 resist = 1; resist < WEATHNUM; ++resist)
-	{
-		if (GetResist((WeatherType)resist) >= 10)
-			outStream <<  GetResist((WeatherType)resist) << "," ;
-		else
-			outStream << "0" <<  GetResist((WeatherType)resist) << ",";
-	}
-	outStream << "[END]" << '\n';
-	outStream << "ScpTrig=" << scriptTrig << '\n';
-	outStream << "Reputation=" << GetFame() << "," << GetKarma() << "," << GetKills() << '\n';
-	// Spin the character tags to save make sure to dump them too
-	for(TAGMAP2_CITERATOR CI = tags.begin(); CI != tags.end(); ++CI)
-	{
-		outStream << "TAGNAME=" << CI->first << '\n';
-		if(CI->second.m_ObjectType == TAGMAP_TYPE_STRING)
-			outStream << "TAGVALS=" << CI->second.m_StringValue << '\n';
-		else
-			outStream << "TAGVAL=" << ((SI32)CI->second.m_IntValue) << '\n';
-	}
-	//====================================================================================
-	// We can have exceptions, but return no errors ?
-	return true;
-}
-#else
 std::stringstream CBaseObject::DumpBody() const
 {
 	std::stringstream Str;
@@ -822,7 +728,6 @@ std::stringstream CBaseObject::DumpBody() const
 	Str << ")\n";
 	return Str;
 }
-#endif
 
 //o--------------------------------------------------------------------------
 //|	Function		-	RACEID GetRace()
@@ -1564,25 +1469,6 @@ void CBaseObject::IncIntelligence( SI16 toInc )
 }
 
 //o--------------------------------------------------------------------------
-//|	Function		-	bool DumpFooter( ofstream &outStream )
-//|	Date			-	Unknown
-//|	Programmer		-	Abaddon
-//|	Modified		-
-//o--------------------------------------------------------------------------
-//|	Purpose			-	Dumps out footer information so that a logical break
-//|						between entries can be found without moving file 
-//|						pointers
-//|						Mode 0 - Text
-//|						Mode 1 - Binary
-//o--------------------------------------------------------------------------
-#if ACT_SQL == 0
-bool CBaseObject::DumpFooter( std::ofstream &outStream ) const
-{
-	outStream << '\n' << "o---o" << '\n' << '\n';
-	return true;
-}
-#endif
-//o--------------------------------------------------------------------------
 //|	Function		-	bool Load( std::ifstream &inStream )
 //|	Date			-	28 July, 2000
 //|	Programmer		-	Abaddon
@@ -1591,30 +1477,12 @@ bool CBaseObject::DumpFooter( std::ofstream &outStream ) const
 //|	Purpose			-	Loads object from disk based on mode
 //o--------------------------------------------------------------------------
 void ReadWorldTagData( std::ifstream &inStream, UString &tag, UString &data );
-#if ACT_SQL == 0
-bool CBaseObject::Load(std::ifstream &inStream)
-{
-	UString tag = "", data = "", UTag = "";
-	while(tag != "o---o")
-	{
-		ReadWorldTagData(inStream, tag, data);
-		if(tag != "o---o")
-		{
-			UTag = tag.upper();
-			if(!HandleLine(UTag, data))
-				Console.Warning("Unknown world file tag %s with contents of %s", tag.c_str(), data.c_str());
-		}
-	}
-	return LoadRemnants();
-}
-#else
+
 bool CBaseObject::Load(std::vector<UString> dataList)
 {
 	HandleLine(dataList);
 	return LoadRemnants();
 }
-#endif
-
 //o--------------------------------------------------------------------------
 //|	Function		-	bool HandleLine( UString &tag, UString &data )
 //|	Date			-	Unknown
@@ -1626,242 +1494,6 @@ bool CBaseObject::Load(std::vector<UString> dataList)
 //|						and load routine continues to next tag.  Otherwise,
 //|						passed up inheritance tree (if any)
 //o--------------------------------------------------------------------------
-#if ACT_SQL == 0
-bool CBaseObject::HandleLine(UString &UTag, UString &data)
-{
-	bool rvalue = true;
-	static std::string staticTagName = "";
-
-	switch (UTag[0])
-	{
-		case 'B':
-			if (UTag == "BASEWEIGHT")
-				(static_cast<CItem *>(this))->SetBaseWeight(data.toULong());
-			break;
-		case 'C':
-			if (UTag == "COLOUR")
-				colour = data.toUShort();
-			else if (UTag == "CARVE")
-				carve = data.toShort();
-			else
-				rvalue = false;
-			break;
-		case 'D':
-			if (UTag == "DAMAGE")
-			{
-				hidamage = data.section(",", 1, 1).stripWhiteSpace().toShort();
-				lodamage = data.section(",", 0, 0).stripWhiteSpace().toShort();
-			}
-			else if (UTag == "DIRECTION")
-				dir = data.toUByte();
-			else if (UTag == "DEXTERITY")
-			{
-				if (data.sectionCount(",") != 0)
-				{
-					dexterity = data.section(",", 0, 0).stripWhiteSpace().toShort();
-					dx2 = data.section(",", 1, 1).stripWhiteSpace().toShort();
-				}
-				else
-					dexterity = data.toShort();
-			}
-			else if (UTag == "DEXTERITY2")
-				dx2 = data.toShort();
-			else if (UTag == "DEFENSE")
-			{
-				size_t numSections = data.sectionCount(",");
-				if (numSections != 0)
-				{
-					for(UI08 resist = 0; resist < numSections; ++resist)
-					{
-						if (data.section(",", resist, resist).empty())
-							break;
-
-						SetResist(data.section(",", resist, resist).stripWhiteSpace().toUShort(), (WeatherType)(resist + 1));
-					}
-				}
-				else
-					SetResist(data.toUShort(), PHYSICAL);
-			}
-			else if (UTag == "DISABLED")
-				SetDisabled(data.toUShort() == 1);
-			else
-				rvalue = false;
-			break;
-		case 'F':
-			if (UTag == "FAME")
-				SetFame(data.toShort());
-			else
-				rvalue = false;
-			break;
-		case 'H':
-			if (UTag == "HITPOINTS")
-				hitpoints = data.toShort();
-			else if (UTag == "HIDAMAGE")
-				hidamage = data.toShort();
-			else
-				rvalue = false;
-			break;
-		case 'I':
-			if (UTag == "ID")
-				id = data.toUShort();
-			else if (UTag == "INTELLIGENCE")
-			{
-				if (data.sectionCount(",") != 0)
-				{
-					intelligence = data.section(",", 0, 0).stripWhiteSpace().toShort();
-					in2 = data.section(",", 1, 1).stripWhiteSpace().toShort();
-				}
-				else
-					intelligence = data.toShort();
-			}
-			else if (UTag == "INTELLIGENCE2")
-				in2 = data.toShort();
-			else 
-				rvalue = false;
-			break;
-		case 'K':
-			if (UTag == "KARMA")
-				SetKarma(data.toShort());
-			else if (UTag == "KILLS")
-				SetKills(data.toShort());
-			else 
-				rvalue = false;
-			break;
-		case 'L':
-			if (UTag == "LOCATION")
-			{
-				x = data.section(",", 0, 0).stripWhiteSpace().toShort();
-				y = data.section(",", 1, 1).stripWhiteSpace().toShort();
-				z = data.section(",", 2, 2).stripWhiteSpace().toByte();
-				worldNumber = data.section(",", 3, 3).stripWhiteSpace().toUByte();
-			}
-			else if (UTag == "LODAMAGE")
-				lodamage = data.toShort();
-			else 
-				rvalue = false;
-			break;
-		case 'M':
-			if (UTag == "MANA")
-				mana = data.toShort();
-			else if (UTag == "MULTIID")
-				multis = (CMultiObj *)data.toULong();
-			else
-				rvalue = false;
-			break;
-		case 'N':
-			if (UTag == "NAME")
-				name = data.substr(0, MAX_NAME);
-			else 
-				rvalue = false;
-			break;
-		case 'O':
-			if (UTag == "OWNERID")
-				owner = data.toULong();
-			else
-				rvalue = false;
-			break;
-		case 'P':
-			if (UTag == "POISONED")
-				poisoned = data.toUByte();
-			else
-				rvalue = false;
-			break;
-		case 'R':
-			if (UTag == "RACE")
-				race = data.toUShort();
-			else if (UTag == "REPUTATION")
-			{
-				if (data.sectionCount(",") == 2)
-				{
-					SetFame(data.section(",", 0, 0).stripWhiteSpace().toShort());
-					SetKarma(data.section(",", 1, 1).stripWhiteSpace().toShort());
-					SetKills(data.section(",", 2, 2).stripWhiteSpace().toShort());
-				}
-			}
-			else
-				rvalue = false;
-			break;
-		case 'S':
-			if (UTag == "STAMINA")
-				stamina	= data.toShort();
-			else if (UTag == "SPAWNERID")
-				spawnserial = data.toULong();
-			else if (UTag == "SERIAL")
-				serial = data.toULong();
-			else if (UTag == "STRENGTH")
-			{
-				if (data.sectionCount(",") != 0)
-				{
-					strength = data.section(",", 0, 0).stripWhiteSpace().toShort();
-					st2 = data.section(",", 1, 1).stripWhiteSpace().toShort();
-				}
-				else
-					strength = data.toShort();
-			}
-			else if (UTag == "STRENGTH2")
-				st2 = data.toShort();
-			else if (UTag == "SCPTRIG")
-				scriptTrig = data.toUShort();
-			else
-				rvalue = false;
-			break;
-		case 'T':
-			if (UTag == "TITLE")
-				title = data.substr(0, MAX_TITLE);
-			else if (UTag == "TAGNAME")
-				staticTagName = data.stripWhiteSpace();
-			else if (UTag == "TAGVAL" && staticTagName != "")
-			{
-				TAGMAPOBJECT tagvalObject;
-				tagvalObject.m_ObjectType = TAGMAP_TYPE_INT;
-				tagvalObject.m_IntValue = data.toULong();
-				tagvalObject.m_Destroy = FALSE;
-				tagvalObject.m_StringValue = "";
-				SetTag(staticTagName, tagvalObject);
-			}
-			else if (UTag == "TAGVALS" && staticTagName != "")
-			{
-				std::string localString = data;
-				TAGMAPOBJECT tagvalObject;
-				tagvalObject.m_ObjectType = TAGMAP_TYPE_STRING;
-				tagvalObject.m_IntValue = localString.length();
-				tagvalObject.m_Destroy = FALSE;
-				tagvalObject.m_StringValue = localString;
-				SetTag(staticTagName, tagvalObject);
-			}
-			else
-				rvalue = false;
-			break;
-		case 'V':
-			if (UTag == "VISIBLE")
-				visible	= (VisibleTypes)data.toByte();
-			break;
-		case 'W':
-			if (UTag == "WEIGHT")
-				SetWeight(data.toLong());
-			else if (UTag == "WIPE") //*
-				SetWipeable(data.toUByte() == 1);
-			else if (UTag == "WORLDNUMBER")
-				worldNumber = data.toUByte();
-			else
-				rvalue = false;
-			break;
-		case 'X':
-			if (UTag == "XYZ")
-			{
-				x = data.section(",", 0, 0).stripWhiteSpace().toShort();
-				y = data.section(",", 1, 1).stripWhiteSpace().toShort();
-				z = data.section(",", 2, 2).stripWhiteSpace().toByte();
-			}
-			else
-				rvalue = false;
-			break;
-		default:
-			rvalue = false;
-	}
-	return rvalue;
-}
-#else
 void CBaseObject::HandleLine(std::vector<UString> dataList)
 {
 	for (std::vector<UString>::iterator itr = dataList.begin(); itr != dataList.end(); ++itr)
@@ -2091,7 +1723,6 @@ void CBaseObject::HandleLine(std::vector<UString> dataList)
 		}
 	}
 }
-#endif
 //o--------------------------------------------------------------------------
 //|	Function		-	PostLoadProcessing()
 //|	Date			-	Unknown

@@ -7,13 +7,10 @@
 #include "CPacketSend.h"
 #include "Dictionary.h"
 #include "CJSEngine.h"
+#include "SQLManager.h"
 
 #ifndef va_start
 	#include <cstdarg>
-#endif
-
-#if ACT_SQL == 1
-#include "SQLManager.h"
 #endif
 
 namespace UOX
@@ -638,30 +635,6 @@ GUILDREL *CGuild::GuildRelationList( void )	// NOTE: This is aimed ONLY at menu 
 	return &relationList;
 }
 
-#if ACT_SQL == 0
-void CGuild::Save( std::ofstream &toSave)
-{
-	toSave << "[GUILD]" << '\n' << "{" << '\n';
-	toSave << "NAME=" << name << '\n';
-	toSave << "ABBREVIATION=" << abbreviation << '\n';
-	toSave << "TYPE=" << GTypeNames[gType] << '\n';
-	toSave << "CHARTER=" << charter << '\n';
-	toSave << "WEBPAGE=" << webpage << '\n';
-	toSave << "STONE=" << stone << '\n';
-	toSave << "MASTER=" << master << '\n';
-
-	for (UOX::SERLIST_ITERATOR counter = recruits.begin(); counter != recruits.end(); ++counter)
-		toSave << "RECRUIT=" << (*counter) << '\n';
-
-	for (UOX::SERLIST_ITERATOR counter = members.begin(); counter != members.end(); ++counter)
-		toSave << "MEMBER=" << (*counter) << '\n';
-
-	for (GUILDREL::const_iterator relly = relationList.begin(); relly != relationList.end(); ++relly)
-		toSave << GRelationNames[relly->second] << " " << relly->first <<'\n';
-	
-	toSave << "}" << '\n' << '\n';
-}
-#else
 UString CGuild::Save(void)
 {
 	std::stringstream Str;
@@ -756,80 +729,7 @@ UString CGuild::Save(void)
 
 	return Str.str();
 }
-#endif
 
-#if ACT_SQL == 0
-void CGuild::Load( ScriptSection *toRead )
-{
-	UString tag;
-	UString data;
-	UString UTag;
-	for( tag = toRead->First(); !toRead->AtEnd(); tag = toRead->Next() )
-	{
-		data = toRead->GrabData();
-		if( tag.empty() )
-			continue;
-		UTag = tag.upper();
-		switch( (UTag.data()[0]) )
-		{
-			case '{':
-			case '/':	break;	// open section, comment, we don't really care ;)
-			case 'A':
-				if( UTag == "ABBREVIATION" )
-					Abbreviation( data.c_str() );
-				else if( UTag == "ALLY" )
-					SetGuildRelation( data.toShort(), GR_ALLY );
-				break;
-			case 'C':
-				if( UTag == "CHARTER" )
-					Charter( data );
-				break;
-			case 'M':
-				if( UTag == "MASTER" )
-					Master( data.toULong() );
-				else if( UTag == "MEMBER" )
-					NewMember( data.toULong() );
-				break;
-			case 'N':
-				if( UTag == "NAME" )
-					Name( data );
-				else if( UTag == "NEUTRAL" )
-					SetGuildRelation( data.toShort(), GR_NEUTRAL );
-				break;
-			case 'R':
-				if( UTag == "RECRUIT" )
-					NewRecruit( data.toULong() );
-			case 'S':
-				if( UTag == "STONE" )
-					Stone( data.toULong() );
-				break;
-			case 'T':
-				if( UTag == "TYPE" )
-				{
-					for( GuildType gt = GT_STANDARD; gt < GT_COUNT; gt = (GuildType)(gt + (GuildType)1) )
-					{
-						if( data == GTypeNames[gt] )
-						{
-							Type( gt );
-							break;
-						}
-					}
-				}
-				break;
-			case 'U':
-				if( UTag == "UNKNOWN" )
-					SetGuildRelation( data.toShort(), GR_UNKNOWN );
-				break;
-			case 'W':
-				if( UTag == "WEBPAGE" )
-					Webpage( data );
-				else if( UTag == "WAR" )
-					SetGuildRelation( data.toShort(), GR_WAR );
-				break;
-		}
-	}
-}
-#else
 void CGuild::Load(std::vector<UString> dataList)
 {
 	for (std::vector<UString>::iterator itr = dataList.begin(); itr != dataList.end(); ++itr)
@@ -895,7 +795,6 @@ void CGuild::Load(std::vector<UString> dataList)
 		}
 	}
 }
-#endif
 
 size_t CGuild::NumMembers( void ) const
 {
@@ -1018,13 +917,6 @@ CGuild *CGuildCollection::operator[]( GUILDID num )
 void CGuildCollection::Save( void )
 {
 	Console << "Saving guild data.... ";
-#if ACT_SQL == 0
-	std::string filename = cwmWorldState->ServerData()->Directory( CSDDP_SHARED ) + "guilds.wsc";
-	std::ofstream toSave( filename.c_str() );
-	
-	for (GUILDLIST::const_iterator pMove = gList.begin(); pMove != gList.end(); ++pMove)
-		(*pMove)->Save( toSave );
-#else
 	UString uStr = "DELETE FROM guilds";
 	bool Started = false;
 	for (std::vector<CGuild*>::iterator pMove = gList.begin(); pMove != gList.end(); ++pMove)
@@ -1044,25 +936,11 @@ void CGuildCollection::Save( void )
 	uStr.clear();
 	while (std::getline(iss, uStr))
 		SQLManager::getSingleton().ExecuteQuery(uStr);
-#endif
+
 	Console.PrintDone();
 }
 void CGuildCollection::Load( void )
 {
-#if ACT_SQL == 0
-	std::string filename	= cwmWorldState->ServerData()->Directory( CSDDP_SHARED ) + "guilds.wsc";
-	if( FileExists( filename ) )
-	{
-		Script newScript( filename, NUM_DEFS, false );
-		GUILDID guildNum		= 0;
-		for( ScriptSection *testSect = newScript.FirstEntry(); testSect != NULL; testSect = newScript.NextEntry() )
-		{
-			CGuild* Guild = new CGuild();
-			gList.push_back(Guild);
-			Guild->Load( testSect );
-		}
-	}
-#else
 	int index;
 	if (SQLManager::getSingleton().ExecuteQuery("SELECT * FROM guilds", &index, false))
 	{
@@ -1088,7 +966,6 @@ void CGuildCollection::Load( void )
 		}
 	}
 	SQLManager::getSingleton().QueryRelease(false);
-#endif
 }
 
 GUILDRELATION CGuildCollection::Compare( GUILDID srcGuild, GUILDID trgGuild ) const

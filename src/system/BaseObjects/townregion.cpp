@@ -79,95 +79,7 @@ CTownRegion::~CTownRegion()
 	orePreferences.resize( 0 );
 	locations.resize( 0 );
 }
-#if ACT_SQL == 0
-bool CTownRegion::Load( Script *ss )
-// ss is a script section containing all the data!
-{
-	size_t location = 0xFFFFFFFF;
-	UString tag;
-	UString data;
-	UString UTag;
-	UString sect = "TOWNREGION " + UString::number( regionNum );
-	if( !ss->isin( sect ) )	// doesn't exist
-		return false;
 
-	ScriptSection *target = ss->FindEntry( sect );
-	for( tag = target->First(); !target->AtEnd(); tag = target->Next() )
-	{
-		UTag = tag.upper();
-		data = target->GrabData();
-		switch( (UTag.data()[0]) )
-		{
-			case 'A':
-				if( UTag == "ALLYTOWN" )
-					alliedTowns.push_back( data.toUByte() );
-				break;
-			case 'E':
-				if( UTag == "ELECTIONTIME" )
-					timeToElectionClose = data.toLong();
-				break;
-			case 'G':
-				if( UTag == "GUARDOWNER" )
-					guardowner = data;
-				else if( UTag == "GUARD" )	// load our purchased guard
-					++numGuards;
-				else if( UTag == "GUARDSBOUGHT" ) // num guards bought
-					guardsPurchased = data.toShort();
-				break;
-			case 'H':
-				if( UTag == "HEALTH" )
-					health = data.toShort();
-				break;
-			case 'M':
-				if( UTag == "MEMBER" )
-				{
-					location = townMember.size();
-					townMember.resize( location + 1 );
-					townMember[location].targVote = INVALIDSERIAL;
-					townMember[location].townMember = data.toULong();
-				}
-				else if( UTag == "MAYOR" )
-					mayorSerial = data.toULong();
-				break;
-			case 'N':
-				if( UTag == "NAME" )
-					name = data.substr( 0, 49 );
-				else if( UTag == "NUMGUARDS" )
-					numGuards = data.toUShort();
-				break;
-			case 'P':
-				if( UTag == "PRIV" )
-					priv = data.toUByte();
-				else if( UTag == "POLLTIME" )
-					timeToNextPoll = data.toLong();
-				break;
-			case 'R':
-				if( UTag == "RACE" )
-					race = data.toUShort();
-				else if( UTag == "RESOURCEAMOUNT" )
-					goldReserved = data.toLong();
-				else if( UTag == "RESOURCECOLLECTED" )
-					resourceCollected = data.toLong();
-				break;
-			case 'T':
-				if( UTag == "TAXEDID" )
-					taxedResource = data.toUShort();
-				else if( UTag == "TAXEDAMOUNT" )
-					taxedAmount = data.toUShort();
-				else if( UTag == "TIMET" )
-					timeSinceTaxedMembers = data.toLong();
-				else if( UTag == "TIMEG" )
-					timeSinceGuardsPaid = data.toLong();
-				break;
-			case 'V':
-				if( UTag == "VOTE" && location != 0xFFFFFFFF )
-					townMember[location].targVote = data.toULong();
-				break;
-		}
-	}
-	return true;
-}
-#else
 void CTownRegion::Load(std::vector<UString> dataLines)
 {
 	size_t location = 0xFFFFFFFF;
@@ -269,45 +181,7 @@ void CTownRegion::Load(std::vector<UString> dataLines)
 		}
 	}
 }
-#endif
 
-#if ACT_SQL == 0
-bool CTownRegion::Save( std::ofstream &outStream )
-// entry is the region #, fp is the file to save in
-{
-	outStream << "[TOWNREGION " << static_cast<UI16>(regionNum) << "]" << '\n' << "{" << '\n';
-	outStream << "RACE=" << race << '\n';
-	outStream << "GUARDOWNER=" << guardowner << '\n';
-	outStream << "MAYOR=" << std::hex << "0x" << mayorSerial << std::dec << '\n';
-	outStream << "PRIV=" << static_cast<UI16>(priv.to_ulong()) << '\n';
-	outStream << "RESOURCEAMOUNT=" << goldReserved << '\n';
-	outStream << "TAXEDID=" << std::hex << "0x" << taxedResource << std::dec << '\n';
-	outStream << "TAXEDAMOUNT=" << taxedAmount << '\n';
-	outStream << "GUARDSPURCHASED=" << guardsPurchased << '\n';
-	outStream << "TIMEG=" << timeSinceGuardsPaid << '\n';
-	outStream << "TIMET=" << timeSinceTaxedMembers << '\n';
-	outStream << "RESOURCECOLLECTED=" << resourceCollected << '\n';
-	outStream << "HEALTH=" << health << '\n';
-	outStream << "ELECTIONTIME=" << timeToElectionClose << '\n';
-	outStream << "POLLTIME=" << timeToNextPoll << '\n';
-	outStream << "WORLD=" << static_cast<UI16>(worldNumber) << '\n';
-	outStream << "NUMGUARDS=" << numGuards << '\n';
-
-	std::vector< townPers >::const_iterator mIter;
-	for( mIter = townMember.begin(); mIter != townMember.end(); ++mIter )
-	{
-		outStream << "MEMBER=" << std::hex << "0x" << (*mIter).townMember << '\n';
-		outStream << "VOTE=" << "0x" << (*mIter).targVote << std::dec << '\n';
-	}
-	std::vector< UI16 >::const_iterator aIter;
-	for( aIter = alliedTowns.begin(); aIter != alliedTowns.end(); ++aIter )
-	{
-		outStream << "ALLYTOWN=" << static_cast<UI16>((*aIter)) << '\n';
-	}
-	outStream << "}" << '\n' << '\n';
-	return true;
-}
-#else
 UString CTownRegion::Save()
 {
 	std::stringstream Str;
@@ -372,7 +246,6 @@ UString CTownRegion::Save()
 	Str << ")";
 	return Str.str();
 }
-#endif
 
 void CTownRegion::CalcNewMayor( void )
 // There has got to be a better way than this hideous O(n^2) algy

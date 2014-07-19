@@ -247,11 +247,9 @@ namespace UOX
 		spellsObj				=	JS_DefineObject( cx, obj, "Spells", &UOXSpells_class, protoList[JSP_SPELLS], 0 );
 		accountsObj				=	JS_DefineObject( cx, obj, "Accounts", &UOXAccount_class, protoList[JSP_ACCOUNTS], 0 );
 		consoleObj				=	JS_DefineObject( cx, obj, "Console", &UOXConsole_class, protoList[JSP_CONSOLE], 0 );
-#if ACT_SQL == 1
 		protoList[JSACT_SQL]		=	JS_InitClass( cx, obj, NULL, &UOXSQLM_class,		NULL,		0,		CSQLMProperties,		CSQLM_Methods,		NULL,	NULL );
 		sqlmObj					=	JS_DefineObject( cx, obj, "SQLM", &UOXSQLM_class, protoList[JSACT_SQL], 0 );
 		JS_LockGCThing( cx, sqlmObj );
-#endif
 		JS_LockGCThing( cx, spellsObj );
 		//JS_AddRoot( cx, &spellsObj );
 		JS_LockGCThing( cx, accountsObj );

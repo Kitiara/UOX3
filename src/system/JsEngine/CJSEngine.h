@@ -33,9 +33,7 @@ enum JSPrototypes
 	JSP_CONSOLE,
 	JSP_FILE,
 	JSP_PARTY,
-#if ACT_SQL == 1
 	JSACT_SQL,
-#endif
 	JSP_COUNT
 };
 
@@ -52,9 +50,7 @@ private:
 	JSObject * spellsObj;
 	JSObject * accountsObj;
 	JSObject * consoleObj;
-#if ACT_SQL == 1
 	JSObject * sqlmObj;
-#endif
 	JSRuntime * jsRuntime;
 	JSContext * jsContext;
 	JSObject * jsGlobal;

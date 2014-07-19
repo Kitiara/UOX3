@@ -173,19 +173,14 @@ class cAccountClass
 public:
 	// Construction/Destruction
 	cAccountClass();
-	cAccountClass(std::string sAccountsPath);
 	~cAccountClass();
 	// Operator overloads
 	cAccountClass& operator++();
 	cAccountClass& operator--(int);
-	UI16					CreateAccountSystem( void );
-	UI16					ImportAccounts( void );
 	void					WriteAccountSection( CAccountBlock& actbTemp, std::fstream& fsOut );
 	UI16					AddAccount( std::string sUsername, std::string sPassword, std::string sContact="NONE", UI16 wAttributes=0x0000 );
 	bool					DelAccount( std::string sUsername );
 	bool					DelAccount( UI16 wAccountID );
-	bool					SetPath( std::string sPath );
-	std::string				GetPath( void );
 	UI16					Save();
 	UI16					Load( void );
 	size_t					size( void );
@@ -215,12 +210,9 @@ private:
 	MAPUSERNAME		m_mapUsernameMap;
 	MAPUSERNAMEID	m_mapUsernameIDMap;
 	UI16			m_wHighestAccount;
-	std::string		m_sAccountsDirectory;
 
-#if UOX_PLATFORM == WIN32
 	bool LoadFromDB( UI16& numLoaded );
 	bool FinaliseBlock( CAccountBlock& toFinalise );
-#endif
 };
 
 extern cAccountClass *Accounts;

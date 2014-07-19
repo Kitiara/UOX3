@@ -237,7 +237,6 @@ public:
 	CServerProfile * ServerProfile( void );
 private:
 	void			RegionSave( void );
-	void			SaveStatistics( void );
 
 	CServerData *	sData;
 	CServerProfile * sProfile;

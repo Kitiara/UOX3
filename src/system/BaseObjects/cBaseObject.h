@@ -186,19 +186,10 @@ public:
 	void					SetSpawn(  SERIAL newSpawn );
 	virtual void			SetOwner(  CChar *newOwner );
 
-#if ACT_SQL == 0
-	virtual bool			Save( std::ofstream &outStream ) = 0;
-	virtual bool			DumpHeader( std::ofstream &outStream ) const = 0;
-	bool					DumpFooter( std::ofstream &outStream ) const;
-	virtual bool			DumpBody(std::ofstream &outStream) const;
-	bool					Load(std::ifstream &inStream);
-	virtual bool			HandleLine(UString &UTag, UString &data);
-#else
 	virtual UString			Save(void) = 0;
 	virtual std::stringstream DumpBody() const;
 	bool					Load(std::vector<UString> dataList);
 	virtual void			HandleLine(std::vector<UString> dataList);
-#endif
 
 	RACEID					GetRace( void ) const;
 	void					SetRace( RACEID newValue );
