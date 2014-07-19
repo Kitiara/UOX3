@@ -700,9 +700,10 @@ bool PostLoadFunctor( CBaseObject *a, UI32 &b, void *extraData )
 void CMapHandler::Load( void )
 {
 	UI32 StartTime = getclock();
-	std::string strsql = "SELECT baseobjects.*, %s %s %s FROM baseobjects %s %s %s WHERE baseobjects.type = %u";
-	std::string column[3] = {"", "", ""};
-	std::string table[3] = {"", "", ""}; // last is not like the others...
+	std::string strsql = "SELECT baseobjects.*, %s %s %s FROM baseobjects %s %s %s WHERE baseobjects.type = %u %s";
+	std::string column[3];
+	std::string table[3];
+	std::string extra; // Can't use right join while loading player characters. Because when there is no data in creatures, whole sql returns NULL.
 	bool Twice = false;
 	for (int objtype = OT_CHAR; objtype < OT_SPAWNER+1;)
 	{
@@ -711,6 +712,7 @@ void CMapHandler::Load( void )
 			column[i] = "";
 			table[i] = "";
 		}
+		extra = "";
 
 		switch (objtype)
 		{
@@ -723,10 +725,14 @@ void CMapHandler::Load( void )
 			table[1] = "RIGHT JOIN characters ON baseobjects.serial = characters.serial";
 			column[1] = "account,robeserial,originalid,hair,beard,townvote,laston,UNIX_TIMESTAMP(laston),orgname,commandlevel,squelched,deaths,fixedlight,townprivileges,atrophy,skilllocks";
 
-			table[2] = "RIGHT JOIN creatures ON baseobjects.serial "+std::string(Twice ? "" : "!")+"= creatures.serial";
 			if (Twice)
+			{
+				table[2] = "RIGHT JOIN creatures ON baseobjects.serial = creatures.serial";
 				column[2] = ",npcaitype,taming,peaceing,provoing,holdg,split,wanderarea,npcwander,spattack,questtype,questregions,fleeat,reattackat,npcflag,mounted,"
 					"stabled,tamedhungerrate,tamedhungerwildchance,foodlist,walkingspeed,runningspeed,fleeingspeed";
+			}
+			else
+				extra = "AND (SELECT COUNT(*) FROM creatures WHERE (creatures.serial = baseobjects.serial)) = 0";
 			break;
 		case OT_MULTI: // Houses (Multis)
 		case OT_BOAT: // Boats
@@ -750,13 +756,14 @@ void CMapHandler::Load( void )
 			break;
 		}
 
-		size_t size = strsql.size()-12;
+		size_t size = strsql.size()-14; // size of total %s and %u
 		for (int i = 0; i < 3; ++i)
-			size += (strlen(column[i].c_str())+strlen(table[i].c_str())*2);
-		size += int(floor(log10(double(objtype)))+1);
+			size += strlen(column[i].c_str()) + strlen(table[i].c_str())*2;
+		size += int(floor(log10(double(objtype)))+1); // size of the objtype
+		size += strlen(extra.c_str());
 
-		char* sql = (char*)malloc(size+1);
-		sprintf_s(sql, size+1, strsql.c_str(), column[0].c_str(), column[1].c_str(), column[2].c_str(), table[0].c_str(), table[1].c_str(), table[2].c_str(), objtype);
+		char* sql = (char*)malloc(size+1); // +1 for \0 (NULL)
+		sprintf_s(sql, size+1, strsql.c_str(), column[0].c_str(), column[1].c_str(), column[2].c_str(), table[0].c_str(), table[1].c_str(), table[2].c_str(), objtype, extra);
 		int index = 0;
 		if (SQLManager::getSingleton().ExecuteQuery(sql, &index, false))
 		{
