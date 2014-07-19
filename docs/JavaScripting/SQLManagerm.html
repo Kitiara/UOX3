@@ -13,7 +13,7 @@
 	<h3>API and Event handling</h3>
 </center>
 
-<h3>ODBC Related Methods</h3>
+<h3>SQLManager Related Methods</h3>
 
 <table class="method">
 <tr>	<th colspan=2 class="method"><a name="BeginTransaction" id="BeginTransaction">BeginTransaction</a>		</tr>
@@ -27,7 +27,7 @@
 </tr>
 <tr>	
 	<td class="property"><b>Example of Usage</b>					</td>
-	<td class="value"><pre>var didStart = ODBC.BeginTransaction();</pre>		</td>
+	<td class="value"><pre>var didStart = SQLManager.BeginTransaction();</pre>		</td>
 </tr>
 </table>
 
@@ -43,23 +43,22 @@
 </tr>
 <tr>	
 	<td class="property"><b>Example of Usage</b>					</td>
-	<td class="value"><pre>var didStart = ODBC.BeginTransaction();
+	<td class="value"><pre>var didStart = SQLManager.BeginTransaction();
 if( didStart )
 {
 	var i = 0;
 	var anyProbs = false;
 	for( i = 0; i < 10 && !anyProbs; ++i )
 	{
-		var iSQL = "INSERT INTO Account( AccountID, Username, Password, ContactDetails, ";
-		iSQL += "IsBanned, IsSuspended, IsPublic, IsOnline, IsSeer, IsCounselor, IsGM, LastUpdated ) VALUES( ";
-		iSQl += " " + (10 + i) + ", 'tempguest" + (i+1) + "', 'tempguest" + (i+1) + "', '', 0, 0, 0, 0, 0, 0, 0";
-		iSQL += ", getdate() );";
-		ODBC.ExecuteQuery( iSQL );
-		if( !ODBC.lastOK )
+		var iSQL = "INSERT INTO accounts SELECT ";
+		iSQL += "MAX(id)+1, \"acc" + (i+1) + "\", "+ "SHA1(\"acc" + (i+1) +":pass" + (i+1) + "\"), ";
+		iSQL += "\"example@example.com\"" + ", 0, '127.0.0.1' FROM accounts;";
+		SQLManager.ExecuteQuery( iSQL );
+		if( !SQLManager.lastOK )
 			anyProbs = true;
 	}
 	// If we have issues (anyProbs == true), we want to rollback (commit == false) and add NONE
-	ODBC.FinaliseTransaction( !anyProbs );
+	SQLManager.FinaliseTransaction( !anyProbs );
 }</pre>	</td>
 </tr>
 </table>
@@ -76,7 +75,7 @@ if( didStart )
 </tr>
 <tr>	
 	<td class="property"><b>Example of Usage</b>					</td>
-	<td class="value"><pre>var iResult = ODBC.ExecuteQuery( "SELECT Count(*) FROM Account;" );</pre>	</td>
+	<td class="value"><pre>var iResult = SQLManager.ExecuteQuery( "SELECT Count(*) FROM Account;" );</pre>	</td>
 </tr>
 </table>
 
@@ -88,11 +87,11 @@ if( didStart )
 </tr>
 <tr>	
 	<td class="property"><b>Purpose</b>						</td>
-	<td class="value">This releases the statement handle associated with your last query.  <b>DO NOT</b> execute this from within a transaction, as it will force a rollback.  Otherwise, you should call thiswhen you have finished with your query.				</td>
+	<td class="value">This releases the statement handle associated with your last query.  <b>DO NOT</b> execute this from within a transaction, as it will force a rollback.  Otherwise, you should call this when you have finished with your query.				</td>
 </tr>
 <tr>	
 	<td class="property"><b>Example of Usage</b>					</td>
-	<td class="value"><pre>ODBC.QueryRelease();</pre>	</td>
+	<td class="value"><pre>SQLManager.QueryRelease();</pre>	</td>
 </tr>
 </table>
 
@@ -108,7 +107,7 @@ if( didStart )
 </tr>
 <tr>	
 	<td class="property"><b>Example of Usage</b>					</td>
-	<td class="value"><pre>ODBC.FetchRow( iResult );</pre>	</td>
+	<td class="value"><pre>SQLManager.FetchRow( iResult );</pre>	</td>
 </tr>
 </table>
 
@@ -124,26 +123,9 @@ if( didStart )
 </tr>
 <tr>	
 	<td class="property"><b>Example of Usage</b>					</td>
-	<td class="value"><pre>var colData = ODBC.GetColumn( 0, iResult );</pre>	</td>
+	<td class="value"><pre>var colData = SQLManager.GetColumn( 0, iResult );</pre>	</td>
 </tr>
 </table>
-
-<table class="method">
-<tr>	<th colspan=2 class="method"><a name="LastOK" id="LastOK">LastOK</a>		</tr>
-<tr>	
-	<td class="property"><b>Prototype</b>						</td>
-	<td class="value"><pre>bool LastOK( void );</pre>				</td>
-</tr>
-<tr>	
-	<td class="property"><b>Purpose</b>						</td>
-	<td class="value">Method equivalent of lastOK.  Only created for testing purposes, use the property instead.				</td>
-</tr>
-<tr>	
-	<td class="property"><b>Example of Usage</b>					</td>
-	<td class="value"><pre>var isOK = ODBC.LastOK();</pre>	</td>
-</tr>
-</table>
-
 
 <center>
 <font face="Tahoma,Arial,MS Sans Serif" size="1">©Copyright 2000-2001 <a href="http://www.uox3.net">WWW.UOX3.NET</a> (Daniel Stratton/Matthew Randall)</font>
