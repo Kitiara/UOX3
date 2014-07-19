@@ -72,7 +72,6 @@ const std::string dirnames[NUM_DEFS] =
 	"house",
 	"colors",
 	"spawn",
-	"html",
 	"race",
 	"weather",
 	"harditems",

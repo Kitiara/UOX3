@@ -390,7 +390,6 @@ enum DEFINITIONCATEGORIES
 	house_def,
 	colors_def,
 	spawn_def,
-	html_def,
 	race_def,
 	weathab_def,
 	hard_items_def,
