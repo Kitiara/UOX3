@@ -277,8 +277,8 @@ bool cAccountClass::LoadFromDB(UI16& numLoaded)
 					switch(i)
 					{
 					case 0:
-						//FinaliseBlock(actB);
-						actB.reset();
+						FinaliseBlock(actB); // Get the accountblock
+						actB.reset(); // We have to reset first especially while reloading accounts this is very important.
 						actB.dbRetrieved = true;
 						CharacterLimit = -1;
 						AccountID = value;
