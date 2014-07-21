@@ -53,22 +53,28 @@ target_link_libraries(uox3
 
 if( WIN32 )
   if ( MSVC )
-    add_custom_command(TARGET uox3
-      POST_BUILD
-      COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/content ${CMAKE_BINARY_DIR}/bin/$(ConfigurationName)/
-    )
+    set(destinationdir "${CMAKE_BINARY_DIR}/bin/$(ConfigurationName)")
   elseif ( MINGW )
-    add_custom_command(TARGET uox3
-      POST_BUILD
-      COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/content ${CMAKE_BINARY_DIR}/bin/
-    )
+    set(destinationdir "${CMAKE_BINARY_DIR}/bin")
+  else()
+    set(destinationdir "${CMAKE_INSTALL_PREFIX}")
+    install(TARGETS uox3 DESTINATION "${CMAKE_INSTALL_PREFIX}")
   endif()
+elseif( UNIX )
+  set(destinationdir "${CONF_DIR}")
+  install(TARGETS uox3 DESTINATION bin)
 endif()
 
-if( UNIX )
-  install(TARGETS uox3 DESTINATION bin)
-  install(FILES content/* DESTINATION ${CONF_DIR})
-elseif( WIN32 )
-  install(TARGETS uox3 DESTINATION "${CMAKE_INSTALL_PREFIX}")
-  install(FILES content/* DESTINATION "${CMAKE_INSTALL_PREFIX}")
-endif()
+file(GLOB_RECURSE allfiles RELATIVE "${CMAKE_CURRENT_SOURCE_DIR}/content" "content/*")
+
+foreach(each_file ${allfiles})
+  set(destinationfile "${destinationdir}/${each_file}")
+  set(sourcefile "${CMAKE_CURRENT_SOURCE_DIR}/content/${each_file}")
+    add_custom_command(TARGET uox3
+      POST_BUILD
+      COMMAND ${CMAKE_COMMAND}
+      -Ddestinationfile=${destinationfile}
+      -Dsourcefile=${sourcefile}
+      -P ${CMAKE_CURRENT_SOURCE_DIR}/check.cmake
+    )
+endforeach(each_file)
