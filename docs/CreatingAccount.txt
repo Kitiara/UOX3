@@ -1,0 +1,3 @@
+Here it is how you create an account using sql query. (hash formula-> account:password )
+
+INSERT INTO accounts SELECT MAX(id)+1, "acc", SHA1("acc:pass"), "example@mail.com", 0, '127.0.0.1' FROM accounts;
