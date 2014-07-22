@@ -18,6 +18,7 @@
 #include "Dictionary.h"
 #include "PageVector.h"
 #include "ObjectFactory.h"
+#include "SQLManager.h"
 
 #undef DBGFILE
 #define DBGFILE "gumps.cpp"
@@ -1311,96 +1312,6 @@ void HandleAddMenuButton( CSocket *s, long button )
 	}
 }
 
-void HandleHowTo( CSocket *sock, int cmdNumber )
-{
-	int iCounter				= 0;
-	UI08 cmdLevelReq			= 0xFF;
-	UI08 cmdType				= 0xFF;
-	std::string cmdName			= "";
-	bool found					= false;
-	for (auto itr = CommandMap.begin(); itr != CommandMap.end(); ++itr)
-	{
-		if (iCounter == cmdNumber)
-		{
-			cmdName		= itr->first;
-			cmdLevelReq = itr->second.cmdLevelReq;
-			cmdType		= itr->second.cmdType;
-			found = true;
-			break;
-		}
-		++iCounter;
-	}
-
-	if (!found)
-		for (auto itr = TargetMap.begin(); itr != TargetMap.end(); ++itr)
-		{
-			if (iCounter == cmdNumber)
-			{
-				cmdName		= itr->first;
-				cmdLevelReq = itr->second.cmdLevelReq;
-				found = true;
-				break;
-			}
-			++iCounter;
-		}
-
-	if (!found)
-		for (auto itr = JSCommandMap.begin(); itr != JSCommandMap.end(); ++itr)
-		{
-			if (iCounter == cmdNumber)
-			{
-				cmdName		= itr->first;
-				cmdLevelReq = itr->second.cmdLevelReq;
-				break;
-			}
-			++iCounter;
-		}
-
-	if( iCounter == cmdNumber )
-	{
-		// Build gump structure here, with basic information like Command Level, Name, Command Type, and parameters (if any, from table)
-		GumpDisplay CommandInfo( sock, 480, 320 );
-		CommandInfo.SetTitle( cmdName );
-
-		CommandInfo.AddData( "Minimum Command Level", cmdLevelReq );
-		switch( cmdType )
-		{
-			case CMD_TARGET:		CommandInfo.AddData( "Syntax", "None (generic target)" );					break;
-			case CMD_FUNC:			CommandInfo.AddData( "Syntax", "None (generic command)" );					break;
-			case CMD_SOCKFUNC:		CommandInfo.AddData( "Syntax", "None (generic command)" );					break;
-			case CMD_TARGETINT:		CommandInfo.AddData( "Syntax", "arg1 (hex or decimal)" );					break;
-			case CMD_TARGETXYZ:		CommandInfo.AddData( "Syntax", "arg1 arg2 arg3 (hex or decimal)" );			break;
-			case CMD_TARGETTXT:		CommandInfo.AddData( "Syntax", "String" );									break;
-			default:				break;
-		}
-
-		char filename[256];
-		sprintf( filename, "help/commands/%s.txt", cmdName.c_str() );
-		std::ifstream toOpen( filename );
-		if( !toOpen.is_open() )
-			CommandInfo.AddData( "", "No extra information is available about this command", 7 );
-		else
-		{
-			char cmdLine[128];
-			while( !toOpen.eof() && !toOpen.fail() )
-			{
-				toOpen.getline( cmdLine, 128 );
-				if( cmdLine[0] != 0 )
-					CommandInfo.AddData( "", cmdLine, 7 );
-			};
-			toOpen.close();
-		}
-		CommandInfo.Send( 4, false, INVALIDSERIAL );
-	}
-	else
-		sock->sysmessage( 280 );
-}
-
-void HandleHowToButton( CSocket *s, long button )
-{
-	HandleHowTo( s, button - 2 );
-}
-
 //o---------------------------------------------------------------------------o
 //|   Function    :  bool CPIGumpMenuSelect::Handle( void )
 //|   Date        :  Unknown
@@ -1534,7 +1445,6 @@ bool CPIGumpMenuSelect::Handle( void )
 		case 9:	HandleAddMenuButton( tSock, buttonID );							break;	// Add Menu
 		case 11: OffList->ButtonSelect( tSock, static_cast<UI16>(buttonID), static_cast<UI08>(gumpID) );				break;	// Who's Offline
 		case 12: Skills->HandleMakeMenu( tSock, buttonID, static_cast<int>(tSock->AddID()));	break;	// New Make Menu
-		case 13: HandleHowToButton( tSock, buttonID );							break;	// Howto
 	}
 	return true;
 }

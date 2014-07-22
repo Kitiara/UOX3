@@ -38,7 +38,6 @@ void endmessage( int x );
 void HandleGumpCommand( CSocket *s, UString cmd, UString data );
 void restock( bool stockAll );
 void sysBroadcast( const std::string& txt );
-void HandleHowTo( CSocket *sock, int cmdNumber );
 void Wiping( CSocket *s );
 
 //o---------------------------------------------------------------------------o
@@ -894,164 +893,6 @@ void command_validcmd( CSocket *s )
 	targetCmds.Send( 4, false, INVALIDSERIAL );
 }
 
-void command_howto( CSocket *s )
-{
-	VALIDATESOCKET( s );
-	UString commandStart = Commands->CommandString( 2 ).upper();
-	if( commandStart.empty() )
-	{
-		CChar *mChar = s->CurrcharObj();
-		if( !ValidateObject( mChar ) )
-			return;
-
-		int iCmd = 2;
-		int numAdded = 0;
-		UI08 pagenum = 1;
-		UI16 position = 40;
-		UI16 linenum = 1;
-
-		CPSendGumpMenu toSend;
-		toSend.UserID( INVALIDSERIAL );
-		toSend.GumpID( 13 );
-
-		toSend.AddCommand( "noclose" );
-		toSend.AddCommand( "resizepic 0 0 %u 480 320", cwmWorldState->ServerData()->BackgroundPic() );
-		toSend.AddCommand( "page 0" );
-		toSend.AddCommand( "text 200 20 0 0" );
-		toSend.AddText( "HOWTO" );
-		toSend.AddCommand( "button 440 20 %u %i 1 0 1", cwmWorldState->ServerData()->ButtonCancel(), cwmWorldState->ServerData()->ButtonCancel() + 1 );
-
-		UI08 currentLevel			= mChar->GetCommandLevel();
-		COMMANDMAP_ITERATOR gAdd	= CommandMap.begin();
-		TARGETMAP_ITERATOR tAdd		= TargetMap.begin();
-		JSCOMMANDMAP_ITERATOR jAdd	= JSCommandMap.begin();
-
-		toSend.AddCommand( "page 1" );
-
-		bool justDonePageAdd = false;
-		while( gAdd != CommandMap.end() )
-		{
-			if( numAdded > 0 && !(numAdded%10) && !justDonePageAdd )
-			{
-				position = 40;
-				++pagenum;
-				toSend.AddCommand( "page %u", pagenum );
-				justDonePageAdd = true;
-			}
-			if( gAdd->second.cmdLevelReq <= currentLevel )
-			{
-				justDonePageAdd = false;
-				toSend.AddCommand( "text 50 %u %u %u", position, cwmWorldState->ServerData()->LeftTextColour(), linenum ); 
-				toSend.AddCommand( "button 20 %u %u %i %u 0 %i", position, cwmWorldState->ServerData()->ButtonRight(), cwmWorldState->ServerData()->ButtonRight() + 1, pagenum, iCmd );
-				toSend.AddText( gAdd->first );
-				++numAdded;
-				++linenum;
-				position += 20;
-			}
-			++iCmd;
-			++gAdd;
-		}
-		while( tAdd != TargetMap.end() )
-		{
-			if( numAdded > 0 && !(numAdded%10) && !justDonePageAdd )
-			{
-				position = 40;
-				++pagenum;
-				toSend.AddCommand( "page %u", pagenum );
-				justDonePageAdd = true;
-			}
-			if( tAdd->second.cmdLevelReq <= currentLevel )
-			{
-				justDonePageAdd = false;
-				toSend.AddCommand( "text 50 %u %u %u", position, cwmWorldState->ServerData()->LeftTextColour(), linenum ); 
-				toSend.AddCommand( "button 20 %u %u %i %u 0 %i", position, cwmWorldState->ServerData()->ButtonRight(), cwmWorldState->ServerData()->ButtonRight() + 1, pagenum, iCmd );
-				toSend.AddText( tAdd->first );
-				++numAdded;
-				++linenum;
-				position += 20;
-			}
-			++iCmd;
-			++tAdd;
-		}
-		while( jAdd != JSCommandMap.end() )
-		{
-			if( numAdded > 0 && !(numAdded%10) && !justDonePageAdd )
-			{
-				position = 40;
-				++pagenum;
-				toSend.AddCommand( "page %u", pagenum );
-				justDonePageAdd = true;
-			}
-			if( jAdd->second.cmdLevelReq <= currentLevel )
-			{
-				justDonePageAdd = false;
-				toSend.AddCommand( "text 50 %u %u %u", position, cwmWorldState->ServerData()->LeftTextColour(), linenum ); 
-				toSend.AddCommand( "button 20 %u %u %i %u 0 %i", position, cwmWorldState->ServerData()->ButtonRight(), cwmWorldState->ServerData()->ButtonRight() + 1, pagenum, iCmd );
-				toSend.AddText( jAdd->first );
-				++numAdded;
-				++linenum;
-				position += 20;
-			}
-			++iCmd;
-			++jAdd;
-		}
-		pagenum = 1; 
-		for( int i = 0; i < numAdded; i += 10 )
-		{
-			toSend.AddCommand( "page %u", pagenum );
-			if( i >= 10 )
-			{
-				toSend.AddCommand( "button 30 290 %u %i 0 %i", cwmWorldState->ServerData()->ButtonLeft(), cwmWorldState->ServerData()->ButtonLeft() + 1, pagenum - 1 ); //back button
-			}
-			if( ( numAdded > 10 ) && ( ( i + 10 ) < numAdded ) )
-			{
-				toSend.AddCommand( "button 440 290 %u %i 0 %i", cwmWorldState->ServerData()->ButtonRight(), cwmWorldState->ServerData()->ButtonRight() + 1, pagenum + 1 );
-			}
-			++pagenum;
-		}
-		toSend.Finalize();
-		s->Send( &toSend );
-	}
-	else
-	{
-		int i = 0;
-		COMMANDMAP_ITERATOR toFind;
-		for( toFind = CommandMap.begin(); toFind != CommandMap.end(); ++toFind )
-		{
-			if( commandStart == toFind->first )
-				break;
-			++i;
-		}
-		if( toFind == CommandMap.end() )
-		{
-			TARGETMAP_ITERATOR findTarg;
-			for( findTarg = TargetMap.begin(); findTarg != TargetMap.end(); ++findTarg )
-			{
-				if( commandStart == findTarg->first )
-					break;
-				++i;
-			}
-			if( findTarg == TargetMap.end() )
-			{
-				JSCOMMANDMAP_ITERATOR findJS = JSCommandMap.begin();
-				for( findJS = JSCommandMap.begin(); findJS != JSCommandMap.end(); ++findJS )
-				{
-					if( commandStart == findJS->first )
-						break;
-					++i;
-				}
-				if( findJS == JSCommandMap.end() )
-				{
-					s->sysmessage( 280 );
-					return;
-				}
-			}
-		}
-		HandleHowTo( s, i );
-	}
-}
-
-
 void command_temp( CSocket *s )
 {
 	VALIDATESOCKET( s );
@@ -1096,7 +937,6 @@ void cCommands::CommandReset( void )
 	CommandMap["GMMENU"]			= CommandMapEntry( CL_GM,		CMD_SOCKFUNC,	(CMD_DEFINE)&command_gmmenu);
 	CommandMap["GCOLLECT"]			= CommandMapEntry( CL_GM,		CMD_FUNC,		(CMD_DEFINE)&CollectGarbage);
 	CommandMap["GQ"]				= CommandMapEntry( CL_GM,		CMD_SOCKFUNC,	(CMD_DEFINE)&command_gq);
-	CommandMap["HOWTO"]				= CommandMapEntry( CL_PLAYER,	CMD_SOCKFUNC,	(CMD_DEFINE)&command_howto );
 	CommandMap["LOADDEFAULTS"]		= CommandMapEntry( CL_ADMIN,	CMD_FUNC,		(CMD_DEFINE)&command_loaddefaults);
 	CommandMap["MEMSTATS"]			= CommandMapEntry( CL_GM,		CMD_SOCKFUNC,	(CMD_DEFINE)&command_memstats);
 	CommandMap["MINECHECK"]			= CommandMapEntry( CL_GM,		CMD_FUNC,		(CMD_DEFINE)&command_minecheck);

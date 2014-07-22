@@ -1,5 +1,0 @@
-        MIDI <value>
-
-  Purpose: 
-        Will start playing a MIDI-song from
-        the MIDI-list.
