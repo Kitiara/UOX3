@@ -874,17 +874,17 @@ void command_validcmd( CSocket *s )
 	GumpDisplay targetCmds( s, 300, 300 );
 	targetCmds.SetTitle( "Valid Commands" );
 
-	for( COMMANDMAP_ITERATOR myCounter = CommandMap.begin(); myCounter != CommandMap.end(); ++myCounter )
+	for( auto myCounter = CommandMap.begin(); myCounter != CommandMap.end(); ++myCounter )
 	{
 		if( myCounter->second.cmdLevelReq <= targetCommand )
 			targetCmds.AddData( myCounter->first, myCounter->second.cmdLevelReq );
 	}
-	for( TARGETMAP_ITERATOR targCounter = TargetMap.begin(); targCounter != TargetMap.end(); ++targCounter )
+	for( auto targCounter = TargetMap.begin(); targCounter != TargetMap.end(); ++targCounter )
 	{
 		if( targCounter->second.cmdLevelReq <= targetCommand )
 			targetCmds.AddData( targCounter->first, targCounter->second.cmdLevelReq );
 	}
-	for( JSCOMMANDMAP_ITERATOR jsCounter = JSCommandMap.begin(); jsCounter != JSCommandMap.end(); ++jsCounter )
+	for( auto jsCounter = JSCommandMap.begin(); jsCounter != JSCommandMap.end(); ++jsCounter )
 	{
 		if( jsCounter->second.cmdLevelReq <= targetCommand )
 			targetCmds.AddData( jsCounter->first, jsCounter->second.cmdLevelReq );
@@ -967,7 +967,7 @@ void cCommands::UnRegister( std::string cmdName, cScript *toRegister )
 #endif
 	UString upper		= cmdName;
 	upper				= upper.upper();
-	JSCOMMANDMAP_ITERATOR p = JSCommandMap.find( upper );
+	auto p = JSCommandMap.find( upper );
 	if( p != JSCommandMap.end() )
 		JSCommandMap.erase( p );
 #if defined( UOX_DEBUG_MODE )
@@ -1000,11 +1000,9 @@ void cCommands::SetCommandStatus( std::string cmdName, bool isEnabled )
 {
 	UString upper					= cmdName;
 	upper							= upper.upper();
-	JSCOMMANDMAP_ITERATOR	toFind	= JSCommandMap.find( upper );
+	auto toFind	= JSCommandMap.find( upper );
 	if( toFind != JSCommandMap.end() )
-	{
 		toFind->second.isEnabled = isEnabled;
-	}
 }
 
 }

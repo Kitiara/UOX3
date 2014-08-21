@@ -30,8 +30,8 @@ class cCommands
 {
 private:
 	std::vector< commandLevel_st *> clearance;
-	COMMANDMAP_ITERATOR				cmdPointer;
-	TARGETMAP_ITERATOR				targPointer;
+	COMMANDMAP::iterator cmdPointer;
+	TARGETMAP::iterator targPointer;
 	UString							commandString;
 
 	void			InitClearance( void );

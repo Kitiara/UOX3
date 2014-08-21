@@ -194,12 +194,6 @@ CConsole& CConsole::operator<<( const std::string &outPut )
 	std::cout << outPut.c_str();
 	return (*this);
 }
-CConsole& CConsole::operator<<( const std::ostream& outPut )
-{
-	StartOfLineCheck();
-	std::cout << outPut;
-	return (*this);
-}
 CConsole& CConsole::operator<<( CBaseObject *outPut )
 {
 	StartOfLineCheck();
@@ -207,12 +201,6 @@ CConsole& CConsole::operator<<( CBaseObject *outPut )
 	return (*this);
 }
 
-CConsole& CConsole::operator<<( std::ostream& outPut )
-{
-	StartOfLineCheck();
-	std::cout << outPut;
-	return (*this);
-}
 CConsole& CConsole::operator<<( CEndL& myObj )
 {
 	if( curLeft == 0 )

@@ -101,7 +101,7 @@ void cCommands::Command( CSocket *s, CChar *mChar, UString text )
 		return;
 	UString command = CommandString( 1, 1 ).upper();	// discard the leading '
 
-	JSCOMMANDMAP_ITERATOR toFind = JSCommandMap.find( command );
+	auto toFind = JSCommandMap.find( command );
 	if( toFind != JSCommandMap.end() )
 	{
 		if( toFind->second.isEnabled )
@@ -127,7 +127,7 @@ void cCommands::Command( CSocket *s, CChar *mChar, UString text )
 		}
 	}
 
-	TARGETMAP_ITERATOR findTarg = TargetMap.find( command );
+	auto findTarg = TargetMap.find( command );
 	if( findTarg != TargetMap.end() )
 	{
 		bool plClearance = ( mChar->GetCommandLevel() >= findTarg->second.cmdLevelReq || mChar->GetAccount().wAccountIndex == 0 );
@@ -176,7 +176,7 @@ void cCommands::Command( CSocket *s, CChar *mChar, UString text )
 	}
 	else
 	{
-		COMMANDMAP_ITERATOR toFind = CommandMap.find( command );
+		auto toFind = CommandMap.find( command );
 		if( toFind == CommandMap.end() )
 		{
 			cScript *toGrab = JSMapping->GetScript( mChar->GetScriptTrigger() );
@@ -236,8 +236,8 @@ void cCommands::Load( void )
 	for( tag = commands->First(); !commands->AtEnd(); tag = commands->Next() )
 	{
 		data						= commands->GrabData();
-		COMMANDMAP_ITERATOR toFind	= CommandMap.find( tag );
-		TARGETMAP_ITERATOR findTarg	= TargetMap.find( tag );
+		auto toFind	= CommandMap.find( tag );
+		auto findTarg	= TargetMap.find( tag );
 		if( toFind == CommandMap.end() && findTarg == TargetMap.end() )
 			badCommands.push_back( tag ); // make sure we don't index into array at -1
 		else
@@ -466,7 +466,7 @@ commandLevel_st *cCommands::GetClearance( UI08 commandLevel )
 //o---------------------------------------------------------------------------o
 bool cCommands::CommandExists( const std::string& cmdName )
 {
-	COMMANDMAP_ITERATOR toFind = CommandMap.find( cmdName );
+	auto toFind = CommandMap.find( cmdName );
 	return ( toFind != CommandMap.end() );
 }
 
@@ -521,7 +521,7 @@ CommandMapEntry *cCommands::CommandDetails( const std::string& cmdName )
 {
 	if( !CommandExists( cmdName ) )
 		return NULL;
-	COMMANDMAP_ITERATOR toFind = CommandMap.find( cmdName );
+	auto toFind = CommandMap.find( cmdName );
 	if( toFind == CommandMap.end() )
 		return NULL;
 	return &(toFind->second);
