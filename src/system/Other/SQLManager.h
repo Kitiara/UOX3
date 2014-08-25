@@ -12,52 +12,52 @@ typedef std::vector< std::pair<int, std::vector<std::vector<std::string>>> > Sta
 
 enum SQL_STATE
 {
-	SQL_STATE_EXECUTEQUERY_RETURN,
-	SQL_STATE_EXECUTEQUERY_NORETURN,
-	SQL_STATE_FETCHROW,
-	SQL_STATE_GETCOLUMN,
-	SQL_STATE_RELEASEQUERY
+    SQL_STATE_EXECUTEQUERY_RETURN,
+    SQL_STATE_EXECUTEQUERY_NORETURN,
+    SQL_STATE_FETCHROW,
+    SQL_STATE_GETCOLUMN,
+    SQL_STATE_RELEASEQUERY
 };
 
 namespace UOX
 {
-	class SQLManager : public Singleton< SQLManager >
-	{
-	protected:
-		MYSQL *conn;
-		MYSQL_RES *res;
-		MYSQL_ROW row;
-		StatementType statementList;
-		int ExecuteOrder;
-		SQL_STATE state;
-		bool lastState;
-		bool inTransaction;
-		std::string ip;
-		unsigned int port;
-		std::string	database;
-		std::string	username;
-		std::string	password;
+    class SQLManager : public Singleton< SQLManager >
+    {
+    protected:
+        MYSQL *conn;
+        MYSQL_RES *res;
+        MYSQL_ROW row;
+        StatementType statementList;
+        int ExecuteOrder;
+        SQL_STATE state;
+        bool lastState;
+        bool inTransaction;
+        std::string ip;
+        unsigned int port;
+        std::string database;
+        std::string username;
+        std::string password;
 
-	public:
-		SQLManager();
-		~SQLManager();
+    public:
+        SQLManager();
+        ~SQLManager();
 
-		void SetDatabaseInfo(UString dbinfo);
+        void SetDatabaseInfo(UString dbinfo);
 
-		std::string GetDatabase() const { return database; }
+        std::string GetDatabase() const { return database; }
 
-		bool Connect( void );
-		bool Disconnect( void );
-		bool ExecuteQuery(std::string sql, int *index = NULL, bool transaction = true);
-		bool FetchRow( int *index );
-		bool GetColumn(int colNumber, UString& value, int *index);
-		bool QueryRelease(bool transaction = true);
-		bool BeginTransaction( void );
-		bool FinaliseTransaction( bool commit );
-		bool LastSucceeded( void );
-		std::vector<std::string> Simplify(UString uStr, bool execute = true, int* index = NULL, bool transaction = true);
+        bool Connect(void);
+        bool Disconnect(void);
+        bool ExecuteQuery(std::string sql, int *index = NULL, bool transaction = true);
+        bool FetchRow(int *index);
+        bool GetColumn(int colNumber, UString& value, int *index);
+        bool QueryRelease(bool transaction = true);
+        bool BeginTransaction(void);
+        bool FinaliseTransaction(bool commit);
+        bool LastSucceeded(void);
+        std::vector<std::string> Simplify(UString uStr, bool execute = true, int* index = NULL, bool transaction = true);
 
-		MYSQL_RES* GetMYSQLResult() { return res; }
+        MYSQL_RES* GetMYSQLResult() { return res; }
 
         /** Override standard Singleton retrieval.
         @remarks
@@ -74,7 +74,7 @@ namespace UOX
         but the implementation stays in this single compilation unit,
         preventing link errors.
         */
-        static SQLManager& getSingleton( void );
+        static SQLManager& getSingleton(void);
         /** Override standard Singleton retrieval.
         @remarks
         Why do we do this? Well, it's because the Singleton
@@ -90,8 +90,8 @@ namespace UOX
         but the implementation stays in this single compilation unit,
         preventing link errors.
         */
-        static SQLManager * getSingletonPtr( void );
-	};
+        static SQLManager * getSingletonPtr(void);
+    };
 }
 
 #endif

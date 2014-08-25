@@ -3,48 +3,50 @@
 namespace UOX
 {
 
-CThreadQueue					messageLoop;
+CThreadQueue messageLoop;
 
-CThreadQueue::CThreadQueue()
+CThreadQueue::CThreadQueue() {}
+
+CThreadQueue &CThreadQueue::operator<<(MessageType newMessage)
 {
+    NewMessage(newMessage, NULL);
+    return (*this);
 }
 
-CThreadQueue &CThreadQueue::operator<<( MessageType newMessage )
+CThreadQueue &CThreadQueue::operator <<(char *toPush)
 {
-	NewMessage( newMessage, NULL );
-	return (*this);
+    NewMessage(MSG_PRINT, toPush);
+    return (*this);
 }
-CThreadQueue &CThreadQueue::operator <<( char *toPush )
+
+bool CThreadQueue::Empty(void)
 {
-	NewMessage( MSG_PRINT, toPush );
-	return (*this);
+    MutexOn();
+    bool retVal = internalQueue.empty();
+    MutexOff();
+    return retVal;
 }
-bool CThreadQueue::Empty( void )
-{
-	MutexOn();
-	bool retVal = internalQueue.empty();
-	MutexOff();
-	return retVal;
-}
-MessagePassed CThreadQueue::GrabMessage( void )
+
+MessagePassed CThreadQueue::GrabMessage(void)
 { 
-	MutexOn();	
-	MessagePassed toReturn = internalQueue.front();	
-	internalQueue.pop();	
-	MutexOff();	
-	return toReturn;	
+    MutexOn();
+    MessagePassed toReturn = internalQueue.front();
+    internalQueue.pop();
+    MutexOff();
+    return toReturn;
 }
-void CThreadQueue::NewMessage( MessageType toAdd, const char *data )
+
+void CThreadQueue::NewMessage(MessageType toAdd, const char *data)
 { 
-	MutexOn();
-	MessagePassed adding;
-	adding.actualMessage = toAdd;
-	if( data == NULL )
-		adding.data[0] = 0;
-	else
-		strncpy( adding.data, data, 128 );
-	internalQueue.push( adding );
-	MutexOff();	
+    MutexOn();
+    MessagePassed adding;
+    adding.actualMessage = toAdd;
+    if (data == NULL)
+        adding.data[0] = 0;
+    else
+        strncpy(adding.data, data, 128);
+    internalQueue.push(adding);
+    MutexOff();
 }
 
 }

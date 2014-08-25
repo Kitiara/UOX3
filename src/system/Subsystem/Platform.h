@@ -26,9 +26,9 @@ suit our own purposes
 
 // Finds the compiler type and version.
 
-#if defined( _MSC_VER )
-#   define UOX_COMPILER COMPILER_MSVC
-#   define UOX_COMP_VER _MSC_VER
+#if defined(_MSC_VER)
+    #define UOX_COMPILER COMPILER_MSVC
+    #define UOX_COMP_VER _MSC_VER
 //#if _MSC_VER >= 1500
 //   // this is Visual C++ 2008
 //#elif _MSC_VER >= 1400
@@ -39,40 +39,37 @@ suit our own purposes
 //   // this is Visual C++ .NET 2002
 //#endif 
 
-#elif defined( __GNUC__ )
-#   define UOX_COMPILER COMPILER_GNUC
-#   define UOX_COMP_VER __VERSION__
-#	define FALSE 0L
-#	define TRUE  1L 
+#elif defined(__GNUC__)
+    #define UOX_COMPILER COMPILER_GNUC
+    #define UOX_COMP_VER __VERSION__
+    #define FALSE 0L
+    #define TRUE  1L 
 
-#elif defined( __BORLANDC__ )
-#   define UOX_COMPILER COMPILER_BORL
-#   define UOX_COMP_VER __BCPLUSPLUS__
+#elif defined(__BORLANDC__)
+    #define UOX_COMPILER COMPILER_BORL
+    #define UOX_COMP_VER __BCPLUSPLUS__
 
 #else
-#   pragma error "No known compiler. Abort! Abort!"
-
+    #pragma error "No known compiler. Abort! Abort!"
 #endif
 
 // See if we can use __forceinline or if we need to use __inline instead
 #if UOX_COMPILER == COMPILER_MSVC 
-#   if UOX_COMP_VER >= 1200
-#       define FORCEINLINE __forceinline
-#   endif
+    #if UOX_COMP_VER >= 1200
+        #define FORCEINLINE __forceinline
+    #endif
 #else
-#   define FORCEINLINE __inline
+    #define FORCEINLINE __inline
 #endif
 
 // Finds the current platform
 
-#if defined( __WIN32__ ) || defined( _WIN32 )
-#   define UOX_PLATFORM PLATFORM_WIN32
-
-#elif defined( __APPLE_CC__)
-#   define UOX_PLATFORM PLATFORM_APPLE
-
+#if defined(__WIN32__) || defined(_WIN32)
+    #define UOX_PLATFORM PLATFORM_WIN32
+#elif defined(__APPLE_CC__)
+    #define UOX_PLATFORM PLATFORM_APPLE
 #else
-#   define UOX_PLATFORM PLATFORM_LINUX
+    #define UOX_PLATFORM PLATFORM_LINUX
 #endif
 
 // For generating compiler warnings - should work on any compiler
@@ -81,90 +78,84 @@ suit our own purposes
 #define _QUOTE(x) # x
 #define QUOTE(x) _QUOTE(x)
 #define __FILE__LINE__ __FILE__ "(" QUOTE(__LINE__) ") : "
-#define NOTE( x )  message( x )
-#define FILE_LINE  message( __FILE__LINE__ )
-#define TODO( x )  message( __FILE__LINE__"\n"           \
+#define NOTE(x)  message(x)
+#define FILE_LINE  message(__FILE__LINE__)
+#define TODO(x)  message(__FILE__LINE__"\n"           \
         "+------------------------------------------------\n" \
         "|  TODO :   " #x "\n" \
-        "+-------------------------------------------------\n" )
-#define FIXME( x )  message(  __FILE__LINE__"\n"           \
+        "+-------------------------------------------------\n")
+#define FIXME(x)  message( __FILE__LINE__"\n"           \
         "+------------------------------------------------\n" \
         "|  FIXME :  " #x "\n" \
-        "+-------------------------------------------------\n" )
-#define todo( x )  message( __FILE__LINE__" TODO :   " #x "\n" )
-#define fixme( x )  message( __FILE__LINE__" FIXME:   " #x "\n" )
-#define note( x )  message( __FILE__LINE__" NOTE :   " #x "\n" )
+        "+-------------------------------------------------\n")
+#define todo(x)  message(__FILE__LINE__" TODO :   " #x "\n")
+#define fixme(x)  message(__FILE__LINE__" FIXME:   " #x "\n")
+#define note(x)  message(__FILE__LINE__" NOTE :   " #x "\n")
 
 //----------------------------------------------------------------------------
 // Windows Settings
 #if UOX_PLATFORM == PLATFORM_WIN32
 
 // Win32 compilers use _DEBUG for specifying debug builds.
-#   ifdef _DEBUG
-#       define UOX_DEBUG_MODE 1
-#   endif
+#ifdef _DEBUG
+    #define UOX_DEBUG_MODE 1
+#endif
 
-#	if UOX_COMPILER == COMPILER_MSVC && UOX_COMP_VER >= 1400	// VS 2005 Defines for Security and Debugging 
-#		define _CRT_SECURE_NO_DEPRECATE						// Disable "depreciated function" warning
-#		define _CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES 1	// Automatically convert normal (sprintf) functions to secure (sprintf_s) functions
-#		define _ITERATOR_DEBUG_LEVEL 0						// Iterator debugging should only be enabled in debug, and WILL cause crashes if iterators are handled improperly.
-#	endif
+#if UOX_COMPILER == COMPILER_MSVC && UOX_COMP_VER >= 1400  // VS 2005 Defines for Security and Debugging
+    #define _CRT_SECURE_NO_DEPRECATE                       // Disable "depreciated function" warning
+    #define _CRT_SECURE_CPP_OVERLOAD_STANDARD_NAMES 1      // Automatically convert normal (sprintf) functions to secure (sprintf_s) functions
+    #define _ITERATOR_DEBUG_LEVEL 0                        // Iterator debugging should only be enabled in debug, and WILL cause crashes if iterators are handled improperly.
+#endif
 
-	#define XP_WIN			// JS API Requires we define OS we compile with
-	#define XP_PC
-	#define OS_STR "Win32"
+#define XP_WIN            // JS API Requires we define OS we compile with
+#define XP_PC
+#define OS_STR "Win32"
 
 // A quick define to overcome different names for the same function
-#	if UOX_COMPILER != COMPILER_GNUC
-#		define snprintf _snprintf
-#		if UOX_COMPILER == COMPILER_MSVC 
-#			if UOX_COMP_VER < 1500 // VS 2008 No longer needs this define (will throw a compile error)
-#				define vsnprintf _vsnprintf
-#			endif
-#		endif
-#	endif
+#if UOX_COMPILER != COMPILER_GNUC
+    #define snprintf _snprintf
+    #if UOX_COMPILER == COMPILER_MSVC 
+        #if UOX_COMP_VER < 1500 // VS 2008 No longer needs this define (will throw a compile error)
+            #define vsnprintf _vsnprintf
+        #endif
+    #endif
+#endif
 
 #endif
-//----------------------------------------------------------------------------
 
-//----------------------------------------------------------------------------
 // Linux/Apple Settings
 #if UOX_PLATFORM == PLATFORM_LINUX || UOX_PLATFORM == PLATFORM_APPLE
 
 // A quick define to overcome different names for the same function
-#   define stricmp strcasecmp
+#define stricmp strcasecmp
 
 // Unlike the Win32 compilers, Linux compilers seem to use DEBUG for when
 // specifying a debug build.
-#   ifdef DEBUG
-#       define UOX_DEBUG_MODE 1
-#   endif
+#ifdef DEBUG
+    #define UOX_DEBUG_MODE 1
+#endif
 
-	#define XP_UNIX			// JS API Requires we define OS we compile with
-	#define OS_STR "Linux"
+#define XP_UNIX            // JS API Requires we define OS we compile with
+#define OS_STR "Linux"
 
-	#define closesocket( s ) close( s )
-	#define ioctlsocket( s, b, c ) ioctl( s, b, c )
+#define closesocket(s) close(s)
+#define ioctlsocket(s, b, c) ioctl(s, b, c)
 
-	#include "uoxlinux.h"	// linux wrappers for windows-specific api calls
+#include "uoxlinux.h"      // linux wrappers for windows-specific api calls
 
 #endif
 
 //For apple, we always have a custom config.h file
 #if UOX_PLATFORM == PLATFORM_APPLE
-#    include "config.h"
-
+#include "config.h"
 #endif
 
-//----------------------------------------------------------------------------
-
-//----------------------------------------------------------------------------
 // Endian Settings
 // check for BIG_ENDIAN config flag, set UOX_ENDIAN correctly
 #ifdef CONFIG_BIG_ENDIAN
-#    define UOX_ENDIAN ENDIAN_BIG
+    #define UOX_ENDIAN ENDIAN_BIG
 #else
-#    define UOX_ENDIAN ENDIAN_LITTLE
+    #define UOX_ENDIAN ENDIAN_LITTLE
 #endif
 
 #endif

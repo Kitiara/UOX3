@@ -6,46 +6,46 @@ namespace UOX
 ThreadSafeObject::ThreadSafeObject()
 {
 #if UOX_PLATFORM == PLATFORM_WIN32
-	d_mutex = CreateMutex( NULL, false, NULL );
+    d_mutex = CreateMutex(NULL, false, NULL);
 #else
-	pthread_mutexattr_t mutexAttr;
-	pthread_mutexattr_init( &mutexAttr );
+    pthread_mutexattr_t mutexAttr;
+    pthread_mutexattr_init(&mutexAttr);
 
-	pthread_mutexattr_settype( &mutexAttr, PTHREAD_MUTEX_RECURSIVE );
+    pthread_mutexattr_settype(&mutexAttr, PTHREAD_MUTEX_RECURSIVE);
 
-	pthread_mutex_init(&d_mutex,&mutexAttr);
+    pthread_mutex_init(&d_mutex,&mutexAttr);
 
-	pthread_mutexattr_destroy( &mutexAttr );
+    pthread_mutexattr_destroy(&mutexAttr);
 #endif
 }
 ThreadSafeObject::~ThreadSafeObject()
 {
 #if UOX_PLATFORM == PLATFORM_WIN32
-	if( d_mutex != NULL )
-	{
-		CloseHandle( d_mutex );
-		d_mutex = NULL;
-	}
+    if (d_mutex != NULL)
+    {
+        CloseHandle(d_mutex);
+        d_mutex = NULL;
+    }
 #else
-	pthread_mutex_unlock(&d_mutex);
-	pthread_mutex_destroy(&d_mutex);
+    pthread_mutex_unlock(&d_mutex);
+    pthread_mutex_destroy(&d_mutex);
 #endif
 }
 
-void ThreadSafeObject::MutexOn( void )
+void ThreadSafeObject::MutexOn(void)
 {
 #if UOX_PLATFORM == PLATFORM_WIN32
-	WaitForSingleObject( d_mutex, INFINITE );
+    WaitForSingleObject(d_mutex, INFINITE);
 #else
-	pthread_mutex_lock( &d_mutex );
+    pthread_mutex_lock(&d_mutex);
 #endif
 }
-void ThreadSafeObject::MutexOff( void )
+void ThreadSafeObject::MutexOff(void)
 {
 #if UOX_PLATFORM == PLATFORM_WIN32
-	ReleaseMutex( d_mutex );
+    ReleaseMutex(d_mutex);
 #else
-	pthread_mutex_unlock( &d_mutex );
+    pthread_mutex_unlock(&d_mutex);
 #endif
 }
 

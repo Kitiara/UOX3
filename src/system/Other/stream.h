@@ -7,29 +7,31 @@
 //| older based string stream library.
 //o---------------------------------------------------------------------------o
 //| Version History
-//| 1.0		First version
+//| 1.0        First version
 //o---------------------------------------------------------------------------o
 
 #ifndef _STREAM_H_
 #define _STREAM_H_
 #include <sstream>
 
-/*#ifndef ios_base
-	#define ios_base ios
-	namespace std
-	{
-		inline ios& left( ios& i )
-		{
-			i.setf( ios::left, ios::adjustfield ); 
-			return i;
-		}
-		inline ios& right( ios& i )
-		{
-			i.setf( ios::right, ios::adjustfield );
-			return i;
-		}
-	}
-#endif*/
+/*
+#ifndef ios_base
+    #define ios_base ios
+    namespace std
+    {
+        inline ios& left(ios& i)
+        {
+            i.setf(ios::left, ios::adjustfield);
+            return i;
+        }
+        inline ios& right(ios& i)
+        {
+            i.setf(ios::right, ios::adjustfield);
+            return i;
+        }
+    }
+#endif
+*/
 
 #endif
 

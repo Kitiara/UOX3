@@ -6,105 +6,105 @@ namespace UOX
 // Function prototypes exposed to the Script Engine
 
 // Version History
-// 1.0		Abaddon		12th September, 2000
-//			Initial implementation, not many functions added
-// 1.1		Abaddon		14th September, 2000
-//			Declaration of 90 API functions and implementation of around 20 of them
-// 1.2		Abaddon		18th September, 2000
-//			Addition of more API functions and declarations of them
-// 1.3		Zippy		28th October, 2001
-//			Addition of File i/o functions.
-// 1.4 		Shadowlord	3rd  November, 2001
-//			Addition of Tag functions.
+// 1.0        Abaddon     12th September, 2000
+//            Initial implementation, not many functions added
+// 1.1        Abaddon     14th September, 2000
+//            Declaration of 90 API functions and implementation of around 20 of them
+// 1.2        Abaddon     18th September, 2000
+//            Addition of more API functions and declarations of them
+// 1.3        Zippy       28th October, 2001
+//            Addition of File i/o functions.
+// 1.4        Shadowlord  3rd  November, 2001
+//            Addition of Tag functions.
 
-typedef JSBool (SEngineFunc)( JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval );
+typedef JSBool (SEngineFunc)(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval);
 
 // 90 functions so far
-// *	== prototype 
-// **	== active function
+// *    == prototype 
+// **   == active function
 
 // Character related functions (9)
 
-SEngineFunc SE_SpawnNPC;			// Create NPC								*
+SEngineFunc SE_SpawnNPC; // Create NPC
 
 // Effect related functions (3)
 
-SEngineFunc SE_DoMovingEffect;		// Does moving effect						***
-SEngineFunc SE_DoTempEffect;		// Does a temp effect						***
+SEngineFunc SE_DoMovingEffect; // Does moving effect
+SEngineFunc SE_DoTempEffect; // Does a temp effect
 
 // Item related functions (2)
 
-SEngineFunc SE_CreateBlankItem;		// Create an item							***
-SEngineFunc SE_CreateDFNItem;		// Create an item							***
+SEngineFunc SE_CreateBlankItem; // Create an item
+SEngineFunc SE_CreateDFNItem; // Create an item
 
 // Speech related functions (7)
-SEngineFunc SE_BroadcastMessage;	//											***
+SEngineFunc SE_BroadcastMessage;
 
 // Random functions(5)
-SEngineFunc SE_RandomNumber;		// Calculates a random number				***
-SEngineFunc SE_CalcCharFromSer;		//											***
-SEngineFunc SE_CalcItemFromSer;		//											***
+SEngineFunc SE_RandomNumber; // Calculates a random number
+SEngineFunc SE_CalcCharFromSer;
+SEngineFunc SE_CalcItemFromSer;
 
-SEngineFunc SE_MakeItem;			//											***
+SEngineFunc SE_MakeItem;
 
-SEngineFunc SE_CommandLevelReq;		//											*
-SEngineFunc SE_CommandExists;		//											*
-SEngineFunc SE_FirstCommand;		//											*
-SEngineFunc SE_NextCommand;			//											*
-SEngineFunc SE_FinishedCommandList;	//											*
+SEngineFunc SE_CommandLevelReq;
+SEngineFunc SE_CommandExists;
+SEngineFunc SE_FirstCommand;
+SEngineFunc SE_NextCommand;
+SEngineFunc SE_FinishedCommandList;
 
-SEngineFunc SE_RegisterCommand;		//											***
-SEngineFunc SE_EnableCommand;		//											***
-SEngineFunc SE_DisableCommand;		//											***
+SEngineFunc SE_RegisterCommand;
+SEngineFunc SE_EnableCommand;
+SEngineFunc SE_DisableCommand;
 
-SEngineFunc SE_RegisterKey;			//											***
-SEngineFunc SE_EnableKey;			//											***
-SEngineFunc SE_DisableKey;			//											***
+SEngineFunc SE_RegisterKey;
+SEngineFunc SE_EnableKey;
+SEngineFunc SE_DisableKey;
 
-SEngineFunc SE_RegisterConsoleFunc;	//											***
-SEngineFunc SE_EnableConsoleFunc;	//											***
-SEngineFunc SE_DisableConsoleFunc;	//											***
+SEngineFunc SE_RegisterConsoleFunc;
+SEngineFunc SE_EnableConsoleFunc;
+SEngineFunc SE_DisableConsoleFunc;
 
-SEngineFunc SE_RegisterSpell;		//											***
-SEngineFunc SE_EnableSpell;			//											***
-SEngineFunc SE_DisableSpell;		//											***
+SEngineFunc SE_RegisterSpell;
+SEngineFunc SE_EnableSpell;
+SEngineFunc SE_DisableSpell;
 
 SEngineFunc SE_RegisterSkill;
 SEngineFunc SE_RegisterPacket;
 
-SEngineFunc SE_GetHour;					//										***
-SEngineFunc SE_GetMinute;				//										***
-SEngineFunc SE_GetDay;					//										***
-SEngineFunc SE_SecondsPerUOMinute;		//										***
+SEngineFunc SE_GetHour;
+SEngineFunc SE_GetMinute;
+SEngineFunc SE_GetDay;
+SEngineFunc SE_SecondsPerUOMinute;
 
-SEngineFunc SE_GetCurrentClock;			//										***
-SEngineFunc SE_GetMurderThreshold;		//										***
-SEngineFunc SE_RollDice;				//										***
-SEngineFunc SE_RaceCompareByRace;		//										***
+SEngineFunc SE_GetCurrentClock;
+SEngineFunc SE_GetMurderThreshold;
+SEngineFunc SE_RollDice;
+SEngineFunc SE_RaceCompareByRace;
 
-SEngineFunc SE_FindMulti;				//										***
-SEngineFunc SE_GetItem;					//										***
-SEngineFunc SE_FindItem;				//										***
+SEngineFunc SE_FindMulti;
+SEngineFunc SE_GetItem;
+SEngineFunc SE_FindItem;
 
-SEngineFunc SE_CompareGuildByGuild;		//										**
+SEngineFunc SE_CompareGuildByGuild;
 
-SEngineFunc SE_PossessTown;				//										***
+SEngineFunc SE_PossessTown;
 
-SEngineFunc SE_IsRaceWeakToWeather;		//										***
-SEngineFunc SE_GetRaceSkillAdjustment;	//										***
+SEngineFunc SE_IsRaceWeakToWeather;
+SEngineFunc SE_GetRaceSkillAdjustment;
 
-SEngineFunc SE_UseDoor;					//										***
+SEngineFunc SE_UseDoor;
 
-SEngineFunc SE_TriggerEvent;			//										*
+SEngineFunc SE_TriggerEvent;
 
-SEngineFunc SE_GetPackOwner;			//										***
-SEngineFunc SE_CalcTargetedItem;		//										***
-SEngineFunc SE_CalcTargetedChar;		//										***
-SEngineFunc SE_GetTileIDAtMapCoord;		//										***
+SEngineFunc SE_GetPackOwner;
+SEngineFunc SE_CalcTargetedItem;
+SEngineFunc SE_CalcTargetedChar;
+SEngineFunc SE_GetTileIDAtMapCoord;
 
-SEngineFunc SE_StringToNum;				// Marked for Deletion
-SEngineFunc SE_NumToString;				// Marked for Deletion
-SEngineFunc SE_NumToHexString;			// Marked for Deletion
+SEngineFunc SE_StringToNum;    // Marked for Deletion
+SEngineFunc SE_NumToString;    // Marked for Deletion
+SEngineFunc SE_NumToHexString; // Marked for Deletion
 
 SEngineFunc SE_GetRaceCount;
 SEngineFunc SE_AreaCharacterFunction;

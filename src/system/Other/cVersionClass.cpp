@@ -1,15 +1,15 @@
 //o--------------------------------------------------------------------------o
-//|	Function/Class	-	
-//|	Date			-	10/17/2002
-//|	Developer(s)	-	EviLDeD
-//|	Company/Team	-	UOX3 DevTeam
-//|	Status			-	
+//| Function/Class -
+//| Date           - 10/17/2002
+//| Developer(s)   - EviLDeD
+//| Company/Team   - UOX3 DevTeam
+//| Status         -
 //o--------------------------------------------------------------------------o
-//|	Description		-	
+//| Description    -
 //o--------------------------------------------------------------------------o
-//|	Returns			-
+//| Returns        -
 //o--------------------------------------------------------------------------o
-//|	Notes			-	
+//| Notes          -
 //o--------------------------------------------------------------------------o
 #include <string>
 #include "cVersionClass.h"
@@ -20,77 +20,69 @@ namespace UOX
 //o---------------------------------------------------------------------------o
 // product info
 //o---------------------------------------------------------------------------o
-const std::string VER				= "0.99";
-const std::string BUILD				= "2";
-const std::string REALBUILD			= "0";
-const std::string SVER				= "2.0";
-const std::string CVER				= "2.0";
-const std::string IVER				= "2.0";
-const std::string PRODUCT			= "Ultima Offline eXperiment 3";
-const std::string NAME				= "The UOX3 DevTeam";
-const std::string EMAIL				= "http://openuo.sourceforge.net/";
-const std::string PROGRAMMERS		= "UOX3 DevTeam";
+const std::string VER         = "0.99";
+const std::string BUILD       = "2";
+const std::string REALBUILD   = "0";
+const std::string SVER        = "2.0";
+const std::string CVER        = "2.0";
+const std::string IVER        = "2.0";
+const std::string PRODUCT     = "Ultima Offline eXperiment 3";
+const std::string NAME        = "The UOX3 DevTeam";
+const std::string EMAIL       = "http://openuo.sourceforge.net/";
+const std::string PROGRAMMERS = "UOX3 DevTeam";
 
-//////////////////////////////////////////////////////////////////////
 // Construction/Destruction
-//////////////////////////////////////////////////////////////////////
-CVersionClass::CVersionClass()
-{
-}
-//o---------------------------------------------------------------------------o
-CVersionClass::~CVersionClass()
-{
+CVersionClass::CVersionClass() {}
+CVersionClass::~CVersionClass() {}
 
+std::string CVersionClass::GetVersion(void)
+{
+    return VER;
 }
 
-std::string CVersionClass::GetVersion( void )
+std::string CVersionClass::GetBuild(void)
 {
-	return VER;
+    return BUILD;
 }
 
-std::string CVersionClass::GetBuild( void )
+std::string CVersionClass::GetRealBuild(void)
 {
-	return BUILD;
+    return REALBUILD;
 }
 
-std::string CVersionClass::GetRealBuild( void )
+std::string CVersionClass::GetScriptVersion(void)
 {
-	return REALBUILD;
+    return SVER;
 }
 
-std::string CVersionClass::GetScriptVersion( void )
+std::string CVersionClass::GetCharacterVersion(void)
 {
-	return SVER;
+    return CVER;
 }
 
-std::string CVersionClass::GetCharacterVersion( void )
+std::string CVersionClass::GetItemVersion(void)
 {
-	return CVER;
+    return IVER;
 }
 
-std::string CVersionClass::GetItemVersion( void )
+std::string CVersionClass::GetProductName(void)
 {
-	return IVER;
+    return PRODUCT;
 }
 
-std::string CVersionClass::GetProductName( void )
+std::string CVersionClass::GetName(void)
 {
-	return PRODUCT;
+    return NAME;
 }
 
-std::string CVersionClass::GetName( void )
+std::string CVersionClass::GetEmail(void)
 {
-	return NAME;
+    return EMAIL;
 }
 
-std::string CVersionClass::GetEmail( void )
+std::string CVersionClass::GetProgrammers(void)
 {
-	return EMAIL;
-}
-
-std::string CVersionClass::GetProgrammers( void )
-{
-	return PROGRAMMERS;
+    return PROGRAMMERS;
 }
 
 }

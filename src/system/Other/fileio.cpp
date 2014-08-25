@@ -16,686 +16,653 @@
 namespace UOX
 {
 
-//
 // support read-only binary mode.
-//
-UOXFile::UOXFile( const char* const fileName, const char * const)
-: memPtr( 0 ), fileSize( 0 ), bIndex( 0 )
+UOXFile::UOXFile(const char* const fileName, const char * const) : memPtr(0), fileSize(0), bIndex(0)
 {
 #if UOX_PLATFORM == PLATFORM_WIN32
-	HANDLE hFile = ::CreateFileA(
-				fileName,
-				GENERIC_READ,
-				FILE_SHARE_READ,
-				NULL,
-				OPEN_EXISTING,
-				FILE_FLAG_SEQUENTIAL_SCAN,
-				NULL
-			);
+    HANDLE hFile = ::CreateFileA(fileName, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_FLAG_SEQUENTIAL_SCAN, NULL);
 
-	if (hFile == INVALID_HANDLE_VALUE)
-		return;
+    if (hFile == INVALID_HANDLE_VALUE)
+        return;
 
-	// Store the size of the file, it's used to construct
-	//  the end iterator
-	fileSize = ::GetFileSize(hFile, NULL);
+    // Store the size of the file, it's used to construct
+    //  the end iterator
+    fileSize = ::GetFileSize(hFile, NULL);
 
-	HANDLE hMap = ::CreateFileMapping(
-				hFile,
-				NULL,
-				PAGE_READONLY,
-				0, 0,
-				NULL
-			);
+    HANDLE hMap = ::CreateFileMapping(hFile, NULL, PAGE_READONLY, 0, 0, NULL);
 
-	if (hMap == NULL)
-	{
-		::CloseHandle(hFile);
-		return;
-	}
+    if (hMap == NULL)
+    {
+        ::CloseHandle(hFile);
+        return;
+    }
 
-	memPtr = (char*)::MapViewOfFile(
-						hMap,
-						FILE_MAP_READ,
-						0, 0, 0
-					);
+    memPtr = (char*)::MapViewOfFile(hMap, FILE_MAP_READ, 0, 0, 0);
 
-	// We hold both the file handle and the memory pointer.
-	// We can close the hMap handle now because Windows holds internally
-	//  a reference to it since there is a view mapped.
-	::CloseHandle(hMap);
+    // We hold both the file handle and the memory pointer.
+    // We can close the hMap handle now because Windows holds internally
+    //  a reference to it since there is a view mapped.
+    ::CloseHandle(hMap);
 
-	// It seems like we can close the file handle as well (because
-	//  a reference is hold by the filemap object).
-	::CloseHandle(hFile);
+    // It seems like we can close the file handle as well (because
+    //  a reference is hold by the filemap object).
+    ::CloseHandle(hFile);
 
 #else
-	// postfix version
+    // postfix version
         // open the file
-	int fd = open(fileName,
+    int fd = open(fileName,
 #ifdef O_NOCTTY
-				O_NOCTTY | // if stdin was closed then opening a file
-								// would cause the file to become the controlling
-								// terminal if the filename refers to a tty. Setting
-								// O_NOCTTY inhibits this.
+                O_NOCTTY | // if stdin was closed then opening a file
+                           // would cause the file to become the controlling
+                           // terminal if the filename refers to a tty. Setting
+                           // O_NOCTTY inhibits this.
 #endif
-				O_RDONLY);
+                O_RDONLY);
 
-	if (fd == -1)
-		return;
+    if (fd == -1)
+        return;
 
-	// call fstat to find get information about the file just
-	// opened (size and file type)
-	struct stat stat_buf;
-	if ((fstat(fd, &stat_buf) != 0) || !S_ISREG(stat_buf.st_mode))
-	{	// if fstat returns an error or if the file isn't a
-		// regular file we give up.
-		close(fd);
-		return;
-	}
+    // call fstat to find get information about the file just
+    // opened (size and file type)
+    struct stat stat_buf;
+    if ((fstat(fd, &stat_buf) != 0) || !S_ISREG(stat_buf.st_mode))
+    {    // if fstat returns an error or if the file isn't a
+        // regular file we give up.
+        close(fd);
+        return;
+    }
 
-	fileSize = stat_buf.st_size;
-	// perform the actual mapping
-	memPtr = (char*)mmap(0, stat_buf.st_size, PROT_READ, MAP_SHARED, fd, 0);
-	// it is safe to close() here. POSIX requires that the OS keeps a
-	// second handle to the file while the file is mmapped.
-	close(fd);
+    fileSize = stat_buf.st_size;
+    // perform the actual mapping
+    memPtr = (char*)mmap(0, stat_buf.st_size, PROT_READ, MAP_SHARED, fd, 0);
+    // it is safe to close() here. POSIX requires that the OS keeps a
+    // second handle to the file while the file is mmapped.
+    close(fd);
 #endif
 }
-
 
 UOXFile::~UOXFile()
 {
-	if( memPtr )
-	{ 
+    if (memPtr)
+    { 
 #if UOX_PLATFORM == PLATFORM_WIN32
-		UnmapViewOfFile( memPtr );
+        UnmapViewOfFile(memPtr);
 #else
-		munmap(memPtr, fileSize);
+        munmap(memPtr, fileSize);
 #endif
-	}
+    }
 }
 
-
-void UOXFile::seek( size_t offset, UI08 whence )
+void UOXFile::seek(size_t offset, UI08 whence)
 {
-	if( whence == SEEK_SET )	// seek from beginnng
-		bIndex = offset;
-	else if ( whence == SEEK_CUR )	// seek from current
-		bIndex += offset;
-	else if ( whence == SEEK_END )	// seek from end
-		bIndex = fileSize + offset;
+    if (whence == SEEK_SET)      // seek from beginnng
+        bIndex = offset;
+    else if (whence == SEEK_CUR) // seek from current
+        bIndex += offset;
+    else if (whence == SEEK_END) // seek from end
+        bIndex = fileSize + offset;
 }
 
-
-int UOXFile::getch( void )
+int UOXFile::getch(void)
 {
-	return *(memPtr + bIndex++);
+    return *(memPtr + bIndex++);
 }
 
-
-void UOXFile::getUChar( UI08 *buff, UI32 number )
+void UOXFile::getUChar(UI08 *buff, UI32 number)
 {
-	memcpy( buff, memPtr+bIndex, number);
-	bIndex += number;
+    memcpy(buff, memPtr+bIndex, number);
+    bIndex += number;
 }
 
-
-void UOXFile::getChar( SI08 *buff, UI32 number )
+void UOXFile::getChar(SI08 *buff, UI32 number)
 {
-	memcpy( buff, memPtr+bIndex, number);
-	bIndex += number;
+    memcpy(buff, memPtr+bIndex, number);
+    bIndex += number;
 }
 
-
-void UOXFile::getUShort( UI16 *buff, UI32 number )
+void UOXFile::getUShort(UI16 *buff, UI32 number)
 {
-	number *= sizeof(UI16);
-	memcpy( buff, memPtr+bIndex, number);
-	bIndex += number;
+    number *= sizeof(UI16);
+    memcpy(buff, memPtr+bIndex, number);
+    bIndex += number;
 }
 
-
-void UOXFile::getShort( SI16 *buff, UI32 number )
+void UOXFile::getShort(SI16 *buff, UI32 number)
 {
-	number *= sizeof(SI16);        
-	memcpy( buff, memPtr+bIndex, number);
-	bIndex += number;
+    number *= sizeof(SI16);        
+    memcpy(buff, memPtr+bIndex, number);
+    bIndex += number;
 }
 
-
-void UOXFile::getULong( UI32 *buff, UI32 number )
+void UOXFile::getULong(UI32 *buff, UI32 number)
 {
-	number *= sizeof(UI32);
-	memcpy( buff, memPtr+bIndex, number);
-	bIndex += number;
+    number *= sizeof(UI32);
+    memcpy(buff, memPtr+bIndex, number);
+    bIndex += number;
 }
 
-void UOXFile::getLong( SI32 *buff, UI32 number )
+void UOXFile::getLong(SI32 *buff, UI32 number)
 {
-	number *= sizeof(SI32);
-	memcpy( buff, memPtr+bIndex, number);
-	bIndex += number;
+    number *= sizeof(SI32);
+    memcpy(buff, memPtr+bIndex, number);
+    bIndex += number;
 }
 
 //o---------------------------------------------------------------------------o
-//|   Function    :  LoadCustomTitle()
-//|   Date        :  Unknown
-//|   Programmer  :  UOX3 DevTeam
+//|   Function   : LoadCustomTitle()
+//|   Date       : Unknown
+//|   Programmer : UOX3 DevTeam
 //o---------------------------------------------------------------------------o
-//|   Purpose     :  Loads players titles (Karma, Fame, Murder, ect)
+//|   Purpose    : Loads players titles (Karma, Fame, Murder, ect)
 //o---------------------------------------------------------------------------o
-void LoadCustomTitle( void )
+void LoadCustomTitle(void)
 { 
-	size_t titlecount = 0;
-	UString tag;
-	UString data;
-	ScriptSection *CustomTitle = FileLookup->FindEntry( "SKILL", titles_def );
-	if( CustomTitle == NULL )
-		return;
-	for( tag = CustomTitle->First(); !CustomTitle->AtEnd() && titlecount < ALLSKILLS; tag = CustomTitle->Next() )
-	{
-		data = CustomTitle->GrabData();
-		cwmWorldState->title[titlecount].skill	= data;
-		++titlecount;
-	}
-	CustomTitle = FileLookup->FindEntry( "PROWESS", titles_def );
-	if( CustomTitle == NULL )
-		return;
-	for( tag = CustomTitle->First(); !CustomTitle->AtEnd(); tag = CustomTitle->Next() )
-	{
-		data = CustomTitle->GrabData();
-		cwmWorldState->prowessTitles.push_back( TitlePair_st( tag.toShort(), data ) );
-	}
+    size_t titlecount = 0;
+    UString tag;
+    UString data;
+    ScriptSection *CustomTitle = FileLookup->FindEntry("SKILL", titles_def);
+    if (CustomTitle == NULL)
+        return;
+    for (tag = CustomTitle->First(); !CustomTitle->AtEnd() && titlecount < ALLSKILLS; tag = CustomTitle->Next())
+    {
+        data = CustomTitle->GrabData();
+        cwmWorldState->title[titlecount].skill    = data;
+        ++titlecount;
+    }
+    CustomTitle = FileLookup->FindEntry("PROWESS", titles_def);
+    if (CustomTitle == NULL)
+        return;
+    for (tag = CustomTitle->First(); !CustomTitle->AtEnd(); tag = CustomTitle->Next())
+    {
+        data = CustomTitle->GrabData();
+        cwmWorldState->prowessTitles.push_back(TitlePair_st(tag.toShort(), data));
+    }
 
-	CustomTitle = FileLookup->FindEntry( "FAME", titles_def );
-	titlecount	= 0;
+    CustomTitle = FileLookup->FindEntry("FAME", titles_def);
+    titlecount    = 0;
 
-	for( tag = CustomTitle->First(); !CustomTitle->AtEnd() && titlecount < ALLSKILLS; tag = CustomTitle->Next() )
-	{
-		data = CustomTitle->GrabData();
-		cwmWorldState->title[titlecount].fame = data;
-		++titlecount;
-	}
+    for (tag = CustomTitle->First(); !CustomTitle->AtEnd() && titlecount < ALLSKILLS; tag = CustomTitle->Next())
+    {
+        data = CustomTitle->GrabData();
+        cwmWorldState->title[titlecount].fame = data;
+        ++titlecount;
+    }
 
-	// Murder tags now scriptable in SECTION MURDER - Titles.scp - Thanks Ab - Zane
-	CustomTitle = FileLookup->FindEntry( "MURDERER", titles_def );
-	if( CustomTitle == NULL )
-		return;
-	for( tag = CustomTitle->First(); !CustomTitle->AtEnd(); tag = CustomTitle->Next() )
-	{
-		data = CustomTitle->GrabData();
-		cwmWorldState->murdererTags.push_back( TitlePair_st( tag.toShort(), data ) );
-	}
+    // Murder tags now scriptable in SECTION MURDER - Titles.scp - Thanks Ab - Zane
+    CustomTitle = FileLookup->FindEntry("MURDERER", titles_def);
+    if (CustomTitle == NULL)
+        return;
+    for (tag = CustomTitle->First(); !CustomTitle->AtEnd(); tag = CustomTitle->Next())
+    {
+        data = CustomTitle->GrabData();
+        cwmWorldState->murdererTags.push_back(TitlePair_st(tag.toShort(), data));
+    }
 
-	FileLookup->Dispose( titles_def );
+    FileLookup->Dispose(titles_def);
 }
 
 //o---------------------------------------------------------------------------o
-//|	Function	-	LoadSkills()
-//|	Programmer	-	UOX3 DevTeam
+//| Function   - LoadSkills()
+//| Programmer - UOX3 DevTeam
 //o---------------------------------------------------------------------------o
-//|	Purpose		-	Load skills
+//| Purpose    - Load skills
 //o---------------------------------------------------------------------------o
-void LoadSkills( void )
+void LoadSkills(void)
 {
 
-	UString skEntry;
-	UString tag, data, UTag;
-	UI08 i = 0;
-	for( Script *creatScp = FileLookup->FirstScript( skills_def ); !FileLookup->FinishedScripts( skills_def ); creatScp = FileLookup->NextScript( skills_def ) )
-	{
-		if( creatScp == NULL )
-			continue;
+    UString skEntry;
+    UString tag, data, UTag;
+    UI08 i = 0;
+    for (Script *creatScp = FileLookup->FirstScript(skills_def); !FileLookup->FinishedScripts(skills_def); creatScp = FileLookup->NextScript(skills_def))
+    {
+        if (creatScp == NULL)
+            continue;
 
-		for( ScriptSection *SkillList = creatScp->FirstEntry(); SkillList != NULL; SkillList = creatScp->NextEntry() )
-		{
-			if( SkillList == NULL )
-				continue;
+        for (ScriptSection *SkillList = creatScp->FirstEntry(); SkillList != NULL; SkillList = creatScp->NextEntry())
+        {
+            if (SkillList == NULL)
+                continue;
 
-			skEntry = creatScp->EntryName();
-			if( skEntry.section( " ", 0, 0 ) == "SKILL" )
-			{
-				i = skEntry.section( " ", 1, 1 ).toUByte();
-				if( i <= INTELLECT )
-				{
-					cwmWorldState->skill[i].ResetDefaults();
-					for( tag = SkillList->First(); !SkillList->AtEnd(); tag = SkillList->Next() )
-					{
-						UTag = tag.upper();
-						data = SkillList->GrabData();
-						if( UTag == "STR" )
-							cwmWorldState->skill[i].strength = data.toUShort();
-						else if( UTag == "DEX" )
-							cwmWorldState->skill[i].dexterity = data.toUShort();
-						else if( UTag == "INT" )
-							cwmWorldState->skill[i].intelligence = data.toUShort();
-						else if( UTag == "SKILLPOINT" )
-						{
-							advance_st tempAdvance;
-							data = data.simplifyWhiteSpace();
-							tempAdvance.base	= data.section( ",", 0, 0 ).toUShort();
-							tempAdvance.success = data.section( ",", 1, 1 ).toUByte();
-							tempAdvance.failure = data.section( ",", 2, 2 ).toUByte();
-							if( data.sectionCount( "," ) == 3 )
-								tempAdvance.amtToGain = data.section( ",", 3, 3 ).toUByte();
-							cwmWorldState->skill[i].advancement.push_back( tempAdvance );
-						}
-						else if( UTag == "MADEWORD" )
-							cwmWorldState->skill[i].madeword = data.stripWhiteSpace();
-						else if( UTag == "NAME" )
-							cwmWorldState->skill[i].name = data.stripWhiteSpace();
-						else
-							Console.Warning( "Unknown tag in skills.dfn: %s", data.stripWhiteSpace().c_str() );
-					}
-				}
-			}
-		}
-	}
+            skEntry = creatScp->EntryName();
+            if (skEntry.section(" ", 0, 0) == "SKILL")
+            {
+                i = skEntry.section(" ", 1, 1).toUByte();
+                if (i <= INTELLECT)
+                {
+                    cwmWorldState->skill[i].ResetDefaults();
+                    for (tag = SkillList->First(); !SkillList->AtEnd(); tag = SkillList->Next())
+                    {
+                        UTag = tag.upper();
+                        data = SkillList->GrabData();
+                        if (UTag == "STR")
+                            cwmWorldState->skill[i].strength = data.toUShort();
+                        else if (UTag == "DEX")
+                            cwmWorldState->skill[i].dexterity = data.toUShort();
+                        else if (UTag == "INT")
+                            cwmWorldState->skill[i].intelligence = data.toUShort();
+                        else if (UTag == "SKILLPOINT")
+                        {
+                            advance_st tempAdvance;
+                            data = data.simplifyWhiteSpace();
+                            tempAdvance.base    = data.section(",", 0, 0).toUShort();
+                            tempAdvance.success = data.section(",", 1, 1).toUByte();
+                            tempAdvance.failure = data.section(",", 2, 2).toUByte();
+                            if (data.sectionCount(",") == 3)
+                                tempAdvance.amtToGain = data.section(",", 3, 3).toUByte();
+                            cwmWorldState->skill[i].advancement.push_back(tempAdvance);
+                        }
+                        else if (UTag == "MADEWORD")
+                            cwmWorldState->skill[i].madeword = data.stripWhiteSpace();
+                        else if (UTag == "NAME")
+                            cwmWorldState->skill[i].name = data.stripWhiteSpace();
+                        else
+                            Console.Warning("Unknown tag in skills.dfn: %s", data.stripWhiteSpace().c_str());
+                    }
+                }
+            }
+        }
+    }
 }
 
 //o---------------------------------------------------------------------------o
-//|	Function	-	LoadSpawnRegions()
-//|	Programmer	-	UOX3 DevTeam
+//| Function   - LoadSpawnRegions()
+//| Programmer - UOX3 DevTeam
 //o---------------------------------------------------------------------------o
-//|	Purpose		-	Loads spawning regions
+//| Purpose    - Loads spawning regions
 //o---------------------------------------------------------------------------o
-void LoadSpawnRegions( void )
+void LoadSpawnRegions(void)
 {
-	cwmWorldState->spawnRegions.clear();
-	UI16 i					= 0;
-	for( Script *spnScp = FileLookup->FirstScript( spawn_def ); !FileLookup->FinishedScripts( spawn_def ); spnScp = FileLookup->NextScript( spawn_def ) )
-	{
-		if( spnScp == NULL )
-			continue;
-		for( ScriptSection *toScan = spnScp->FirstEntry(); toScan != NULL; toScan = spnScp->NextEntry() )
-		{
-			if( toScan == NULL )
-				continue;
-			UString sectionName = spnScp->EntryName();
-			if( "REGIONSPAWN" == sectionName.section( " ", 0, 0 ) ) // Is it a region spawn entry?
-			{
-				i = sectionName.section( " ", 1, 1 ).toUShort();
-				if( cwmWorldState->spawnRegions.find( i ) == cwmWorldState->spawnRegions.end() )
-				{
-					cwmWorldState->spawnRegions[i] = new CSpawnRegion( i );
-					cwmWorldState->spawnRegions[i]->Load( toScan );
-				}
-				else
-					Console.Warning( "spawn.dfn has a duplicate REGIONSPAWN entry, Entry Number: %u", i );
-			}
-		}
-	}
+    cwmWorldState->spawnRegions.clear();
+    UI16 i = 0;
+    for (Script *spnScp = FileLookup->FirstScript(spawn_def); !FileLookup->FinishedScripts(spawn_def); spnScp = FileLookup->NextScript(spawn_def))
+    {
+        if (spnScp == NULL)
+            continue;
+
+        for (ScriptSection *toScan = spnScp->FirstEntry(); toScan != NULL; toScan = spnScp->NextEntry())
+        {
+            if (toScan == NULL)
+                continue;
+
+            UString sectionName = spnScp->EntryName();
+            if ("REGIONSPAWN" == sectionName.section(" ", 0, 0)) // Is it a region spawn entry?
+            {
+                i = sectionName.section(" ", 1, 1).toUShort();
+                if (cwmWorldState->spawnRegions.find(i) == cwmWorldState->spawnRegions.end())
+                {
+                    cwmWorldState->spawnRegions[i] = new CSpawnRegion(i);
+                    cwmWorldState->spawnRegions[i]->Load(toScan);
+                }
+                else
+                    Console.Warning("spawn.dfn has a duplicate REGIONSPAWN entry, Entry Number: %u", i);
+            }
+        }
+    }
 }
 
 //o---------------------------------------------------------------------------o
-//|	Function	-	LoadRegions()
-//|	Programmer	-	UOX3 DevTeam
+//| Function   - LoadRegions()
+//| Programmer - UOX3 DevTeam
 //o---------------------------------------------------------------------------o
-//|	Purpose		-	Load regions from regions.dfn and townregions from regions.wsc
+//| Purpose    - Load regions from regions.dfn and townregions from regions.wsc
 //o---------------------------------------------------------------------------o
-void LoadRegions( void )
+void LoadRegions(void)
 {
-	typedef std::tr1::unordered_map<UI16, std::vector<UString> > UNORDERED_MAP;
-	UNORDERED_MAP uMap;
-	std::string sql = "SELECT id, name, race, guardowner, mayor, priv, resourceamount, taxedid, taxedamount, guardspurchased, "
-		"UNIX_TIMESTAMP(timeg), UNIX_TIMESTAMP(timet), resourcecollected, health, electiontime, polltime, world, numguards, member, vote, allytown FROM regions";
-	int index;
-	if (SQLManager::getSingleton().ExecuteQuery(sql, &index, false))
-	{
-		int ColumnCount = mysql_num_fields(SQLManager::getSingleton().GetMYSQLResult());
-		UOX::UI16 id = NULL;
-		while (SQLManager::getSingleton().FetchRow(&index))
-		{
-			std::vector<UString> dataLines;
-			for(int i = 0; i < ColumnCount; ++i)
-			{
-				UString value;
-				bool EmptyColumn = SQLManager::getSingleton().GetColumn(i, value, &index) == false ? true : false;
-				if (i == 0)
-				{
-					if (EmptyColumn)
-					{
-						id = NULL;
-						break;
-					}
-					id = value.toUShort();
-				}
-				else
-					dataLines.push_back(value);
-			}
-			if (id != NULL)
-				uMap.insert(std::make_pair(id, dataLines));
-		}
-		SQLManager::getSingleton().QueryRelease(false);
-	}
+    typedef std::tr1::unordered_map<UI16, std::vector<UString> > UNORDERED_MAP;
+    UNORDERED_MAP uMap;
+    std::string sql = "SELECT id, name, race, guardowner, mayor, priv, resourceamount, taxedid, taxedamount, guardspurchased, "
+        "UNIX_TIMESTAMP(timeg), UNIX_TIMESTAMP(timet), resourcecollected, health, electiontime, polltime, world, numguards, member, vote, allytown FROM regions";
+    int index;
+    if (SQLManager::getSingleton().ExecuteQuery(sql, &index, false))
+    {
+        int ColumnCount = mysql_num_fields(SQLManager::getSingleton().GetMYSQLResult());
+        UOX::UI16 id = NULL;
+        while (SQLManager::getSingleton().FetchRow(&index))
+        {
+            std::vector<UString> dataLines;
+            for (int i = 0; i < ColumnCount; ++i)
+            {
+                UString value;
+                bool EmptyColumn = SQLManager::getSingleton().GetColumn(i, value, &index) == false ? true : false;
+                if (i == 0)
+                {
+                    if (EmptyColumn)
+                    {
+                        id = NULL;
+                        break;
+                    }
+                    id = value.toUShort();
+                }
+                else
+                    dataLines.push_back(value);
+            }
+            if (id != NULL)
+                uMap.insert(std::make_pair(id, dataLines));
+        }
+        SQLManager::getSingleton().QueryRelease(false);
+    }
 
-	for (Script *regScp = FileLookup->FirstScript(regions_def); !FileLookup->FinishedScripts(regions_def); regScp = FileLookup->NextScript(regions_def))
-	{
-		if(regScp == NULL)
-			continue;
+    for (Script *regScp = FileLookup->FirstScript(regions_def); !FileLookup->FinishedScripts(regions_def); regScp = FileLookup->NextScript(regions_def))
+    {
+        if (regScp == NULL)
+            continue;
 
-		for (ScriptSection *toScan = regScp->FirstEntry(); toScan != NULL; toScan = regScp->NextEntry())
-		{
-			if(toScan == NULL)
-				continue;
+        for (ScriptSection *toScan = regScp->FirstEntry(); toScan != NULL; toScan = regScp->NextEntry())
+        {
+            if (toScan == NULL)
+                continue;
 
-			UString regEntry = regScp->EntryName();
-			if (regEntry.section(" ", 0, 0) == "REGION")
-			{
-				UI16 i = regEntry.section(" ", 1, 1 ).toUShort();
-				if (cwmWorldState->townRegions.find(i) == cwmWorldState->townRegions.end())
-				{
-					cwmWorldState->townRegions[i] = new CTownRegion(i);
-					cwmWorldState->townRegions[i]->InitFromScript(toScan);
-					if (!uMap.empty())
-					{
-						UNORDERED_MAP::const_iterator itr = uMap.find(i);
-						if (itr != uMap.end())
-							cwmWorldState->townRegions[i]->Load(itr->second);
-					}
-				}
-				else
-					Console.Warning("regions.dfn has a duplicate REGION entry, Entry Number: %u", i);
-			}
-		}
-	}
+            UString regEntry = regScp->EntryName();
+            if (regEntry.section(" ", 0, 0) == "REGION")
+            {
+                UI16 i = regEntry.section(" ", 1, 1).toUShort();
+                if (cwmWorldState->townRegions.find(i) == cwmWorldState->townRegions.end())
+                {
+                    cwmWorldState->townRegions[i] = new CTownRegion(i);
+                    cwmWorldState->townRegions[i]->InitFromScript(toScan);
+                    if (!uMap.empty())
+                    {
+                        UNORDERED_MAP::const_iterator itr = uMap.find(i);
+                        if (itr != uMap.end())
+                            cwmWorldState->townRegions[i]->Load(itr->second);
+                    }
+                }
+                else
+                    Console.Warning("regions.dfn has a duplicate REGION entry, Entry Number: %u", i);
+            }
+        }
+    }
 
-	ScriptSection *InstaLog = FileLookup->FindEntry( "INSTALOG", regions_def );
-	if( InstaLog == NULL ) 
-		return;
-	LogoutLocationEntry toAdd;
-	UString data, UTag;
-	for( UString tag = InstaLog->First(); !InstaLog->AtEnd(); tag = InstaLog->Next() )
-	{
-		UTag = tag.upper();
-		data	= InstaLog->GrabData();
-		if( UTag == "X1" ) 
-			toAdd.x1 = data.toShort();
-		else if( UTag == "Y1" ) 
-			toAdd.y1 = data.toShort();
-		else if( UTag == "X2" )
-			toAdd.x2 = data.toShort();
-		else if( UTag == "Y2" )
-			toAdd.y2 = data.toShort();
-		else if( UTag == "WORLD" )
-		{
-			toAdd.worldNum = data.toByte();
-			cwmWorldState->logoutLocs.push_back( toAdd );
-		}
-	}
+    ScriptSection *InstaLog = FileLookup->FindEntry("INSTALOG", regions_def);
+    if (InstaLog == NULL) 
+        return;
+    LogoutLocationEntry toAdd;
+    UString data, UTag;
+    for (UString tag = InstaLog->First(); !InstaLog->AtEnd(); tag = InstaLog->Next())
+    {
+        UTag = tag.upper();
+        data    = InstaLog->GrabData();
+        if (UTag == "X1") 
+            toAdd.x1 = data.toShort();
+        else if (UTag == "Y1") 
+            toAdd.y1 = data.toShort();
+        else if (UTag == "X2")
+            toAdd.x2 = data.toShort();
+        else if (UTag == "Y2")
+            toAdd.y2 = data.toShort();
+        else if (UTag == "WORLD")
+        {
+            toAdd.worldNum = data.toByte();
+            cwmWorldState->logoutLocs.push_back(toAdd);
+        }
+    }
 }
 
 //o---------------------------------------------------------------------------o
-//|	Function	-	LoadTeleportLocations()
-//|	Programmer	-	UOX3 DevTeam
+//| Function   - LoadTeleportLocations()
+//| Programmer - UOX3 DevTeam
 //o---------------------------------------------------------------------------o
-//|	Purpose		-	Load teleport locations
+//| Purpose    - Load teleport locations
 //o---------------------------------------------------------------------------o
-void LoadTeleportLocations( void )
+void LoadTeleportLocations(void)
 {
-	std::string filename = cwmWorldState->ServerData()->Directory( CSDDP_SCRIPTS ) + "teleport.scp"; 
-	cwmWorldState->teleLocs.resize( 0 );
-	
-	if( !FileExists( filename ) )
-	{
-		Console << myendl;
-		Console.Error( " Failed to open teleport data script %s", filename.c_str() );
-		Console.Error( " Teleport Data not found" );
-		cwmWorldState->SetKeepRun( false );
-		cwmWorldState->SetError( true );
-		return;
-	}
+    std::string filename = cwmWorldState->ServerData()->Directory(CSDDP_SCRIPTS) + "teleport.scp"; 
+    cwmWorldState->teleLocs.resize(0);
+    
+    if (!FileExists(filename))
+    {
+        Console << myendl;
+        Console.Error(" Failed to open teleport data script %s", filename.c_str());
+        Console.Error(" Teleport Data not found");
+        cwmWorldState->SetKeepRun(false);
+        cwmWorldState->SetError(true);
+        return;
+    }
 
-	Script *teleportData = new Script( filename, NUM_DEFS, false );
-	if( teleportData != NULL )
-	{
-		cwmWorldState->teleLocs.reserve( teleportData->NumEntries() );
+    Script *teleportData = new Script(filename, NUM_DEFS, false);
+    if (teleportData != NULL)
+    {
+        cwmWorldState->teleLocs.reserve(teleportData->NumEntries());
 
-		UI16 tempX, tempY;
-		SI08 tempZ;
-		ScriptSection *teleportSect = NULL;
-		UString tag, data, temp;
-		for( teleportSect = teleportData->FirstEntry(); teleportSect != NULL; teleportSect = teleportData->NextEntry() )
-		{
-			if( teleportSect != NULL )
-			{
-				for( tag = teleportSect->First(); !teleportSect->AtEnd(); tag = teleportSect->Next() )
-				{
-					CTeleLocationEntry toAdd;
-					if( tag.upper() == "ENTRY" )
-					{
-						tempX = 0, tempY = 0;
-						tempZ = ILLEGAL_Z;
-						data = teleportSect->GrabData().simplifyWhiteSpace();
-						int sectCount = data.sectionCount( "," );
-						if( sectCount >= 5 )
-						{
-							tempX	= data.section( ",", 0, 0 ).toUShort();
-							tempY	= data.section( ",", 1, 1 ).toUShort();
-							temp	= data.section( ",", 2, 2 ).upper();
-							temp	= temp.stripWhiteSpace().upper();
-							if( temp != "ALL" && temp != "A" )
-								tempZ = temp.toByte();
-							toAdd.SourceLocation( tempX, tempY, tempZ );
+        UI16 tempX, tempY;
+        SI08 tempZ;
+        ScriptSection *teleportSect = NULL;
+        UString tag, data, temp;
+        for (teleportSect = teleportData->FirstEntry(); teleportSect != NULL; teleportSect = teleportData->NextEntry())
+            if (teleportSect != NULL)
+                for (tag = teleportSect->First(); !teleportSect->AtEnd(); tag = teleportSect->Next())
+                {
+                    CTeleLocationEntry toAdd;
+                    if (tag.upper() == "ENTRY")
+                    {
+                        tempX = 0, tempY = 0;
+                        tempZ = ILLEGAL_Z;
+                        data = teleportSect->GrabData().simplifyWhiteSpace();
+                        int sectCount = data.sectionCount(",");
+                        if (sectCount >= 5)
+                        {
+                            tempX = data.section(",", 0, 0).toUShort();
+                            tempY = data.section(",", 1, 1).toUShort();
+                            temp = data.section(",", 2, 2).upper();
+                            temp = temp.stripWhiteSpace().upper();
+                            if (temp != "ALL" && temp != "A")
+                                tempZ = temp.toByte();
+                            toAdd.SourceLocation(tempX, tempY, tempZ);
 
-							tempX	= data.section( ",", 3, 3 ).toUShort();
-							tempY	= data.section( ",", 4, 4 ).toUShort();
-							tempZ	= data.section( ",", 5, 5 ).toByte();
-							toAdd.TargetLocation( tempX, tempY, tempZ );
+                            tempX = data.section(",", 3, 3).toUShort();
+                            tempY = data.section(",", 4, 4).toUShort();
+                            tempZ = data.section(",", 5, 5).toByte();
+                            toAdd.TargetLocation(tempX, tempY, tempZ);
 
-							if( sectCount >= 6 )
-							{
-								toAdd.SourceWorld( data.section( ",", 6, 6 ).toUByte() );
-								if( sectCount >= 7 )
-									toAdd.TargetWorld( data.section( ",", 7, 7 ).toUByte() );
-							}
-							cwmWorldState->teleLocs.push_back( toAdd );
-						}
-						else
-							Console.Error( "Insufficient parameters for teleport entry" );
-					}
-				}
-			}
-		}
-		delete teleportData;
-	}
+                            if (sectCount >= 6)
+                            {
+                                toAdd.SourceWorld(data.section(",", 6, 6).toUByte());
+                                if (sectCount >= 7)
+                                    toAdd.TargetWorld(data.section(",", 7, 7).toUByte());
+                            }
+                            cwmWorldState->teleLocs.push_back(toAdd);
+                        }
+                        else
+                            Console.Error("Insufficient parameters for teleport entry");
+                    }
+                }
+        delete teleportData;
+    }
 }
 
 //o---------------------------------------------------------------------------o
-//|	Function	-	LoadCreatures()
-//|	Programmer	-	UOX3 DevTeam
+//| Function   - LoadCreatures()
+//| Programmer - UOX3 DevTeam
 //o---------------------------------------------------------------------------o
-//|	Purpose		-	Loads creatures from creatures.dfn
+//| Purpose    - Loads creatures from creatures.dfn
 //o---------------------------------------------------------------------------o
-void LoadCreatures( void )
+void LoadCreatures(void)
 {
-	UString cEntry;
-	UString tag, data, UTag;
-	UI16 i = 0;
-	for( Script *creatScp = FileLookup->FirstScript( creatures_def ); !FileLookup->FinishedScripts( creatures_def ); creatScp = FileLookup->NextScript( creatures_def ) )
-	{
-		if( creatScp == NULL )
-			continue;
+    UString cEntry;
+    UString tag, data, UTag;
+    UI16 i = 0;
+    for (Script *creatScp = FileLookup->FirstScript(creatures_def); !FileLookup->FinishedScripts(creatures_def); creatScp = FileLookup->NextScript(creatures_def))
+    {
+        if (creatScp == NULL)
+            continue;
 
-		for( ScriptSection *creatureData = creatScp->FirstEntry(); creatureData != NULL; creatureData = creatScp->NextEntry() )
-		{
-			if( creatureData == NULL )
-				continue;
+        for (ScriptSection *creatureData = creatScp->FirstEntry(); creatureData != NULL; creatureData = creatScp->NextEntry())
+        {
+            if (creatureData == NULL)
+                continue;
 
-			cEntry = creatScp->EntryName();
-			if( cEntry.section( " ", 0, 0 ) == "CREATURE" )
-			{
-				i = cEntry.section( " ", 1, 1 ).toUShort();
+            cEntry = creatScp->EntryName();
+            if (cEntry.section(" ", 0, 0) == "CREATURE")
+            {
+                i = cEntry.section(" ", 1, 1).toUShort();
 
-				for( tag = creatureData->First(); !creatureData->AtEnd(); tag = creatureData->Next() )
-				{
-					if( tag.empty() )
-						continue;
-					data = creatureData->GrabData();
-					UTag = tag.upper();
-					switch( (UTag.data()[0]) )
-					{
-						case 'A':
-							if( UTag == "ANTIBLINK" )
-								cwmWorldState->creatures[i].AntiBlink( true );
-							else if( UTag == "ANIMAL" )
-								cwmWorldState->creatures[i].IsAnimal( true );
-							break;
-						case 'B':
-							if( UTag == "BASESOUND" )
-								break;
-							break;
-						case 'F':
-							if( UTag == "FLIES" )
-								cwmWorldState->creatures[i].CanFly( true );
-							break;
-						case 'H':
-							if( UTag == "HUMAN" )
-								cwmWorldState->creatures[i].IsHuman( true );
-							break;
-						case 'I':
-							if( UTag == "ICON" )
-								cwmWorldState->creatures[i].Icon( data.toUShort() );
-							break;
-						case 'M':
-							if( UTag == "MOVEMENT" )
-							{
-								if( data.upper() == "WATER" )
-									cwmWorldState->creatures[i].IsWater( true );
-								else if( data.upper() == "BOTH" )
-									cwmWorldState->creatures[i].IsAmphibian( true );
-								else
-								{
-									cwmWorldState->creatures[i].IsWater( false );
-									cwmWorldState->creatures[i].IsAmphibian( false );
-								}
-							}
-							else if( UTag == "MOUNTID" )
-								cwmWorldState->creatures[i].MountID( data.toUShort() );
-							break;
-						case 'S':
-							if( UTag == "SOUNDFLAG" )
-								break;
-							else if( UTag == "SOUND_IDLE" )
-								cwmWorldState->creatures[i].SetSound( SND_IDLE, data.toUShort() );
-							else if( UTag == "SOUND_STARTATTACK" )
-								cwmWorldState->creatures[i].SetSound( SND_STARTATTACK, data.toUShort() );
-							else if( UTag == "SOUND_ATTACK" )
-								cwmWorldState->creatures[i].SetSound( SND_ATTACK, data.toUShort() );
-							else if( UTag == "SOUND_DEFEND" )
-								cwmWorldState->creatures[i].SetSound( SND_DEFEND, data.toUShort() );
-							else if( UTag == "SOUND_DIE" )
-								cwmWorldState->creatures[i].SetSound( SND_DIE, data.toUShort() );
-							break;
-					}
-				}
-			}
-		}
-	}
+                for (tag = creatureData->First(); !creatureData->AtEnd(); tag = creatureData->Next())
+                {
+                    if (tag.empty())
+                        continue;
+                    data = creatureData->GrabData();
+                    UTag = tag.upper();
+                    switch((UTag.data()[0]))
+                    {
+                        case 'A':
+                            if (UTag == "ANTIBLINK")
+                                cwmWorldState->creatures[i].AntiBlink(true);
+                            else if (UTag == "ANIMAL")
+                                cwmWorldState->creatures[i].IsAnimal(true);
+                            break;
+                        case 'B':
+                            if (UTag == "BASESOUND")
+                                break;
+                            break;
+                        case 'F':
+                            if (UTag == "FLIES")
+                                cwmWorldState->creatures[i].CanFly(true);
+                            break;
+                        case 'H':
+                            if (UTag == "HUMAN")
+                                cwmWorldState->creatures[i].IsHuman(true);
+                            break;
+                        case 'I':
+                            if (UTag == "ICON")
+                                cwmWorldState->creatures[i].Icon(data.toUShort());
+                            break;
+                        case 'M':
+                            if (UTag == "MOVEMENT")
+                            {
+                                if (data.upper() == "WATER")
+                                    cwmWorldState->creatures[i].IsWater(true);
+                                else if (data.upper() == "BOTH")
+                                    cwmWorldState->creatures[i].IsAmphibian(true);
+                                else
+                                {
+                                    cwmWorldState->creatures[i].IsWater(false);
+                                    cwmWorldState->creatures[i].IsAmphibian(false);
+                                }
+                            }
+                            else if (UTag == "MOUNTID")
+                                cwmWorldState->creatures[i].MountID(data.toUShort());
+                            break;
+                        case 'S':
+                            if (UTag == "SOUNDFLAG")
+                                break;
+                            else if (UTag == "SOUND_IDLE")
+                                cwmWorldState->creatures[i].SetSound(SND_IDLE, data.toUShort());
+                            else if (UTag == "SOUND_STARTATTACK")
+                                cwmWorldState->creatures[i].SetSound(SND_STARTATTACK, data.toUShort());
+                            else if (UTag == "SOUND_ATTACK")
+                                cwmWorldState->creatures[i].SetSound(SND_ATTACK, data.toUShort());
+                            else if (UTag == "SOUND_DEFEND")
+                                cwmWorldState->creatures[i].SetSound(SND_DEFEND, data.toUShort());
+                            else if (UTag == "SOUND_DIE")
+                                cwmWorldState->creatures[i].SetSound(SND_DIE, data.toUShort());
+                            break;
+                    }
+                }
+            }
+        }
+    }
 
-	FileLookup->Dispose( creatures_def );
+    FileLookup->Dispose(creatures_def);
 }
 
 
-void ReadWorldTagData( std::ifstream &inStream, UString &tag, UString &data )
+void ReadWorldTagData(std::ifstream &inStream, UString &tag, UString &data)
 {
-	char temp[4096];
-	tag = "o---o";
-	data = "o---o";
-	while( !inStream.eof() && !inStream.fail() )
-	{
-		inStream.getline( temp, 4096 );
-		UString sLine( temp );
-		sLine = sLine.removeComment().stripWhiteSpace();
-		if( !sLine.empty() )
-		{
-			if( sLine != "o---o" )
-			{
-				if( sLine.sectionCount( "=" ) == 1 )
-				{
-					tag		= sLine.section( "=", 0, 0 ).stripWhiteSpace();
-					data	= sLine.section( "=", 1 ).stripWhiteSpace();
-					break;
-				}
-			}
-			else
-				break;
-		}
-	}
+    char temp[4096];
+    tag = "o---o";
+    data = "o---o";
+    while (!inStream.eof() && !inStream.fail())
+    {
+        inStream.getline(temp, 4096);
+        UString sLine(temp);
+        sLine = sLine.removeComment().stripWhiteSpace();
+        if (!sLine.empty())
+            if (sLine != "o---o")
+            {
+                if (sLine.sectionCount("=") == 1)
+                {
+                    tag = sLine.section("=", 0, 0).stripWhiteSpace();
+                    data = sLine.section("=", 1).stripWhiteSpace();
+                    break;
+                }
+            }
+            else
+                break;
+    }
 }
 
 //o---------------------------------------------------------------------------o
-//|	Function	-	LoadPlaces()
-//|	Programmer	-	UOX3 DevTeam
+//| Function   - LoadPlaces()
+//| Programmer - UOX3 DevTeam
 //o---------------------------------------------------------------------------o
-//|	Purpose		-	Load locations.dfn
+//| Purpose    - Load locations.dfn
 //o---------------------------------------------------------------------------o
-void LoadPlaces( void )
+void LoadPlaces(void)
 {
-	cwmWorldState->goPlaces.clear();
-	UString data, UTag, entryName;
-	GoPlaces_st *toAdd		= NULL;
+    cwmWorldState->goPlaces.clear();
+    UString data, UTag, entryName;
+    GoPlaces_st *toAdd = NULL;
 
-	for( Script *locScp = FileLookup->FirstScript( location_def ); !FileLookup->FinishedScripts( location_def ); locScp = FileLookup->NextScript( location_def ) )
-	{
-		if( locScp == NULL )
-			continue;
-		for( ScriptSection *toScan = locScp->FirstEntry(); toScan != NULL; toScan = locScp->NextEntry() )
-		{
-			if( toScan == NULL )
-				continue;
-			entryName			= locScp->EntryName();
-			size_t entryNum		= entryName.section( " ", 1, 1 ).toULong();
-			if( entryName.section( " ", 0, 0 ).upper() == "LOCATION" && entryNum )
-			{
-				if( cwmWorldState->goPlaces.find( entryNum ) != cwmWorldState->goPlaces.end() )
-					Console.Warning( "Doubled up entry in Location.dfn (%u)", entryNum );
-				toAdd = &cwmWorldState->goPlaces[entryNum];
-				if( toAdd != NULL )
-				{
-					for( UString tag = toScan->First(); !toScan->AtEnd(); tag = toScan->Next() )
-					{
-						data = toScan->GrabData();
-						UTag = tag.upper();
-						if( UTag == "X" )
-							toAdd->x = data.toShort();
-						else if( UTag == "Y" )
-							toAdd->y = data.toShort();
-						else if( UTag == "Z" )
-							toAdd->z = data.toByte();
-						else if( UTag == "WORLD" )
-							toAdd->worldNum = data.toUByte();
-						else if( UTag == "LOCATION" )
-						{
-							size_t sectionCount = data.sectionCount( "," );
-							if( sectionCount == 3 )
-							{
-								toAdd->x		= data.section( ",", 0, 0 ).toShort();
-								toAdd->y		= data.section( ",", 1, 1 ).toShort();
-								toAdd->z		= data.section( ",", 2, 2 ).toByte();
-								toAdd->worldNum = data.section( ",", 3, 3 ).toUByte();
-							}
-						}
-					}
-				}
-			}
-		}
-	}
+    for (Script *locScp = FileLookup->FirstScript(location_def); !FileLookup->FinishedScripts(location_def); locScp = FileLookup->NextScript(location_def))
+    {
+        if (locScp == NULL)
+            continue;
 
-	FileLookup->Dispose( location_def );
+        for (ScriptSection *toScan = locScp->FirstEntry(); toScan != NULL; toScan = locScp->NextEntry())
+        {
+            if (toScan == NULL)
+                continue;
+
+            entryName = locScp->EntryName();
+            size_t entryNum = entryName.section(" ", 1, 1).toULong();
+            if (entryName.section(" ", 0, 0).upper() == "LOCATION" && entryNum)
+            {
+                if (cwmWorldState->goPlaces.find(entryNum) != cwmWorldState->goPlaces.end())
+                    Console.Warning("Doubled up entry in Location.dfn (%u)", entryNum);
+                toAdd = &cwmWorldState->goPlaces[entryNum];
+                if (toAdd != NULL)
+                    for (UString tag = toScan->First(); !toScan->AtEnd(); tag = toScan->Next())
+                    {
+                        data = toScan->GrabData();
+                        UTag = tag.upper();
+                        if (UTag == "X")
+                            toAdd->x = data.toShort();
+                        else if (UTag == "Y")
+                            toAdd->y = data.toShort();
+                        else if (UTag == "Z")
+                            toAdd->z = data.toByte();
+                        else if (UTag == "WORLD")
+                            toAdd->worldNum = data.toUByte();
+                        else if (UTag == "LOCATION")
+                        {
+                            size_t sectionCount = data.sectionCount(",");
+                            if (sectionCount == 3)
+                            {
+                                toAdd->x = data.section(",", 0, 0).toShort();
+                                toAdd->y = data.section(",", 1, 1).toShort();
+                                toAdd->z = data.section(",", 2, 2).toByte();
+                                toAdd->worldNum = data.section(",", 3, 3).toUByte();
+                            }
+                        }
+                    }
+            }
+        }
+    }
+
+    FileLookup->Dispose(location_def);
 }
 
-bool FileExists( std::string filepath )
+bool FileExists(std::string filepath)
 {
-	std::ifstream ifsFile;
-	ifsFile.open( filepath.c_str(), std::ios::in );
-	if( ifsFile.is_open() )
-	{
-		ifsFile.close();
-		return true;
-	}
-	return false;
+    std::ifstream ifsFile;
+    ifsFile.open(filepath.c_str(), std::ios::in);
+    if (ifsFile.is_open())
+    {
+        ifsFile.close();
+        return true;
+    }
+    return false;
 }
 
 }

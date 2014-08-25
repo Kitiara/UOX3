@@ -8,32 +8,32 @@
 #include <string>
 #include <string.h>
 
-//	  This header is kind of a patch for all the windows-specific things in
-//	 uox3. --Sean
+//      This header is kind of a patch for all the windows-specific things in
+//     uox3. --Sean
 
-inline int stricmp( const char *s1, const char *s2 )
+inline int stricmp(const char *s1, const char *s2)
 {
-	return strcasecmp( s1, s2 );
+    return strcasecmp(s1, s2);
 }
 
-inline int strnicmp( const char *s1, const char *s2, size_t n )
+inline int strnicmp(const char *s1, const char *s2, size_t n)
 {
-	return strncasecmp( s1, s2, n );
+    return strncasecmp(s1, s2, n);
 }
 
-inline void GetCurrentDirectory( size_t size, char *buf )
+inline void GetCurrentDirectory(size_t size, char *buf)
 {
-	getcwd( buf, size );
+    getcwd(buf, size);
 }
 
-inline int _chdir( const char *newDirectory )
+inline int _chdir(const char *newDirectory)
 {
-	return chdir( newDirectory );
+    return chdir(newDirectory);
 }
 
-inline int _mkdir( const char *dirname )
+inline int _mkdir(const char *dirname)
 {
-	return mkdir( dirname, (mode_t)0777 );
+    return mkdir(dirname, (mode_t)0777);
 }
 
 // This function converts a windows line read from a file into
@@ -42,8 +42,8 @@ inline int _mkdir( const char *dirname )
 // same world files.
 inline void trimWindowsText(char *buffer)
 {
-	const unsigned int lastchar = strlen(buffer) - 1;
-	if ( buffer[lastchar] == '\r' )
-	        buffer[lastchar] = '\0';
+    const unsigned int lastchar = strlen(buffer) - 1;
+    if (buffer[lastchar] == '\r')
+       buffer[lastchar] = '\0';
 }
 #endif
