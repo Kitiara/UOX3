@@ -705,7 +705,7 @@ bool CPICreateCharacter::Handle(void)
             SetNewCharGender(mChar);
 
             mChar->SetPriv(cwmWorldState->ServerData()->ServerStartPrivs());
-            
+
             CAccountBlock& actbTemp2 = mChar->GetAccount();
             if (actbTemp2.wAccountIndex != AB_INVALID_ID && actbTemp2.wFlags.test(AB_FLAGS_GM))
             { 
@@ -741,6 +741,8 @@ bool CPICreateCharacter::Handle(void)
                 }
 
             startChar(tSock, true);
+            CMapRegion* Region = MapRegion->GetMapRegion(mChar);
+            Region->GetCharList()->Add(mChar);
 
             SQLManager::getSingleton().BeginTransaction();
             auto eachTable = SQLManager::getSingleton().Simplify(mChar->Save());

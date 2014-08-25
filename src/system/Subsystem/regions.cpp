@@ -136,11 +136,11 @@ void CMapRegion::SaveToDB()
             default:
                 uStr += itemToWrite->Save();
                 break;
-            }                
+            }
         }
     }
     itemData.Pop();
-    
+
     // Rest will make the saving process ~50% faster.
     auto eachTable = SQLManager::getSingleton().Simplify(uStr);
     for (auto itr = eachTable.begin(); itr != eachTable.end(); ++itr)
@@ -153,7 +153,7 @@ void CMapRegion::SaveToDB()
 //o--------------------------------------------------------------------------o
 //| Purpose    - Returns the Item DataList for iteration
 //o--------------------------------------------------------------------------o
-CDataList< CItem * > * CMapRegion::GetItemList(void)
+CDataList<CItem *> * CMapRegion::GetItemList(void)
 {
     return &itemData;
 }
@@ -165,7 +165,7 @@ CDataList< CItem * > * CMapRegion::GetItemList(void)
 //o--------------------------------------------------------------------------o
 //| Purpose    - Returns the Character DataList for iteration
 //o--------------------------------------------------------------------------o
-CDataList< CChar * > * CMapRegion::GetCharList(void)
+CDataList<CChar *> * CMapRegion::GetCharList(void)
 {
     return &charData;
 }
@@ -481,7 +481,7 @@ bool CMapHandler::AddChar(CChar *toAdd)
 //| Programmer - Abaddon
 //o--------------------------------------------------------------------------o
 //| Purpose    - Removes toRemove from it's CURRENT SubRegion
-//|                 -    Do this before adjusting the location
+//|            - Do this before adjusting the location
 //o--------------------------------------------------------------------------o
 bool CMapHandler::RemoveChar(CChar *toRemove)
 {
@@ -638,12 +638,12 @@ void CMapHandler::Save(void)
     Console << "Saving Character and Item Map Region data...   ";
     UI32 StartTime = getclock();
     SI32 baseX, baseY;
-    for (SI16 counter1 = 0; counter1 < AreaX; ++counter1)   // move left->right
+    for (SI16 counter1 = 0; counter1 < AreaX; ++counter1)     // move left->right
     { 
         baseX = counter1 * 8;
         for (SI16 counter2 = 0; counter2 < AreaY; ++counter2) // move up->down
         {
-            baseY = counter2 * 8;                            // calculate x grid offset
+            baseY = counter2 * 8;                             // calculate x grid offset
             for (UI08 xCnt = 0; xCnt < 8; ++xCnt)             // walk through each part of the 8x8 grid, left->right
                 for (UI08 yCnt = 0; yCnt < 8; ++yCnt)         // walk the row
                     for (WORLDLIST_ITERATOR mIter = mapWorlds.begin(); mIter != mapWorlds.end(); ++mIter)

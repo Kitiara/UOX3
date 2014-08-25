@@ -555,7 +555,7 @@ void sysBroadcast(const std::string& txt);
 //o--------------------------------------------------------------------------o
 //| Description    - Saves the UOX world
 //| Modification   - 10/21/2002 - Xuri fix for archiving. Now it wont always
-//|                               archive :)
+//|                  archive :)
 //o--------------------------------------------------------------------------o
 void CWorldMain::SaveNewWorld(bool x)
 {
