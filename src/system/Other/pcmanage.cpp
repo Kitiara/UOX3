@@ -585,7 +585,7 @@ void CPICreateCharacter::newbieItems(CChar *mChar)
     {
         ItemID = hairStyle;
         ItemColour = validHairColour(hairColour, mChar->GetID());
-        CreatedItems[HAIR]    = Items->CreateItem(tSock, mChar, ItemID, 1, ItemColour, OT_ITEM);
+        CreatedItems[HAIR] = Items->CreateItem(tSock, mChar, ItemID, 1, ItemColour, OT_ITEM);
         if (CreatedItems[HAIR] != NULL)
         {
             CreatedItems[HAIR]->SetDecayable(false);
@@ -598,9 +598,9 @@ void CPICreateCharacter::newbieItems(CChar *mChar)
     {
         ItemID = facialHair;
         if (mChar->GetID() == 0x029A) // gargoyle male
-            ItemColour = Capped(facialHairColour, static_cast< UI16 >(0x06E0), static_cast< UI16 >(0x076B));
+            ItemColour = Capped(facialHairColour, static_cast<UI16>(0x06E0), static_cast< UI16 >(0x076B));
         else // human male
-            ItemColour = Capped(facialHairColour, static_cast< UI16 >(0x044E), static_cast< UI16 >(0x04AD));
+            ItemColour = Capped(facialHairColour, static_cast<UI16>(0x044E), static_cast< UI16 >(0x04AD));
         CreatedItems[BEARD] = Items->CreateItem(tSock, mChar, ItemID, 1, ItemColour, OT_ITEM);
         if (CreatedItems[BEARD] != NULL)
         {
@@ -764,7 +764,7 @@ void CPICreateCharacter::SetNewCharSkillsStats(CChar *mChar)
     UI08 i;
     R32 percheck;
 
-    if (profession != 0) //player picked a character profession during character creation
+    if (profession != 0) // player picked a character profession during character creation
     {
         bool extStats = cwmWorldState->ServerData()->ExtendedStartingStats();
         bool extSkills = cwmWorldState->ServerData()->ExtendedStartingSkills();
