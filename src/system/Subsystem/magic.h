@@ -155,7 +155,7 @@ public:
 #define MAG_TESTHANDLER(name)  extern bool name (MAGIC_TEST_LIST)
 #define MAG_CHARHANDLER(name)  extern bool name (MAGIC_CHARTARG_LIST)
 #define MAG_ITEMHANDLER(name)  extern bool name (MAGIC_ITEMTARG_LIST)
-#define MAG_LOCHANDLER( name)  extern bool name (MAGIC_LOCATION_LIST)
+#define MAG_LOCHANDLER(name)   extern bool name (MAGIC_LOCATION_LIST)
 #define MAG_FIELDHANDLER(name) extern bool name (MAGIC_FIELD_LIST)
 #define MAG_NOHANDLER(name)    extern bool name (MAGIC_NOTARG_LIST)
 #define MAG_AREASTUB(name)     extern void name (MAGIC_AREA_STUB_LIST)

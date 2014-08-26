@@ -192,7 +192,20 @@ bool splClumsy(CChar *caster, CChar *target, CChar *src, SI08 curSpell)
 
 bool splCreateFood(CSocket *sock, CChar *caster, SI08 curSpell)
 {
-    CItem *j = Items->CreateItem(sock, caster, 0x09D3, 1, 0x0000, OT_ITEM, true);
+    UI16 foods[10];
+    foods[0] = 2512; // Apple
+    foods[1] = 2519; // Cooked Bird
+    foods[2] = 2546; // Cut of Ribs
+    foods[3] = 2427; // Fish Steak
+    foods[4] = 2513; // Grape Bunch
+    foods[5] = 2515; // Ham
+    foods[6] = 2539; // Muffins(triple)
+    foods[7] = 2514; // Peach
+    foods[8] = 2497; // Sausage
+    foods[9] = 2429; // Wedge of Cheese
+
+    srand(time(NULL));
+    CItem *j = Items->CreateItem(sock, caster, foods[rand()%10], 1, 0x0000, OT_ITEM, true);
     if (ValidateObject(j))
         j->SetType(IT_FOOD);
     return true;
@@ -3115,7 +3128,7 @@ void cMagic::LoadScript(void)
                                     mRegs->drake = data.toUByte();
                                 break;
                             case 'E':
-                                if (UTag == "ENABLE")   // presence of enable is enough to enable it
+                                if (UTag == "ENABLE") // presence of enable is enough to enable it
                                     spells[i].Enabled(data.toUShort() != 0);
                                 break;
                             case 'F':

@@ -383,10 +383,9 @@ CItem * cItem::CreateItem(CSocket *mSock, CChar *mChar, const UI16 iID, const UI
         return NULL;
 
     if (iID != 0x0000)
-    {
         if (Map->IsValidTile(iID))
             iCreated->SetID(iID);
-    }
+
     if (iColour != 0x0000)
         iCreated->SetColour(iColour);
 
