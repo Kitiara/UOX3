@@ -1,0 +1,1 @@
+DROP INDEX `PRIMARY` ON effects;
