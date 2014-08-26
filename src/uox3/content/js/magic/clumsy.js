@@ -339,5 +339,8 @@ function onSpellSuccess( mSock, mChar, ourTarg )
 	sourceChar.SpellMoveEffect( ourTarg, mSpell );
 	ourTarg.SpellStaticEffect( mSpell );
 
-	DoTempEffect( 0, sourceChar, ourTarg, 3, (mChar.skills.magery / 100) );	
+	var calc = Math.round(8 + (mChar.skills.evaluatingintel / 100) - (ourTarg.skills.magicresistance / 100));
+	if (calc < 0)
+		calc = 0;
+	DoTempEffect( 0, sourceChar, ourTarg, 3, calc );
 }

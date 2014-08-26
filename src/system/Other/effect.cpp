@@ -704,26 +704,24 @@ void cEffects::tempeffect(CChar *source, CChar *dest, UI08 num, UI16 more1, UI16
             toAdd->Dispellable(true);
             break;
         case 3:
+        {
             if (dest->GetDexterity() < more[0])
                 more[0] = dest->GetDexterity();
             dest->IncDexterity2(-more[0]);
             dest->SetStamina(UOX_MIN(dest->GetStamina(), dest->GetMaxStam()));
-            // Halve effect-timer on resist
-            spellResisted = Magic->CheckResist(source, dest, 1);
-            if (spellResisted)
-                toAdd->ExpireTime(BuildTimeValue((R32)source->GetSkill(MAGERY) / 20.0f));
-            else
-                toAdd->ExpireTime(BuildTimeValue((R32)source->GetSkill(MAGERY) / 10.0f));
+            R32 duration = (R32)((source->GetSkill(EVALUATINGINTEL) / 5) + 1) * 6;
+            if (Magic->CheckResist(source, dest, 1)) // Halve effect-timer on resist
+                duration /= 2;
+            toAdd->ExpireTime(BuildTimeValue(duration));
             toAdd->Dispellable(true);
             break;
+        }
         case 4:
             if (dest->GetIntelligence() < more[0])
                 more[0] = dest->GetIntelligence();
             dest->IncIntelligence2(-more[0]);
             dest->SetMana(UOX_MIN(dest->GetMana(), dest->GetMaxMana()));
-            // Halve effect-timer on resist
-            spellResisted = Magic->CheckResist(source, dest, 1);
-            if (spellResisted)
+            if (Magic->CheckResist(source, dest, 1)) // Halve effect-timer on resist
                 toAdd->ExpireTime(BuildTimeValue((R32)source->GetSkill(MAGERY) / 20.0f));
             else
                 toAdd->ExpireTime(BuildTimeValue((R32)source->GetSkill(MAGERY) / 10.0f));
@@ -734,9 +732,7 @@ void cEffects::tempeffect(CChar *source, CChar *dest, UI08 num, UI16 more1, UI16
                 more[0] = dest->GetStrength();
             dest->IncStrength2(-more[0]);
             dest->SetHP(UOX_MIN(dest->GetHP(), static_cast<SI16>(dest->GetMaxHP())));
-            // Halve effect-timer on resist
-            spellResisted = Magic->CheckResist(source, dest, 4);
-            if (spellResisted)
+            if (Magic->CheckResist(source, dest, 4)) // Halve effect-timer on resist
                 toAdd->ExpireTime(BuildTimeValue((R32)source->GetSkill(MAGERY) / 20.0f));
             else
                 toAdd->ExpireTime(BuildTimeValue((R32)source->GetSkill(MAGERY) / 10.0f));
@@ -778,9 +774,7 @@ void cEffects::tempeffect(CChar *source, CChar *dest, UI08 num, UI16 more1, UI16
             dest->IncStrength2(-more[0]);
             dest->IncDexterity2(-more[1]);
             dest->IncIntelligence2(-more[2]);
-            // Halve effect-timer on resist
-            spellResisted = Magic->CheckResist(source, dest, 4);
-            if (spellResisted)
+            if (Magic->CheckResist(source, dest, 4)) // Halve effect-timer on resist
                 toAdd->ExpireTime(BuildTimeValue((R32)source->GetSkill(MAGERY) / 20.0f));
             else
                 toAdd->ExpireTime(BuildTimeValue((R32)source->GetSkill(MAGERY) / 10.0f));

@@ -186,7 +186,10 @@ bool FieldSpell(CChar *caster, UI16 id, SI16 x, SI16 y, SI08 z, UI08 fieldDir)
 
 bool splClumsy(CChar *caster, CChar *target, CChar *src, SI08 curSpell)
 {
-    Effects->tempeffect(src, target, 3, caster->GetSkill(MAGERY)/100);
+    int calc = round(8 + (caster->GetSkill(EVALUATINGINTEL) / 100) - (target->GetSkill(MAGICRESISTANCE) / 100));
+    if (calc < 0)
+        calc = 0;
+    Effects->tempeffect(src, target, 3, calc);
     return true;
 }
 
