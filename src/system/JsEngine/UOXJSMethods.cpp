@@ -2684,19 +2684,19 @@ JSBool CBase_StartTimer(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, j
             if (JSVAL_TO_BOOLEAN(argv[2]) == JS_TRUE)
                 Effect->AssocScript(JSMapping->GetScriptID(JS_GetGlobalObject(cx)));
             else
-                Effect->More2(0xFFFF);
+                Effect->More(0xFFFF, 1);
         }
         else
-            Effect->More2((UI16)JSVAL_TO_INT(argv[2]));
+            Effect->More((UI16)JSVAL_TO_INT(argv[2]), 1);
     }
     else
-        Effect->More2(0xFFFF);
+        Effect->More(0xFFFF, 1);
 
     Effect->Destination(myObj->GetSerial());
     Effect->ExpireTime(ExpireTime);
     Effect->Source(myObj->GetSerial());
     Effect->Number(40);
-    Effect->More1(TriggerNum);
+    Effect->More(TriggerNum, 0);
 
     cwmWorldState->tempEffects.Add(Effect);
 

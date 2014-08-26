@@ -15,17 +15,18 @@ struct isEqual
 namespace UOX
 {
     const int ALLOC_NONE    = 0;
-    const int ALLOC_ENV        = 1;
-    const int ALLOC_DBC        = 2;
+    const int ALLOC_ENV     = 1;
+    const int ALLOC_DBC     = 2;
     const int ALLOC_CONNECT = 3;
     const int ALLOC_STMT    = 4;
 
     //---------------------------------------------------------------------------------------------
-    template<> SQLManager * Singleton< SQLManager >::ms_Singleton = 0;
+    template<> SQLManager * Singleton<SQLManager>::ms_Singleton = 0;
     SQLManager* SQLManager::getSingletonPtr(void)
     {
         return ms_Singleton;
     }
+
     SQLManager& SQLManager::getSingleton(void)
     {  
         assert(ms_Singleton);  return (*ms_Singleton);  
@@ -33,6 +34,7 @@ namespace UOX
     //---------------------------------------------------------------------------------------------
 
     SQLManager::SQLManager() : inTransaction(false), ExecuteOrder(0)  {}
+
     SQLManager::~SQLManager()
     {
         Disconnect();

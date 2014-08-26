@@ -20,6 +20,6 @@ function shearSheep( pUser, sheep )
 		var delay = RandomNumber( 60, 180 );
 		
 		// Trigger a hardcoded timer in UOX3 which changes ID of the sheep back to normal
-		DoTempEffect( 0, sheep, pUser, 43, delay, 0, 0 );
+		DoTempEffect( 0, sheep, pUser, 21, delay );
 	}
 }

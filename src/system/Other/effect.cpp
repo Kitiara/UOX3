@@ -237,7 +237,7 @@ void explodeItem(CSocket *mSock, CItem *nItem)
                     {
                         if (RandomNum(0, 1) == 1)
                             chain = true;
-                        Effects->tempeffect(c, tempItem, 17, 0, 1, 0);
+                        Effects->tempeffect(c, tempItem, 22, 0, 1, 0);
                     }
             }
         regItems->Pop();
@@ -251,7 +251,7 @@ void cEffects::HandleMakeItemEffect(CTEffect *tMake)
         return;
 
     CChar *src = calcCharObjFromSer(tMake->Source());
-    UI16 iMaking = tMake->More2();
+    UI16 iMaking = tMake->More(1);
     createEntry *toMake = Skills->FindItem(iMaking);
     if (toMake == NULL)
         return;
@@ -363,57 +363,57 @@ void cEffects::checktempeffects(void)
                 doLight(tSock, cwmWorldState->ServerData()->WorldLightCurrentLevel());
                 break;
             case 3:
-                s->IncDexterity2(Effect->More1());
+                s->IncDexterity2(Effect->More(0));
                 equipCheckNeeded = true;
                 break;
             case 4:
-                s->IncIntelligence2(Effect->More1());
+                s->IncIntelligence2(Effect->More(0));
                 equipCheckNeeded = true;
                 break;
             case 5:
-                s->IncStrength2(Effect->More1());
+                s->IncStrength2(Effect->More(0));
                 equipCheckNeeded = true;
                 break;
             case 6:
-                s->IncDexterity2(-Effect->More1());
+                s->IncDexterity2(-Effect->More(0));
                 s->SetStamina(UOX_MIN(s->GetStamina(), s->GetMaxStam()));
                 equipCheckNeeded = true;
                 break;
             case 7:
-                s->IncIntelligence2(-Effect->More1());
+                s->IncIntelligence2(-Effect->More(0));
                 s->SetMana(UOX_MIN(s->GetMana(), s->GetMaxMana()));
                 equipCheckNeeded = true;
                 break;
             case 8:
-                s->IncStrength2(-Effect->More1());
+                s->IncStrength2(-Effect->More(0));
                 s->SetHP(UOX_MIN(s->GetHP(), static_cast<SI16>(s->GetMaxHP())));
                 equipCheckNeeded = true;
                 break;
             case 9: // Grind potion (also used for necro stuff)
-                switch(Effect->More1())
+                switch(Effect->More(0))
                 {
                     case 0:
-                        if (Effect->More2() != 0)
+                        if (Effect->More(1) != 0)
                             s->TextMessage(NULL, 1270, EMOTE, true, s->GetName().c_str());
                         PlaySound(s, 0x0242);
                         break;
                 }
                 break;
             case 11:
-                s->IncStrength2(-Effect->More1());
+                s->IncStrength2(-Effect->More(0));
                 s->SetHP( UOX_MIN(s->GetHP(), static_cast<SI16>(s->GetMaxHP())));
-                s->IncDexterity2(-Effect->More2());
+                s->IncDexterity2(-Effect->More(1));
                 s->SetStamina(UOX_MIN(s->GetStamina(), s->GetMaxStam()));
-                s->IncIntelligence2(-Effect->More3());
+                s->IncIntelligence2(-Effect->More(2));
                 s->SetMana(UOX_MIN(s->GetMana(), s->GetMaxMana()));
                 equipCheckNeeded = true;
                 break;
             case 12: // Curse
                 if (s != NULL)
                 {
-                    s->IncStrength2(Effect->More1());
-                    s->IncDexterity2(Effect->More2());
-                    s->IncIntelligence2(Effect->More3());
+                    s->IncStrength2(Effect->More(0));
+                    s->IncDexterity2(Effect->More(1));
+                    s->IncIntelligence2(Effect->More(2));
                     equipCheckNeeded = true;
                 }
                 else
@@ -427,7 +427,7 @@ void cEffects::checktempeffects(void)
                 if (src->GetTimer(tCHAR_ANTISPAM) < cwmWorldState->GetUICurrentTime())
                 {
                     src->SetTimer(tCHAR_ANTISPAM, BuildTimeValue(1));
-                    UString mTemp = UString::number(Effect->More3());
+                    UString mTemp = UString::number(Effect->More(2));
                     if (tSock != NULL)
                         tSock->sysmessage(mTemp.c_str());
                 } 
@@ -465,7 +465,7 @@ void cEffects::checktempeffects(void)
                 break;
             case 21:
                 UI16 toDrop;
-                toDrop = Effect->More1();
+                toDrop = Effect->More(0);
                 if ((s->GetBaseSkill(PARRYING) - toDrop) < 0)
                     s->SetBaseSkill(0, PARRYING);
                 else
@@ -474,7 +474,7 @@ void cEffects::checktempeffects(void)
                 break;
             case 25:
                 // Same result no matter if the if-check is true or false? What is this effect even for?
-                if (Effect->More2() == 0)
+                if (Effect->More(1) == 0)
                     Effect->ObjPtr()->SetDisabled(false);
                 else
                     Effect->ObjPtr()->SetDisabled(false);
@@ -489,7 +489,7 @@ void cEffects::checktempeffects(void)
                 Magic->playSound(src, 43);
                 Magic->doMoveEffect(43, s, src);
                 Magic->doStaticEffect(s, 43);
-                Magic->MagicDamage(s, Effect->More1(), src, HEAT);
+                Magic->MagicDamage(s, Effect->More(0), src, HEAT);
                 equipCheckNeeded = true;
                 break;
             case 40:
@@ -513,8 +513,8 @@ void cEffects::checktempeffects(void)
 
                 if (tScript == NULL) // No associated script, so it must be another callback variety
                 {
-                    if (Effect->More2() != 0xFFFF)
-                        scpNum = Effect->More2();
+                    if (Effect->More(1) != 0xFFFF)
+                        scpNum = Effect->More(1);
                     else
                         scpNum = myObj->GetScriptTrigger();
                     tScript = JSMapping->GetScript(scpNum);
@@ -534,7 +534,7 @@ void cEffects::checktempeffects(void)
                     }
 
                 if (tScript != NULL) // do OnTimer stuff here
-                    tScript->OnTimer(myObj, static_cast<UI08>(Effect->More1()));
+                    tScript->OnTimer(myObj, static_cast<UI08>(Effect->More(0)));
                 break;
             }
             case 41: // Creating an item
@@ -542,7 +542,7 @@ void cEffects::checktempeffects(void)
                 break;
             case 42:
                 src = calcCharObjFromSer(Effect->Source());
-                PlaySound(src, Effect->More2());
+                PlaySound(src, Effect->More(1));
                 break;
             case 43:
                 src = calcCharObjFromSer(Effect->Source());
@@ -583,21 +583,21 @@ void reverseEffect(CTEffect *Effect)
             case 2:
                 s->SetFixedLight(255);
                 break;
-            case 3: s->IncDexterity2(Effect->More1());     break;
-            case 4: s->IncIntelligence2(Effect->More1());  break;
-            case 5: s->IncStrength2(Effect->More1());      break;
-            case 6: s->IncDexterity2(-Effect->More1());    break;
-            case 7: s->IncIntelligence2(-Effect->More1()); break;
-            case 8: s->IncStrength2(-Effect->More1());     break;
+            case 3: s->IncDexterity2(Effect->More(0));     break;
+            case 4: s->IncIntelligence2(Effect->More(0));  break;
+            case 5: s->IncStrength2(Effect->More(0));      break;
+            case 6: s->IncDexterity2(-Effect->More(0));    break;
+            case 7: s->IncIntelligence2(-Effect->More(0)); break;
+            case 8: s->IncStrength2(-Effect->More(0));     break;
             case 11:
-                s->IncStrength2(-Effect->More1());
-                s->IncDexterity2(-Effect->More2());
-                s->IncIntelligence2(-Effect->More3());
+                s->IncStrength2(-Effect->More(0));
+                s->IncDexterity2(-Effect->More(1));
+                s->IncIntelligence2(-Effect->More(2));
                 break;
             case 12:
-                s->IncStrength2(Effect->More1());
-                s->IncDexterity2(Effect->More2());
-                s->IncIntelligence2(Effect->More3());
+                s->IncStrength2(Effect->More(0));
+                s->IncDexterity2(Effect->More(1));
+                s->IncIntelligence2(Effect->More(2));
                 break;
             case 18: // Polymorph spell
                 s->SetID(s->GetOrgID());
@@ -628,7 +628,7 @@ void reverseEffect(CTEffect *Effect)
                 break;
             case 21:
                 int toDrop;
-                toDrop = Effect->More1();
+                toDrop = Effect->More(0);
                 if ((s->GetBaseSkill(PARRYING) - toDrop) < 0)
                     s->SetBaseSkill(0, PARRYING);
                 else
@@ -645,15 +645,17 @@ void reverseEffect(CTEffect *Effect)
     Items->CheckEquipment(s);
 }
 
-void cEffects::tempeffect(CChar *source, CChar *dest, UI08 num, UI16 more1, UI16 more2, UI16 more3, CItem *targItemPtr)
+void cEffects::tempeffect(CChar *source, CChar *dest, UI08 num, UI16 more1, UI16 more2, UI16 more3)
 {
     if (!ValidateObject(source) || !ValidateObject(dest))
         return;
 
     bool spellResisted = false;
     CTEffect *toAdd    = new CTEffect;
-    SERIAL sourSer    = source->GetSerial();
-    SERIAL targSer    = dest->GetSerial();
+    SERIAL sourSer     = source->GetSerial();
+    SERIAL targSer     = dest->GetSerial();
+    UI16 more[3] = { more1, more2, more3 };
+    bool allowed[3] = { true, true, true };
     toAdd->Source(sourSer);
     toAdd->Destination(targSer);
 
@@ -682,8 +684,8 @@ void cEffects::tempeffect(CChar *source, CChar *dest, UI08 num, UI16 more1, UI16
                         break;
                 }
             }
-
     cwmWorldState->tempEffects.Pop();
+
     CSocket *tSock = dest->GetSocket();
     toAdd->Number(num);
     switch(num)
@@ -702,176 +704,150 @@ void cEffects::tempeffect(CChar *source, CChar *dest, UI08 num, UI16 more1, UI16
             toAdd->Dispellable(true);
             break;
         case 3:
-            if (dest->GetDexterity() < more1)
-                more1 = dest->GetDexterity();
-            dest->IncDexterity2(-more1);
+            if (dest->GetDexterity() < more[0])
+                more[0] = dest->GetDexterity();
+            dest->IncDexterity2(-more[0]);
             dest->SetStamina(UOX_MIN(dest->GetStamina(), dest->GetMaxStam()));
-            //Halve effect-timer on resist
+            // Halve effect-timer on resist
             spellResisted = Magic->CheckResist(source, dest, 1);
             if (spellResisted)
                 toAdd->ExpireTime(BuildTimeValue((R32)source->GetSkill(MAGERY) / 20.0f));
             else
                 toAdd->ExpireTime(BuildTimeValue((R32)source->GetSkill(MAGERY) / 10.0f));
-            toAdd->More1(more1);
             toAdd->Dispellable(true);
             break;
         case 4:
-            if (dest->GetIntelligence() < more1)
-                more1 = dest->GetIntelligence();
-            dest->IncIntelligence2(-more1);
+            if (dest->GetIntelligence() < more[0])
+                more[0] = dest->GetIntelligence();
+            dest->IncIntelligence2(-more[0]);
             dest->SetMana(UOX_MIN(dest->GetMana(), dest->GetMaxMana()));
-            //Halve effect-timer on resist
+            // Halve effect-timer on resist
             spellResisted = Magic->CheckResist(source, dest, 1);
             if (spellResisted)
                 toAdd->ExpireTime(BuildTimeValue((R32)source->GetSkill(MAGERY) / 20.0f));
             else
                 toAdd->ExpireTime(BuildTimeValue((R32)source->GetSkill(MAGERY) / 10.0f));
-            toAdd->More1(more1);
             toAdd->Dispellable(true);
             break;
         case 5:
-            if (dest->GetStrength() < more1)
-                more1 = dest->GetStrength();
-            dest->IncStrength2(-more1);
+            if (dest->GetStrength() < more[0])
+                more[0] = dest->GetStrength();
+            dest->IncStrength2(-more[0]);
             dest->SetHP(UOX_MIN(dest->GetHP(), static_cast<SI16>(dest->GetMaxHP())));
-            //Halve effect-timer on resist
+            // Halve effect-timer on resist
             spellResisted = Magic->CheckResist(source, dest, 4);
             if (spellResisted)
                 toAdd->ExpireTime(BuildTimeValue((R32)source->GetSkill(MAGERY) / 20.0f));
             else
                 toAdd->ExpireTime(BuildTimeValue((R32)source->GetSkill(MAGERY) / 10.0f));
-            toAdd->More1(more1);
             toAdd->Dispellable(true);
             break;
         case 6:
-            dest->IncDexterity(more1);
+            dest->IncDexterity(more[0]);
             toAdd->ExpireTime(BuildTimeValue((R32)source->GetSkill(MAGERY) / 10.0f));
-            toAdd->More1(more1);
             toAdd->Dispellable(true);
             break;
         case 7:
-            dest->IncIntelligence2(more1);
+            dest->IncIntelligence2(more[0]);
             toAdd->ExpireTime(BuildTimeValue((R32)source->GetSkill(MAGERY) / 10.0f));
-            toAdd->More1(more1);
             toAdd->Dispellable(true);
             break;
         case 8:
-            dest->IncStrength2(more1);
+            dest->IncStrength2(more[0]);
             toAdd->ExpireTime(BuildTimeValue((R32)source->GetSkill(MAGERY) / 10.0f));
-            toAdd->More1(more1);
             toAdd->Dispellable(true);
             break;
         case 9:
             toAdd->ExpireTime(BuildTimeValue((R32)more2));
-            toAdd->More1(more1);
-            toAdd->More2(more2);
             toAdd->Dispellable(false);
             break;
-        case 10:
-            toAdd->ExpireTime(BuildTimeValue(12.0f));
-            toAdd->Dispellable(false);
-            toAdd->More1(more1);
-            toAdd->More2(more2);
-            break;
-        case 11: // Bless
-            dest->IncStrength2(more1);
-            dest->IncDexterity2(more2);
-            dest->IncIntelligence2(more3);
+        case 10: // Bless
+            dest->IncStrength2(more[0]);
+            dest->IncDexterity2(more[1]);
+            dest->IncIntelligence2(more[2]);
             toAdd->ExpireTime(BuildTimeValue((R32)source->GetSkill(MAGERY) / 10.0f));
-            toAdd->More1(more1);
-            toAdd->More2(more2);
-            toAdd->More3(more3);
             toAdd->Dispellable(true);
             break;
-        case 12: // Curse
-            if (dest->GetStrength() < more1)
-                more1 = dest->GetStrength();
-            if (dest->GetDexterity() < more2)
-                more2 = dest->GetDexterity();
-            if (dest->GetIntelligence() < more3)
-                more3 = dest->GetIntelligence();
-            dest->IncStrength2(-more1);
-            dest->IncDexterity2(-more2);
-            dest->IncIntelligence2(-more3);
-            //Halve effect-timer on resist
+        case 11: // Curse
+            if (dest->GetStrength() < more[0])
+                more[0] = dest->GetStrength();
+            if (dest->GetDexterity() < more[1])
+                more[1] = dest->GetDexterity();
+            if (dest->GetIntelligence() < more[2])
+                more[2] = dest->GetIntelligence();
+            dest->IncStrength2(-more[0]);
+            dest->IncDexterity2(-more[1]);
+            dest->IncIntelligence2(-more[2]);
+            // Halve effect-timer on resist
             spellResisted = Magic->CheckResist(source, dest, 4);
             if (spellResisted)
                 toAdd->ExpireTime(BuildTimeValue((R32)source->GetSkill(MAGERY) / 20.0f));
             else
                 toAdd->ExpireTime(BuildTimeValue((R32)source->GetSkill(MAGERY) / 10.0f));
-            toAdd->More1(more1);
-            toAdd->More2(more2);
-            toAdd->More3(more3);
             toAdd->Dispellable(true);
             break;
-        case 15: // Reactive Armor
+        case 12: // Reactive Armor
             toAdd->ExpireTime(BuildTimeValue((R32)source->GetSkill(MAGERY) / 10.0f));
             toAdd->Dispellable(true);
             break;
-        case 16: //Explosion potions
-            toAdd->ExpireTime(BuildTimeValue((R32)more2));
-            toAdd->More1(more1); // item/potion
-            toAdd->More2(more2); // seconds
-            toAdd->More3(more3); // countdown#
+        case 13: //Explosion potions
+            toAdd->ExpireTime(BuildTimeValue((R32)more[1]));
             toAdd->Dispellable(false);
             break;
-        case 18: // Polymorph
+        case 14: // Polymorph
+        {
             toAdd->ExpireTime(cwmWorldState->ServerData()->BuildSystemTimeValue(tSERVER_POLYMORPH));
             toAdd->Dispellable(false);
-            
-            UI16 k;
+
             // Grey flag when polymorphed
             dest->SetTimer(tCHAR_CRIMFLAG, cwmWorldState->ServerData()->BuildSystemTimeValue(tSERVER_POLYMORPH));
             if (dest->IsOnHorse()) 
                 DismountCreature(dest);
-            k = (more1<<8) + more2;
+            UI16 k = (more[0] << 8) + more[1];
             
             if (k <= 0x03e2) // lord binary, body-values >0x3e1 crash the client
                 dest->SetID(k);
+            allowed[0] = false;
+            allowed[1] = false;
+        }
             break;
-        case 19: // incognito spell - AntiChrist (10/99)
+        case 15: // incognito spell - AntiChrist (10/99)
             toAdd->ExpireTime(BuildTimeValue(90.0f)); // 90 seconds
             toAdd->Dispellable(false);
             break;
-        case 21: // protection
+        case 16: // protection
             toAdd->ExpireTime(BuildTimeValue(120.0f));
             toAdd->Dispellable(true);
-            toAdd->More1(more1);
-            dest->SetBaseSkill(dest->GetBaseSkill(PARRYING) + more1, PARRYING);
+            dest->SetBaseSkill(dest->GetBaseSkill(PARRYING) + more[0], PARRYING);
             break;
-        case 25:
-            toAdd->ExpireTime(BuildTimeValue((R32)more1));
-            toAdd->ObjPtr(dest);
-            dest->SetDisabled(true);
-            toAdd->More2(1);
-            break;
-        case 26:
+        case 17:
             toAdd->ExpireTime(cwmWorldState->ServerData()->BuildSystemTimeValue(tSERVER_POTION));
             dest->SetUsingPotion(true);
             break;
-        case 27:
+        case 18:
             toAdd->ExpireTime(BuildTimeValue(static_cast<R32>(cwmWorldState->ServerData()->CombatExplodeDelay())));
-            toAdd->More1(more1);
             break;
-        case 40:
-            toAdd->ExpireTime(BuildTimeValue(((R32)more1 + (R32)more2 / 1000.0f)));
-            toAdd->More1(more3);
+        case 19: // creating item
+            toAdd->ExpireTime(BuildTimeValue((R32)(more[0]) / 100.0f));
+            allowed[0] = false;
             break;
-        case 41: // creating item
-            toAdd->ExpireTime(BuildTimeValue((R32)(more1) / 100.0f));
-            toAdd->More2(more2);
+        case 20: // delayed sound effect
+            toAdd->ExpireTime(BuildTimeValue((R32)(more[0]) / 100.0f));
+            allowed[0] = false;
             break;
-        case 42: // delayed sound effect
-            toAdd->ExpireTime(BuildTimeValue((R32)(more1) / 100.0f));
-            toAdd->More2(more2);
-            break;
-        case 43: // regain wool for sheeps
-            toAdd->ExpireTime(BuildTimeValue((R32)(more1)));
+        case 21: // regain wool for sheeps
+            toAdd->ExpireTime(BuildTimeValue((R32)(more[0])));
+            allowed[0] = false;
             break;
         default:
             Console.Error(" Fallout of switch statement (%d) without default. uox3.cpp, tempeffect()", num);
             return;
     }
+
+    for (int i = 0; i < 3; ++i)
+        if (more[i] != NULL && allowed[i])
+            toAdd->More(more[i], i);
+
     cwmWorldState->tempEffects.Add(toAdd);
 }
 
@@ -881,6 +857,8 @@ void cEffects::tempeffect(CChar *source, CItem *dest, UI08 num, UI16 more1, UI16
         return;
 
     CTEffect *toAdd = new CTEffect;
+    UI16 more[3] = { more1, more2, more3 };
+    bool allowed[3] = { true, true, true };
 
     if (ValidateObject(source))
         toAdd->Source(source->GetSerial());
@@ -891,37 +869,26 @@ void cEffects::tempeffect(CChar *source, CItem *dest, UI08 num, UI16 more1, UI16
     toAdd->Number(num);
     switch(num)
     {
-        case 10:
-            toAdd->ExpireTime(BuildTimeValue(12));
-            toAdd->Dispellable(false);
-            toAdd->More1(more1);
-            toAdd->More2(more2);
-            source->SkillUsed(true, ALCHEMY);
-            break;
-        case 13:
-            if (!dest->isDoorOpen())
-                dest->SetDoorOpen(true);
-
-            toAdd->ExpireTime(BuildTimeValue(10));
-            toAdd->Dispellable(false);
-            break;
-        case 17: //Explosion potion (explosion)  Tauriel (explode in 4 seconds)
+        case 22: //Explosion potion (explosion)  Tauriel (explode in 4 seconds)
             toAdd->ExpireTime(BuildTimeValue(4));
-            toAdd->More1(more1);
-            toAdd->More2(more2);
             toAdd->ObjPtr(dest);
             toAdd->Dispellable(false);
             break;
-        case 25:
-            toAdd->ExpireTime(BuildTimeValue(more1));
+        case 23:
+            toAdd->ExpireTime(BuildTimeValue(more[0]));
             toAdd->ObjPtr(dest);
             dest->SetDisabled(true);
-            toAdd->More2(0);
+            allowed[0] = false;
             break;
         default:
             Console.Error(" Fallout of switch statement without default. uox3.cpp, tempeffect2()");
             return;
     }
+
+    for (int i = 0; i < 3; ++i)
+        if (more[i] != NULL && allowed[i])
+            toAdd->More(more[i], i);
+
     cwmWorldState->tempEffects.Add(toAdd);
 }
 
@@ -1018,14 +985,14 @@ void cEffects::LoadEffects(void)
                 case 4: // effects.number
                     toLoad->Number(value.toUByte());
                     break;
-                case 5: // effects.more1
-                    toLoad->More1(value.toUShort());
+                case 5: // effects.more[0]
+                    toLoad->More(value.toUShort(), 0);
                     break;
-                case 6: // effects.more2
-                    toLoad->More2(value.toUShort());
+                case 6: // effects.more[1]
+                    toLoad->More(value.toUShort(), 1);
                     break;
-                case 7: // effects.more3
-                    toLoad->More3(value.toUShort());
+                case 7: // effects.more[2]
+                    toLoad->More(value.toUShort(), 2);
                     break;
                 case 8: // effects.dispel
                     toLoad->Dispellable(value.toUByte() == 1 ? true : false);
@@ -1062,9 +1029,9 @@ UString CTEffect::Save(void) const
 
     Str << "'" << (ExpireTime() - cwmWorldState->GetUICurrentTime()) << "', ";
     Str << "'" << int((UI08)static_cast<UI16>(Number())) << "', ";
-    Str << "'" << More1() << "', ";
-    Str << "'" << More2() << "', ";
-    Str << "'" << More3() << "', ";
+    Str << "'" << More(0) << "', ";
+    Str << "'" << More(1) << "', ";
+    Str << "'" << More(2) << "', ";
     Str << "'" << Dispellable() << "', ";
 
     if (AssocScript() == 65535)

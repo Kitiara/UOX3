@@ -44,7 +44,7 @@ function onUseChecked( pUser, iUsed )
 	DoSoundEffect( iUsed, 1, 0x0231, true );
 
 	// temporary disable the item
-	DoTempEffect( 1, pUser, iUsed, 25, 1000, 0, 0, iUsed );
+	DoTempEffect( 1, pUser, iUsed, 23, 1000, 0 );
 
 	// give some resources
 	var loot = RollDice( 1, 3, 0 ); 

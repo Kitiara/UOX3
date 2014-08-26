@@ -2403,11 +2403,11 @@ void cSkills::MakeItem(createEntry &toMake, CChar *player, CSocket *sock, UI16 i
         for (sCounter = toMake.skillReqs.begin(); sCounter != toMake.skillReqs.end(); ++sCounter)
             player->SkillUsed(true, (*sCounter).skillNumber);
 
-        Effects->tempeffect(player, player, 41, toMake.delay, itemEntry, 0);
+        Effects->tempeffect(player, player, 19, toMake.delay, itemEntry);
         if (toMake.soundPlayed)
             if (toMake.delay > 300)
                 for (SI16 i = 0; i < (toMake.delay / 300); ++i)
-                    Effects->tempeffect(player, player, 42, 300 * i, toMake.soundPlayed, 0);
+                    Effects->tempeffect(player, player, 20, 300 * i, toMake.soundPlayed);
     }
 
     for (resCounter = toMake.resourceNeeded.begin(); resCounter != toMake.resourceNeeded.end(); ++resCounter)
@@ -2571,10 +2571,10 @@ void cSkills::MakeNecroReg(CSocket *nSocket, CItem *nItem, UI16 itemID)
     if (itemID >= 0x1B11 && itemID <= 0x1B1C) // Make bone powder.
     {
         iCharID->TextMessage(NULL, 741, EMOTE, true, iCharID->GetName().c_str());
-        Effects->tempeffect(iCharID, iCharID, 9, 0, 0, 0);
-        Effects->tempeffect(iCharID, iCharID, 9, 0, 3, 0);
-        Effects->tempeffect(iCharID, iCharID, 9, 0, 6, 0);
-        Effects->tempeffect(iCharID, iCharID, 9, 0, 9, 0);
+        Effects->tempeffect(iCharID, iCharID, 9, 0, 0);
+        Effects->tempeffect(iCharID, iCharID, 9, 0, 3);
+        Effects->tempeffect(iCharID, iCharID, 9, 0, 6);
+        Effects->tempeffect(iCharID, iCharID, 9, 0, 9);
         iItem = Items->CreateItem(nSocket, iCharID, 0x0F8F, 1, 0, OT_ITEM, true);
         if (iItem == NULL)
             return;

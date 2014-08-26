@@ -68,12 +68,12 @@ std::map<std::string, ObjectType> stringToObjType;
 
 void InitStringToObjType(void)
 {
-    stringToObjType["BASEOBJ"]      = OT_CBO;
-    stringToObjType["CHARACTER"]    = OT_CHAR;
-    stringToObjType["ITEM"]         = OT_ITEM;
-    stringToObjType["SPAWNER"]      = OT_SPAWNER;
-    stringToObjType["MULTI"]        = OT_MULTI;
-    stringToObjType["BOAT"]         = OT_BOAT;
+    stringToObjType["BASEOBJ"]   = OT_CBO;
+    stringToObjType["CHARACTER"] = OT_CHAR;
+    stringToObjType["ITEM"]      = OT_ITEM;
+    stringToObjType["SPAWNER"]   = OT_SPAWNER;
+    stringToObjType["MULTI"]     = OT_MULTI;
+    stringToObjType["BOAT"]      = OT_BOAT;
 }
 
 ObjectType FindObjTypeFromString(UString strToFind)
@@ -94,57 +94,48 @@ JSBool SE_DoTempEffect(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, js
         DoSEErrorMessage("DoTempEffect: Invalid number of arguments (takes 7 or 8)");
         return JS_FALSE;
     }
-    UI08 iType          = static_cast<UI08>(JSVAL_TO_INT(argv[0]));
-    long targNum        = JSVAL_TO_INT(argv[3]);
-    UI08 more1          = (UI08)JSVAL_TO_INT(argv[4]);
-    UI08 more2          = (UI08)JSVAL_TO_INT(argv[5]);
-    UI08 more3          = (UI08)JSVAL_TO_INT(argv[6]);
+    UI08 iType = static_cast<UI08>(JSVAL_TO_INT(argv[0]));
+    JSObject* mysrc = JSVAL_TO_OBJECT(argv[1]);
+    JSObject* mydest = JSVAL_TO_OBJECT(argv[2]);
+    long targNum = JSVAL_TO_INT(argv[3]);
+    UI08 more1 = argv[4] ? (UI08)JSVAL_TO_INT(argv[4]) : NULL;
+    UI08 more2 = argv[5] ? (UI08)JSVAL_TO_INT(argv[5]) : NULL;
+    UI08 more3 = argv[6] ? (UI08)JSVAL_TO_INT(argv[6]) : NULL;
 
-    CItem *myItemPtr    = NULL;
-
-    if (argc == 8)
-    {
-        JSObject *myitemptr = NULL;
-        myitemptr = JSVAL_TO_OBJECT(argv[7]);
-        myItemPtr = static_cast<CItem *>(JS_GetPrivate(cx, myitemptr));
-    }
-
-    JSObject *mysrc     = JSVAL_TO_OBJECT(argv[1]);
-    CChar *mysrcChar    = static_cast<CChar*>(JS_GetPrivate(cx, mysrc));
-
+    CChar *mysrcChar = static_cast<CChar*>(JS_GetPrivate(cx, mysrc));
     if (!ValidateObject(mysrcChar))
     {
         DoSEErrorMessage("DoTempEffect: Invalid src");
         return JS_FALSE;
     }
-    
+
+    CChar* CObj = NULL;
+    CItem* IObj = NULL;
+    bool error = true;
+
     if (iType == 0) // character
     {
-        JSObject *mydestc = JSVAL_TO_OBJECT(argv[2]);
-        CChar *mydestChar = static_cast<CChar*>(JS_GetPrivate(cx, mydestc));
-
-        if (!ValidateObject(mydestChar))
-        {
-            DoSEErrorMessage("DoTempEffect: Invalid target ");
-           return JS_FALSE;
-        }
-        if (argc == 8)
-            Effects->tempeffect(mysrcChar, mydestChar, static_cast<SI08>(targNum), more1, more2, more3, myItemPtr);
-        else
-            Effects->tempeffect(mysrcChar, mydestChar, static_cast<SI08>(targNum), more1, more2, more3);
+        CObj = static_cast<CChar*>(JS_GetPrivate(cx, mydest));
+        error = !ValidateObject(CObj);
+    }
+    else if (iType == 1)
+    {
+        IObj = static_cast<CItem*>(JS_GetPrivate(cx, mydest));
+        error = !ValidateObject(IObj);
     }
     else
-    {
-        JSObject *mydesti = JSVAL_TO_OBJECT(argv[2]);
-        CItem *mydestItem = static_cast<CItem *>(JS_GetPrivate(cx, mydesti));
+        return JS_FALSE;
 
-        if (!ValidateObject(mydestItem))
-        {
-            DoSEErrorMessage("DoTempEffect: Invalid target ");
-           return JS_FALSE;
-        }
-        Effects->tempeffect(mysrcChar, mydestItem, static_cast<SI08>(targNum), more1, more2, more3);
+    if (error)
+    {
+        DoSEErrorMessage("DoTempEffect: Invalid target ");
+        return JS_FALSE;
     }
+
+    if (iType == 0)
+        Effects->tempeffect(mysrcChar, CObj, static_cast<SI08>(targNum), more1, more2, more3);
+    else
+        Effects->tempeffect(mysrcChar, IObj, static_cast<SI08>(targNum), more1, more2, more3);
     return JS_TRUE;
 }
 

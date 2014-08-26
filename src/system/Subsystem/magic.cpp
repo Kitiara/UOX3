@@ -186,7 +186,7 @@ bool FieldSpell(CChar *caster, UI16 id, SI16 x, SI16 y, SI08 z, UI08 fieldDir)
 
 bool splClumsy(CChar *caster, CChar *target, CChar *src, SI08 curSpell)
 {
-    Effects->tempeffect(src, target, 3, caster->GetSkill(MAGERY)/100, 0, 0);
+    Effects->tempeffect(src, target, 3, caster->GetSkill(MAGERY)/100);
     return true;
 }
 
@@ -214,7 +214,7 @@ bool splCreateFood(CSocket *sock, CChar *caster, SI08 curSpell)
 bool splFeeblemind(CChar *caster, CChar *target, CChar *src, SI08 curSpell)
 {
     // Redundant - this spell is now handled in JS/MAGIC/level1targ.js
-    Effects->tempeffect(src, target, 4, caster->GetSkill(MAGERY)/100, 0, 0);
+    Effects->tempeffect(src, target, 4, caster->GetSkill(MAGERY)/100);
     return true;
 }
 
@@ -252,7 +252,7 @@ bool splMagicArrow(CChar *caster, CChar *target, CChar *src, SI08 curSpell)
 
 bool splNightSight(CChar *caster, CChar *target, CChar *src, SI08 curSpell)
 {
-    Effects->tempeffect(src, target, 2, 0, 0, 0);
+    Effects->tempeffect(src, target, 2);
     if (target->IsMurderer())
         criminal(caster);
     return true;
@@ -260,20 +260,20 @@ bool splNightSight(CChar *caster, CChar *target, CChar *src, SI08 curSpell)
 
 bool splReactiveArmor(CChar *caster, CChar *target, CChar *src, SI08 curSpell)
 {
-    Effects->tempeffect(src, target, 15, caster->GetSkill(MAGERY)/100, 0, 0);
+    Effects->tempeffect(src, target, 12, caster->GetSkill(MAGERY)/100);
     target->SetReactiveArmour(true);
     return true;
 }
 
 bool splWeaken(CChar *caster, CChar *target, CChar *src, SI08 curSpell)
 {
-    Effects->tempeffect(src, target, 5, caster->GetSkill(MAGERY)/100, 0, 0);
+    Effects->tempeffect(src, target, 5, caster->GetSkill(MAGERY)/100);
     return true;
 }
 
 bool splAgility(CChar *caster, CChar *target, CChar *src, SI08 curSpell)
 {
-    Effects->tempeffect(src, target, 6, caster->GetSkill(MAGERY)/100, 0, 0);
+    Effects->tempeffect(src, target, 6, caster->GetSkill(MAGERY)/100);
     if (target->IsMurderer())
         criminal(caster);
     return true;
@@ -281,7 +281,7 @@ bool splAgility(CChar *caster, CChar *target, CChar *src, SI08 curSpell)
 
 bool splCunning(CChar *caster, CChar *target, CChar *src, SI08 curSpell)
 {
-    Effects->tempeffect(src, target, 7, caster->GetSkill(MAGERY)/100, 0, 0);
+    Effects->tempeffect(src, target, 7, caster->GetSkill(MAGERY)/100);
     if (target->IsMurderer())
         criminal(caster);
     return true;
@@ -346,7 +346,7 @@ bool splMagicUntrap(CSocket *sock, CChar *caster, CItem *target, SI08 curSpell)
 
 bool splProtection(CChar *caster, CChar *target, CChar *src, SI08 curSpell)
 {
-    Effects->tempeffect(src, target, 21, caster->GetSkill(MAGERY)/10, 0, 0);
+    Effects->tempeffect(src, target, 16, caster->GetSkill(MAGERY)/10);
     if (target->IsMurderer())
         criminal(caster);
     return true;
@@ -354,7 +354,7 @@ bool splProtection(CChar *caster, CChar *target, CChar *src, SI08 curSpell)
 
 bool splStrength(CChar *caster, CChar *target, CChar *src, SI08 curSpell)
 {
-    Effects->tempeffect(src, target, 8, caster->GetSkill(MAGERY)/100, 0, 0);
+    Effects->tempeffect(src, target, 8, caster->GetSkill(MAGERY)/100);
     if (target->IsMurderer())
         criminal(caster);
     return true;
@@ -362,8 +362,8 @@ bool splStrength(CChar *caster, CChar *target, CChar *src, SI08 curSpell)
 
 bool splBless(CChar *caster, CChar *target, CChar *src, SI08 curSpell)
 {
-    int j = caster->GetSkill(MAGERY)/100;
-    Effects->tempeffect(src, target, 11, j, j, j);
+    UI16 j = caster->GetSkill(MAGERY)/100;
+    Effects->tempeffect(src, target, 10, j, j, j);
     if (target->IsMurderer())
         criminal(caster);
     return true;
@@ -541,7 +541,7 @@ void ArchProtectionStub(CChar *caster, CChar *target, SI08 curSpell, SI08 targCo
 {
     Magic->playSound(target, 26);
     Magic->doStaticEffect(target, 15); // protection
-    Effects->tempeffect(caster, target, 21, caster->GetSkill(MAGERY)/10, 0, 0);
+    Effects->tempeffect(caster, target, 16, caster->GetSkill(MAGERY)/10);
 }
 
 bool splArchProtection(CSocket *sock, CChar *caster, CChar *target, CChar *src, SI08 curSpell)
@@ -552,8 +552,8 @@ bool splArchProtection(CSocket *sock, CChar *caster, CChar *target, CChar *src, 
 
 bool splCurse(CChar *caster, CChar *target, CChar *src, SI08 curSpell)
 {
-    int j = caster->GetSkill(MAGERY) / 100;
-    Effects->tempeffect(caster, target, 12, j, j, j);
+    UI16 j = caster->GetSkill(MAGERY) / 100;
+    Effects->tempeffect(caster, target, 11, j, j, j);
     return true;
 }
 
@@ -749,7 +749,7 @@ bool splIncognito(CSocket *sock, CChar *caster, SI08 curSpell)
     //only refresh once
     caster->SendWornItems(sock);
     Effects->PlaySound(caster, 0x0203);
-    Effects->tempeffect(caster, caster, 19, 0, 0, 0);
+    Effects->tempeffect(caster, caster, 15);
     caster->IsIncognito(true);
     return true;
 }
@@ -793,7 +793,7 @@ bool splMindBlast(CChar *caster, CChar *target, CChar *src, SI08 curSpell)
 bool splParalyze(CChar *caster, CChar *target, CChar *src, SI08 curSpell)
 {
     if (!Magic->CheckResist(caster, target, 7))
-        Effects->tempeffect(caster, target, 1, 0, 0, 0);
+        Effects->tempeffect(caster, target, 1);
     return true;
 }
 
@@ -855,7 +855,7 @@ bool splExplosion(CChar *caster, CChar *target, CChar *src, SI08 curSpell)
     spellDamage = Magic->spells[curSpell].BaseDmg();
     spellDamage = CalcSpellDamageMod(caster, target, spellDamage, spellResisted);
 
-    Effects->tempeffect(src, target, 27, spellDamage, 0, 0);
+    Effects->tempeffect(src, target, 18, spellDamage);
     return true;
 }
 
@@ -917,16 +917,13 @@ void MassCurseStub(CChar *caster, CChar *target, SI08 curSpell, SI08 targCount)
         return; // Player Vendors can't be killed
     if (target->IsGM() || target->IsInvulnerable())
         return; // GMs/Invuls can't be killed
-    int j;
+
     if (target->IsNpc()) 
         Combat->AttackTarget(caster, target);
     Effects->PlayStaticAnimation(target, 0x374A, 0, 15);
     Effects->PlaySound(target, 0x01FC);
-    if (Magic->CheckResist(caster, target, 6))
-        j = caster->GetSkill(MAGERY)/200;
-    else 
-        j = caster->GetSkill(MAGERY)/75;
-    Effects->tempeffect(caster, target, 12, j, j, j);
+    UI16 more = caster->GetSkill(MAGERY) / (Magic->CheckResist(caster, target, 6) ? 200 : 75);
+    Effects->tempeffect(caster, target, 11, more, more, more);
 
 }
 
@@ -2151,7 +2148,7 @@ bool cMagic::HandleFieldEffects(CChar *mChar, CItem *fieldItem, UI16 id)
         }
         return true;
     }
-    else if (id >= 0x3967 && id <= 0x398A) // paralysis field
+    else if (id >= 0x3967 && id <= 0x398A) // paralyze field
     {
         caster = calcCharObjFromSer(fieldItem->GetTempVar(CITV_MOREY)); // store caster in morey
         if (mChar->IsInnocent())
@@ -2160,7 +2157,7 @@ bool cMagic::HandleFieldEffects(CChar *mChar, CItem *fieldItem, UI16 id)
 
         if (RandomNum(0, 2) == 1 && !CheckResist(NULL, mChar, 6))
         {
-            Effects->tempeffect(caster, mChar, 1, 0, 0, 0);
+            Effects->tempeffect(caster, mChar, 1);
             Effects->PlaySound(mChar, 520);
         }
         return true;
@@ -3274,15 +3271,13 @@ void cMagic::PolymorphMenu(CSocket *s, UI16 gmindex)
 
 void cMagic::Polymorph(CSocket *s, UI16 polyID)
 {
-    UI08 id1 = static_cast<UI08>(polyID>>8);
-    UI08 id2 = static_cast<UI08>(polyID%256);
     CChar *mChar = s->CurrcharObj();
 
     // store our original ID
     mChar->SetOrgID(mChar->GetID());
     Effects->PlaySound(mChar, 0x020F);
     // Temp effect will actually switch our body for us
-    Effects->tempeffect(mChar, mChar, 18, id1, id2, 0);
+    Effects->tempeffect(mChar, mChar, 14, static_cast<UI08>(polyID >> 8), static_cast<UI08>(polyID % 256));
     mChar->IsPolymorphed(true);
 }
 
