@@ -89,9 +89,9 @@ ObjectType FindObjTypeFromString(UString strToFind)
 // Effect related functions
 JSBool SE_DoTempEffect(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 {
-    if (argc < 7)
+    if (argc < 4)
     {
-        DoSEErrorMessage("DoTempEffect: Invalid number of arguments (takes 7 or 8)");
+        DoSEErrorMessage("DoTempEffect: Invalid number of arguments (takes 4 minimum)");
         return JS_FALSE;
     }
     UI08 iType = static_cast<UI08>(JSVAL_TO_INT(argv[0]));

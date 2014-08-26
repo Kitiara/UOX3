@@ -1898,7 +1898,7 @@ SI16 cScript::OnScrollCast(CChar *tChar, UI08 SpellID)
 {
     if (!ValidateObject(tChar))
         return -2;
-    
+
     if (!ExistAndVerify(seOnScrollCast, "onScrollCast"))
         return -2;
 
@@ -1915,7 +1915,7 @@ SI16 cScript::OnScrollCast(CChar *tChar, UI08 SpellID)
         SetEventExists(seOnScrollCast, false);
         return -2;
     }
-    
+
     return (SI16)JSVAL_TO_INT(rval);
 }
 
@@ -1923,7 +1923,7 @@ bool cScript::OnSpellSuccess(CChar *tChar, UI08 SpellID)
 {
     if (!ValidateObject(tChar))
         return false;
-    
+
     if (!ExistAndVerify(seOnSpellSuccess, "onSpellSuccess"))
         return false;
 
@@ -1937,7 +1937,7 @@ bool cScript::OnSpellSuccess(CChar *tChar, UI08 SpellID)
 
     if (retVal == JS_FALSE)
         SetEventExists(seOnSpellSuccess, false);
-    
+
     return (retVal == JS_TRUE);
 }
 
@@ -1945,14 +1945,14 @@ bool cScript::OnTalk(CChar *myChar, const char *mySpeech)
 {
     if (!ValidateObject(myChar))
         return true;
-    
+
     if (!ExistAndVerify(seOnTalk, "onTalk"))
         return true;
 
     jsval params[2], rval;
     
-    JSString *strSpeech    = NULL;
-    UString lwrSpeech    = mySpeech;
+    JSString *strSpeech = NULL;
+    UString lwrSpeech = mySpeech;
 
     strSpeech = JS_NewStringCopyZ(targContext, lwrSpeech.lower().c_str());
 

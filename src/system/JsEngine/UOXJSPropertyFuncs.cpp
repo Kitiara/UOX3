@@ -1612,7 +1612,7 @@ namespace UOX
 
         if (!ValidateObject(myChar))
             return JS_FALSE;
-        
+
         UI08 SkillID = (UI08)JSVAL_TO_INT(id);
 
         if (myClass.ClassName() == "UOXSkills")

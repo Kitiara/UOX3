@@ -1460,7 +1460,6 @@ JSBool CBase_KillTimers(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, j
     return JS_TRUE;
 }
 
-
 JSBool CBase_Delete(JSContext *cx, JSObject *obj, uintN argc, jsval *argv, jsval *rval)
 {
     CBaseObject *myObj = static_cast<CBaseObject*>(JS_GetPrivate(cx, obj));
