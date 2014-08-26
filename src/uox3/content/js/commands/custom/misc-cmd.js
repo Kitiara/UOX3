@@ -65,7 +65,7 @@ function command_BROWSE( pSock, execString )
 	if( execString != "" )
 		pSock.OpenURL( execString );
 	else
-		pUser.SysMessage( "That's not a valid URL." );
+		pSock.SysMessage( "That's not a valid URL." );
 }
 
 function command_INVUL( pSock, execString )
@@ -403,7 +403,6 @@ function onCallback12( pSock, myTarget )
 	else
 		pUser.SysMessage( "You must target either a character or a dynamic item." );
 }
-
 
 function command_LINKDOORS( pSock, execString )
 {
