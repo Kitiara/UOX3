@@ -487,7 +487,10 @@ function DispatchSpell( spellNum, mSpell, sourceChar, ourTarg, caster )
 		var spellResisted = CheckTargetResist( caster, ourTarg, mSpell.circle );
 		
 		//caster.TextMessage( "Casting feeblemind" );
-		DoTempEffect( 0, sourceChar, ourTarg, 4, (mMagery / 100) );	
+		var calc = Math.round(8 + (mChar.skills.evaluatingintel / 100) - (ourTarg.skills.magicresistance / 100));
+		if (calc < 0)
+			calc = 0;
+		DoTempEffect( 0, sourceChar, ourTarg, 4, calc );
 	}
 	else if( spellNum == 4 )	// Heal
 	{

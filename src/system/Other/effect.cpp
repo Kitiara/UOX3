@@ -703,7 +703,7 @@ void cEffects::tempeffect(CChar *source, CChar *dest, UI08 num, UI16 more1, UI16
             toAdd->ExpireTime(BuildTimeValue((R32)source->GetSkill(MAGERY) / 2.0f));
             toAdd->Dispellable(true);
             break;
-        case 3:
+        case 3: // Clumsy
         {
             if (dest->GetDexterity() < more[0])
                 more[0] = dest->GetDexterity();
@@ -716,17 +716,19 @@ void cEffects::tempeffect(CChar *source, CChar *dest, UI08 num, UI16 more1, UI16
             toAdd->Dispellable(true);
             break;
         }
-        case 4:
+        case 4: // Feeblemind
+        {
             if (dest->GetIntelligence() < more[0])
                 more[0] = dest->GetIntelligence();
             dest->IncIntelligence2(-more[0]);
             dest->SetMana(UOX_MIN(dest->GetMana(), dest->GetMaxMana()));
+            R32 duration = (R32)((source->GetSkill(EVALUATINGINTEL) / 5) + 1) * 6;
             if (Magic->CheckResist(source, dest, 1)) // Halve effect-timer on resist
-                toAdd->ExpireTime(BuildTimeValue((R32)source->GetSkill(MAGERY) / 20.0f));
-            else
-                toAdd->ExpireTime(BuildTimeValue((R32)source->GetSkill(MAGERY) / 10.0f));
+                duration /= 2;
+            toAdd->ExpireTime(BuildTimeValue(duration));
             toAdd->Dispellable(true);
             break;
+        }
         case 5:
             if (dest->GetStrength() < more[0])
                 more[0] = dest->GetStrength();
