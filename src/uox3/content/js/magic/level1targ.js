@@ -478,6 +478,11 @@ function MagicDamage( p, amount, attacker, mSock, element )
 	}
 }
 
+function GenerateRandomInt(min, max)
+{
+    return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
 function DispatchSpell( spellNum, mSpell, sourceChar, ourTarg, caster )
 {
 	var mMagery = caster.skills.magery;
@@ -490,30 +495,24 @@ function DispatchSpell( spellNum, mSpell, sourceChar, ourTarg, caster )
 		var calc = Math.round(8 + (mChar.skills.evaluatingintel / 100) - (ourTarg.skills.magicresistance / 100));
 		if (calc < 0)
 			calc = 0;
-		DoTempEffect( 0, sourceChar, ourTarg, 4, calc );
+		DoTempEffect( 0, sourceChar, ourTarg, 4, calc );	
 	}
 	else if( spellNum == 4 )	// Heal
 	{
-		var baseHealing = Math.round( RandomNumber( mSpell.baseDmg / 2, mSpell.baseDmg ));
-		
+		var baseHealing = mSpell.baseDmg;
+		var Bonus = [ 7, 5 ]; // Maximum bonus for minHeal & Maximum bonus for maxHeal
+		var minHeal = baseHealing + (Bonus[0] * mMagery / 1000);
+		var maxHeal = minHeal + (Bonus[1] * mMagery / 1000);
+
+		var heal = GenerateRandomInt(Math.floor(minHeal), Math.round(maxHeal));
 		//caster.TextMessage( "Casting Heal" );
-		var bonus = (mMagery/500) + (mMagery/100);
-		//caster.TextMessage( "Healing bonus " + bonus );
 		//caster.TextMessage( "Old health " + ourTarg.health );
-		if( bonus != 0 )
-		{
-			var rAdd = baseHealing + bonus;
-			//caster.TextMessage( "Adding " + rAdd + " health!" );
-			ourTarg.health += rAdd;
-		}
-		else
-		{
-			//caster.TextMessage( "Adding 4 health!" );
-			ourTarg.health += baseHealing;
-		}
+
+		ourTarg.health += heal;
+		
 		//caster.TextMessage( "New health " + ourTarg.health );
 		//caster.TextMessage( "Subtracting health" );
-		//SubtractHealth( caster, bonus / 2, 4 );
+		//SubtractHealth( caster, heal - baseHealing, 4 );
 		if( ourTarg.murderer )
 			caster.criminal = true;
 	}
@@ -566,7 +565,7 @@ function CheckTargetResist( caster, ourTarg, circle )
 function CalcSpellDamage( caster, ourTarg, baseDamage, spellResisted )
 {
 	baseDamage = RandomNumber( baseDamage / 2, baseDamage );
-	caster.TextMessage( "BOOM" );
+	//caster.TextMessage( "BOOM" );
 	if( spellResisted )
 		baseDamage = baseDamage / 2;
 		

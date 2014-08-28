@@ -228,17 +228,18 @@ bool splFeeblemind(CChar *caster, CChar *target, CChar *src, SI08 curSpell)
 bool splHeal(CChar *caster, CChar *target, CChar *src, SI08 curSpell)
 {
     // Redundant - this spell is now handled in JS/MAGIC/level1targ.js
-    SI16 baseHealing = HalfRandomNum(Magic->spells[curSpell].BaseDmg());
+    SI16 baseHealing = Magic->spells[curSpell].BaseDmg();
+    SI16 Bonus[2] = { 7, 5 }; // Maximum bonus for minHeal & Maximum bonus for maxHeal
+    R32 minHeal = baseHealing + (Bonus[0] * caster->GetSkill(MAGERY) / 1000);
+    R32 maxHeal = minHeal + (Bonus[1] * caster->GetSkill(MAGERY) / 1000);
 
-    int bonus = (caster->GetSkill(MAGERY)/500) + (caster->GetSkill(MAGERY)/100);
-    if (bonus != 0)
-    {
-        baseHealing += bonus;
-        target->Heal(baseHealing, caster);
-    }
-    else
-        target->Heal(baseHealing);
-    Magic->SubtractHealth(caster, bonus, Magic->spells[curSpell].Health());
+    SI16 range = round(maxHeal) - floor(minHeal);
+    srand(time(NULL));
+    SI16 heal = floor(minHeal) + rand() % (range + 1);
+
+    target->Heal(heal, caster->GetSkill(MAGERY) != 0 ? caster : NULL);
+    Magic->SubtractHealth(caster, heal - baseHealing, Magic->spells[curSpell].Health());
+
     if (target->IsMurderer())
         criminal(caster);
     return true;
