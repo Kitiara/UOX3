@@ -275,7 +275,10 @@ bool splReactiveArmor(CChar *caster, CChar *target, CChar *src, SI08 curSpell)
 
 bool splWeaken(CChar *caster, CChar *target, CChar *src, SI08 curSpell)
 {
-    Effects->tempeffect(src, target, 5, caster->GetSkill(MAGERY)/100);
+    int calc = round(8 + (caster->GetSkill(EVALUATINGINTEL) / 100) - (target->GetSkill(MAGICRESISTANCE) / 100));
+    if (calc < 0)
+        calc = 0;
+    Effects->tempeffect(src, target, 5, calc);
     return true;
 }
 
