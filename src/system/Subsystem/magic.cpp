@@ -198,7 +198,7 @@ bool splCreateFood(CSocket *sock, CChar *caster, SI08 curSpell)
 {
     UI16 foods[10];
     foods[0] = 2512; // Apple
-    foods[1] = 2519; // Cooked Bird
+    foods[1] = 2487; // Cooked Bird
     foods[2] = 2546; // Cut of Ribs
     foods[3] = 2427; // Fish Steak
     foods[4] = 2513; // Grape Bunch
