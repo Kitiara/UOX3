@@ -729,15 +729,15 @@ void cEffects::tempeffect(CChar *source, CChar *dest, UI08 num, UI16 more1, UI16
             toAdd->Dispellable(true);
             break;
         }
-        case 5:
+        case 5: // Weaken
             if (dest->GetStrength() < more[0])
                 more[0] = dest->GetStrength();
             dest->IncStrength2(-more[0]);
             dest->SetHP(UOX_MIN(dest->GetHP(), static_cast<SI16>(dest->GetMaxHP())));
-            if (Magic->CheckResist(source, dest, 4)) // Halve effect-timer on resist
-                toAdd->ExpireTime(BuildTimeValue((R32)source->GetSkill(MAGERY) / 20.0f));
-            else
-                toAdd->ExpireTime(BuildTimeValue((R32)source->GetSkill(MAGERY) / 10.0f));
+            R32 duration = (R32)((source->GetSkill(EVALUATINGINTEL) / 5) + 1) * 6;
+            if (Magic->CheckResist(source, dest, 1)) // Halve effect-timer on resist
+                duration /= 2;
+            toAdd->ExpireTime(BuildTimeValue(duration));
             toAdd->Dispellable(true);
             break;
         case 6:
