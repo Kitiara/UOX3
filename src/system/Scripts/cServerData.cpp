@@ -2002,38 +2002,6 @@ void CServerData::LoadTime(void)
     }
 }
 
-void CServerData::LoadTimeTags(std::ifstream &input)
-{
-    UString UTag, tag, data;
-    while (tag != "o---o")
-    {
-        ReadWorldTagData(input, tag, data);
-        if (tag != "o---o")
-        {
-            UTag = tag.upper();
-            if (UTag == "AMPM")
-                ServerTimeAMPM((data.toByte() == 1));
-            else if (UTag == "CURRENTLIGHT")
-                WorldLightCurrentLevel(data.toUShort());
-            else if (UTag == "DAY")
-                ServerTimeDay(data.toShort());
-            else if (UTag == "HOUR")
-                ServerTimeHours(data.toUShort());
-            else if (UTag == "MINUTE")
-                ServerTimeMinutes(data.toUShort());
-            else if (UTag == "MOON")
-            {
-                if (data.sectionCount(",") != 0)
-                {
-                    ServerMoon(0, data.section(",", 0, 0).stripWhiteSpace().toShort());
-                    ServerMoon(1, data.section(",", 1, 1).stripWhiteSpace().toShort());
-                }
-            }
-        }
-    }
-    tag = "";
-}
-
 SI16 CServerData::ServerTimeDay(void) const
 {
     return days;

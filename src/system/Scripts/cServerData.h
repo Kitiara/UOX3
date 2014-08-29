@@ -653,8 +653,6 @@ public:
     void SaveTime(void);
     void LoadTime(void);
 
-    void LoadTimeTags(std::ifstream &input);
-
     // These functions return TRUE if it's a new day
     bool incSecond(void);
     bool incMinute(void);
