@@ -2125,8 +2125,8 @@ bool CServerData::incHour(void)
     {
         if (ampm)
             retVal = incDay();
-        hours    = 0;
-        ampm    = !ampm;
+        hours = 0;
+        ampm = !ampm;
     }
     return retVal;
 }

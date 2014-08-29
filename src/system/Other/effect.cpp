@@ -695,14 +695,15 @@ void cEffects::tempeffect(CChar *source, CChar *dest, UI08 num, UI16 more1, UI16
             toAdd->ExpireTime(BuildTimeValue((R32)source->GetSkill(MAGERY) / 100.0f));
             toAdd->Dispellable(true);
             break;
-        case 2:
-            SI16 worldbrightlevel;
-            worldbrightlevel = cwmWorldState->ServerData()->WorldLightBrightLevel();
+        case 2: // Night Sight
+        {
+            SI16 worldbrightlevel = cwmWorldState->ServerData()->WorldLightBrightLevel();
             dest->SetFixedLight(static_cast<UI08>(worldbrightlevel));
             doLight(tSock, static_cast<char>(worldbrightlevel));
             toAdd->ExpireTime(BuildTimeValue((R32)source->GetSkill(MAGERY) / 2.0f));
             toAdd->Dispellable(true);
             break;
+        }
         case 3: // Clumsy
         {
             if (dest->GetDexterity() < more[0])
@@ -730,6 +731,7 @@ void cEffects::tempeffect(CChar *source, CChar *dest, UI08 num, UI16 more1, UI16
             break;
         }
         case 5: // Weaken
+        {
             if (dest->GetStrength() < more[0])
                 more[0] = dest->GetStrength();
             dest->IncStrength2(-more[0]);
@@ -740,6 +742,7 @@ void cEffects::tempeffect(CChar *source, CChar *dest, UI08 num, UI16 more1, UI16
             toAdd->ExpireTime(BuildTimeValue(duration));
             toAdd->Dispellable(true);
             break;
+        }
         case 6:
             dest->IncDexterity(more[0]);
             toAdd->ExpireTime(BuildTimeValue((R32)source->GetSkill(MAGERY) / 10.0f));
